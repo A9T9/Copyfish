@@ -1,0 +1,151 @@
+﻿<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="styles/material.min.css" />
+    <link href="styles/options.css" rel="stylesheet">
+    <title>Copyfish Options</title>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Copyfish Options</h1>
+      <div class="inner-wrapper">
+        <div class="mdl-grid options-container input-language">
+          <div class="mdl-cell mdl-cell--5-col label">
+            <label>Input Language (OCR Language)</label>
+          </div>
+          <div class="mdl-cell mdl-cell--7-col">
+            <select id="input-lang" name="inputlang">
+              <option value="ce">Czech</option>
+              <option value="chs">ChineseSimplified</option>
+              <option value="cht">ChineseTraditional</option>
+              <option value="dan">Danish</option>
+              <option value="dut">Dutch</option>
+              <option value="eng">English</option>
+              <option value="fin">Finnish</option>
+              <option value="fre">French</option>
+              <option value="ger">German</option>
+              <option value="gre">Greek</option>
+              <option value="hun">Hungarian</option>
+              <option value="ita">Italian</option>
+              <option value="jpn">Japanese</option>
+              <option value="kor">Korean</option>
+              <option value="nor">Norwegian</option>
+              <option value="pol">Polish</option>
+              <option value="por">Portuguese</option>
+              <option value="rus">Russian</option>
+              <option value="spa">Spanish</option>
+              <option value="swe">Swedish</option>
+              <option value="tur">Turkish</option>
+            </select>
+          </div>
+        </div>
+        <div class="mdl-grid options-container translate-options">
+          <div class="mdl-cell mdl-cell--5-col label">
+            <label>Translate to</label>
+          </div>
+          <div class="mdl-cell mdl-cell--7-col">
+            <select id="output-lang" name="outputlang">
+              <option value="af">Afrikaans</option>
+              <option value="sq">Albanian</option>
+              <option value="ar">Arabian</option>
+              <option value="hy">Armenian</option>
+              <option value="az">Azeri</option>
+              <option value="eu">Basque</option>
+              <option value="be">Belarusian</option>
+              <option value="bs">Bosnian</option>
+              <option value="bg">Bulgarian</option>
+              <option value="ca">Catalan</option>
+              <option value="hr">Croatian</option>
+              <option value="cs">Czech</option>
+              <option value="zh">Chinese</option>
+              <option value="da">Danish</option>
+              <option value="nl">Dutch</option>
+              <option value="en">English</option>
+              <option value="et">Estonian</option>
+              <option value="fi">Finnish</option>
+              <option value="fr">French</option>
+              <option value="gl">Galician</option>
+              <option value="ka">Georgian</option>
+              <option value="de">German</option>
+              <option value="el">Greek</option>
+              <option value="ht">Haitian (Creole)</option>
+              <option value="he">Hebrew</option>
+              <option value="hu">Hungarian</option>
+              <option value="is">Icelandic</option>
+              <option value="id">Indonesian</option>
+              <option value="ga">Irish</option>
+              <option value="it">Italian</option>
+              <option value="ja">Japanese</option>
+              <option value="kk">Kazakh</option>
+              <option value="ko">Korean</option>
+              <option value="ky">Kyrgyz</option>
+              <option value="la">Latin</option>
+              <option value="lv">Latvian</option>
+              <option value="lt">Lithuanian</option>
+              <option value="mk">Macedonian</option>
+              <option value="mg">Malagasy</option>
+              <option value="ms">Malay</option>
+              <option value="mt">Maltese</option>
+              <option value="mn">Mongolian</option>
+              <option value="no">Norwegian</option>
+              <option value="fa">Persian</option>
+              <option value="pl">Polish</option>
+              <option value="pt">Portuguese</option>
+              <option value="ro">Romanian</option>
+              <option value="ru">Russian</option>
+              <option value="es">Spanish</option>
+              <option value="sr">Serbian</option>
+              <option value="sk">Slovak</option>
+              <option value="sl">Slovenian</option>
+              <option value="sw">Swahili</option>
+              <option value="sv">Swedish</option>
+              <option value="tl">Tagalog</option>
+              <option value="tg">Tajik</option>
+              <option value="tt">Tatar</option>
+              <option value="th">Thai</option>
+              <option value="tr">Turkish</option>
+              <option value="uz">Uzbek</option>
+              <option value="uk">Ukrainian</option>
+              <option value="vi">Vietnamese</option>
+              <option value="cy">Welsh</option>
+            </select>
+          </div>
+        </div>
+        <div class="mdl-grid options-container translate-options">
+          <div class="mdl-cell mdl-cell--5-col label">
+            <label>Process on Capture</label>
+          </div>
+          <div class="mdl-cell mdl-cell--7-col">
+            <label title="Automatically process text after capture" class="mdl-switch mdl-js-switch mdl-js-ripple-effect auto-process" for="switch-auto-process">
+              <input type="checkbox" id="switch-auto-process" class="mdl-switch__input" checked  />
+              <span class="mdl-switch__label"></span>
+            </label>
+          </div>
+        </div>
+        <div class="mdl-grid options-container translate-options">
+          <div class="mdl-cell mdl-cell--5-col label">
+            <label title="Automatically translate text after OCR processing">Translate after OCR</label>
+          </div>
+          <div class="mdl-cell mdl-cell--7-col">
+            <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect auto-translate" for="switch-auto-translate">
+              <input type="checkbox" id="switch-auto-translate" class="mdl-switch__input" checked  />
+              <span class="mdl-switch__label"></span>
+            </label>
+          </div>
+        </div>
+        <div class="mdl-grid options-container buttons">
+          <div class="mdl-cell mdl-cell--5-col label"></div>
+          <div class="mdl-cell mdl-cell--7-col">
+            <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent btn btn-reset" title="Reset">Reset</button>
+            <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent btn btn-save" title="Save">Save</button>
+          </div>
+        </div>
+        <div class="status-text">Settings saved successfully.</div>
+      </div>
+    </div>
+    <script src="scripts/jquery.min.js"></script>
+    <script src="scripts/material.min.js"></script>
+    <script src="scripts/options.js"></script>
+  </body>
+</html>

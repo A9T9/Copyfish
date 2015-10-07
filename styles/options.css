@@ -1,0 +1,69 @@
+/*right*/
+body {
+  font-size: 16px;
+  color: #757575;
+}
+.container {
+  width: 960px;
+  margin: 0 auto;
+  padding: 20px;
+  box-sizing: border-box;
+}
+.container h1 {
+  text-align: center;
+  margin-bottom: 10px;
+  padding-bottom: 20px;
+  border-bottom: 4px solid #2196f3;
+}
+.container .inner-wrapper {
+  margin: 40px 0 0 0;
+}
+.container .inner-wrapper .options-container {
+  margin-top: 25px;
+}
+.container .inner-wrapper .options-container:nth-child(1) {
+  margin-top: 0px;
+}
+.container .inner-wrapper .label {
+  padding: 8px 20px 0 0;
+  text-align: right;
+}
+.container .inner-wrapper select {
+  width: 400px;
+  padding: 8px 4px;
+  font-size: 16px;
+}
+.container .inner-wrapper label.auto-process,
+.container .inner-wrapper label.auto-translate {
+  margin-top: 5px;
+}
+.container .inner-wrapper .btn {
+  padding: 0 20px;
+}
+.container .inner-wrapper .btn:nth-child(2) {
+  margin-left: 15px;
+}
+.container .inner-wrapper .status-text {
+  color: #2196f3;
+  width: 100%;
+  text-align: center;
+  transition: opacity 0.6s;
+  opacity: 0;
+  padding-left: 45px;
+  margin-top: 30px;
+  font-size: 18px;
+}
+.container .inner-wrapper .status-text.visible {
+  opacity: 1;
+}
+@media screen and (max-width: 959px) {
+  .container {
+    width: 100%;
+  }
+  .container .inner-wrapper .label {
+    text-align: left;
+  }
+  .container .inner-wrapper select {
+    width: 90%;
+  }
+}

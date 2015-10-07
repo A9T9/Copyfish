@@ -1,0 +1,56 @@
+{
+  "name": "__MSG_appName__",
+  "version": "0.8.3",
+  "manifest_version": 2,
+  "description": "__MSG_appDescription__",
+  "icons": {
+    "16": "images/icon-16.png",
+    "19": "images/icon-19.png",
+    "38": "images/icon-38.png",
+    "128": "images/icon-128.png"
+  },
+  "default_locale": "en",
+  "background": {
+    "scripts": [
+      "scripts/chromereload.js",
+      "scripts/background.js"
+    ]
+  },
+  "options_page": "options.html",
+  "web_accessible_resources": [
+    "dialog.html",
+    "config/config.json",
+    "images/gear.png"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ],
+      "css": [
+        "styles/material.min.css",
+        "styles/cs.css"
+      ],
+      "js": [
+        "scripts/jquery.min.js",
+        "scripts/material.min.js",
+        "scripts/cs.js"
+      ]
+    }
+  ],
+  "browser_action": {
+    "default_icon": {
+      "19": "images/icon-19.png",
+      "38": "images/icon-38.png"
+    },
+    "default_title": "__MSG_appName__"
+  },
+  "permissions": [
+    "tabs",
+    "activeTab",
+    "storage",
+    "http://*/*",
+    "https://*/*"
+  ]
+}

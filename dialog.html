@@ -1,0 +1,40 @@
+<div class="ocrext-wrapper">
+  <header class="ocrext-header">
+    <span class="ocrext-title mdl-layout-title">Copyfish<a class="ocrext-settings-link icon-action-white icon-action-white-ic_settings_white_24dp"></a></span>
+
+  </header>
+  <div class="ocrext-content clearfix">
+    <div class="ocrext-canvas-container">
+      <canvas id="ocrext-can" width=480 height=320></canvas>
+    </div>
+    <div class="ocrext-ocr-output">
+      <div class="ocrext-spinner-wrapper">
+        <div class="mdl-spinner mdl-js-spinner ocrext-spinner"></div>
+      </div>
+      <p class="ocrext-status"></p>
+      <div class="mdl-grid">
+        <div class="mdl-cell mdl-cell--2-col">
+          <h5 class="ocrext-label ocrext-message">OCR Result<span></span></h5> 
+        </div>
+        <div class="mdl-cell mdl-cell--10-col">
+          <p class="ocrext-ocr-message ocrext-result">N/A</p>
+        </div>
+      </div>
+      <div class="mdl-grid">
+        <div class="mdl-cell mdl-cell--2-col">
+          <h5 class="ocrext-label ocrext-translated">Translated<span></span></h5>
+        </div>
+        <div class="mdl-cell mdl-cell--10-col">
+          <p class="ocrext-ocr-translated ocrext-result">N/A</p>
+        </div>
+      </div>
+      
+    </div>
+    <div class="ocrext-btn-container">
+      <button class="ocrext-ocr-sendocr ocrext-btn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" title="Redo OCR">Redo OCR</button>
+      <button class="ocrext-ocr-recapture ocrext-btn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" title="Recapture">Recapture</button>
+      <button class="ocrext-ocr-copy ocrext-btn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" title="Copy to clipboard">Copy to clipboard</button>
+      <button class="ocrext-ocr-close ocrext-btn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" title="Close">Close</button>
+    </div>
+  </div>
+</div>

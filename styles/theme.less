@@ -1,0 +1,122 @@
+
+@primary:rgb(33, 150, 243);
+@accent:rgb(255, 82, 82);
+@white:#fff;
+@orange:#FF5722;
+@black:rgb(117, 117, 117);
+@success:#8BC34A;
+@error:#d9534f;
+@progress:#03A9F4;
+
+@fontColor:rgb(117, 117, 117);
+@bg:@white;
+@wrapper-bg:@white;
+@wrapper-border:#8C8C8C;
+
+@fontFamily:'Roboto',Helvetica, Arial, serif;
+@fontSize:16px;
+@title-font-size:20px;
+@result-font-size: 16px;
+@result-line-height:22px;
+
+@selector-border-width:3px;
+@selector-border-color:@orange;
+@selector-border-radius:5px;
+
+@wrapper-min-width:640px;
+@wrapper-max-width:1020px;
+@wrapper-min-height:200px;
+@wrapper-width:65%;
+@wrapper-right:5%;
+@border-radius:10px;
+
+
+@header-border-radius:@border-radius @border-radius 0 0;
+@header-padding:15px 20px;
+
+@canvas-min-width:430px;
+@canvas-max-height:200px;
+
+@output-max-height: 200px;
+@output-min-height: 200px;
+@output-height:200px;
+
+@main-spinner-dim:80px;
+
+/*right*/
+.wrapper-position(){
+  right:2%;
+  width: 65%;
+}
+
+.btn() {
+	display: inline-block;
+  padding: 6px 12px;
+  margin-bottom: 0;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.42857143;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  -ms-touch-action: manipulation;
+  touch-action: manipulation;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  background-image: none;
+  border: 1px solid rgba(0, 0, 0, 0);
+  border-radius: 4px;
+}
+
+.label(){
+  display: block;
+  max-width: 40%;
+  padding: .4em .6em .3em;
+  font-size: 75%;
+  font-weight: 700;
+  line-height: 1;
+  color: #fff;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: .25em;
+}
+
+.box-shadow() {
+  box-shadow: 0 2px 2px 0 rgba(0,0,0,.14),
+              0 3px 1px -2px rgba(0,0,0,.2),
+              0 1px 5px 0 rgba(0,0,0,.12);
+  -webkit-box-shadow: 0 2px 2px 0 rgba(0,0,0,.14),
+  0 3px 1px -2px rgba(0,0,0,.2),
+  0 1px 5px 0 rgba(0,0,0,.12);
+}
+
+.transition-bottom(){
+  transition:bottom 0.3s;
+  -webkit-transition:bottom 0.3s;
+}
+
+.transition-height(){
+  transition:height 0.25 ease;
+  -webkit-transition:height 0.25s ease;
+}
+
+.transition-opacity(@duration:0.25s){
+  transition:opacity 0.25 ease;
+  -webkit-transition:opacity 0.25s ease;
+}
+
+.transition-all(){
+  transition:all 0.25 ease;
+  -webkit-transition:all 0.25s ease;
+}
+
+.ellipsis(){;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  word-wrap: normal;
+}
