@@ -1,4 +1,3 @@
-@import 'reset.less';
 @import 'theme.less';
 .ocrext-ch {
   cursor:crosshair;
@@ -11,6 +10,21 @@
     opacity: 0;
     .transition-opacity();
     cursor: crosshair;
+    transform:none;
+    min-height: initial;
+    min-width: intial;
+    max-width: 100%;
+    max-height: 100%;
+    p.ocrext-element {
+      font-size: 54px;
+      top:25%;
+      color:#000;
+      text-align: center;
+      transform:scale(0,0);
+      .transition-all();
+      position: relative;
+      /*text-shadow: 5px 3px 5px #DECECE;*/
+    }
   }
 	.ocrext-selector {
 		background: none;
@@ -20,6 +34,22 @@
 	}
 }
 
+.ocrext-element {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+  font:inherit;
+  line-height: normal;
+  text-decoration: none;
+  text-transform: none;
+  color: @fontColor;
+  font-family: @fontFamily;
+  font-size: @fontSize;
+  font-variant: normal;
+}
 .ocrext-wrapper {
   background: @bg;
   border:none;
@@ -29,12 +59,36 @@
   display:none;
   font-family: @fontFamily;
   font-size: @fontSize;
+  font-weight: normal;
+  font-variant: normal;
   .wrapper-position();
   max-width: @wrapper-max-width;
   min-height: @wrapper-min-height;
   min-width: @wrapper-min-width;
   position:fixed;
-  .transition-bottom();
+  /*.transition-bottom();*/
+  .transition-all();
+  * {
+    font: inherit;
+    line-height: normal;
+    color: inherit;
+    text-transform: none;
+  }
+
+  .ocrext-clearfix:after {
+    visibility: hidden;
+    display: block;
+    font-size: 0;
+    content: " ";
+    clear: both;
+    height: 0;
+  }
+  .ocrext-clearfix { display: inline-block; }
+
+  /* start commented backslash hack \*/
+  * html .ocrext-clearfix { height: 1%; }
+  .ocrext-clearfix { display: block; }
+  /* close commented backslash hack */
 
   /*Header*/
   header.ocrext-header {
@@ -45,20 +99,28 @@
     top: 0;
     height: auto;
     padding: 0;
+    margin: 0;
+    min-width: initial;
+    min-height:45px; 
+    height:45px;
+    box-sizing:border-box;
+    overflow: hidden;
     .box-shadow();
     cursor:pointer;
     .ocrext-title {
       color: @white;
       text-align: left;
-      padding: @header-padding; 
+      /*padding: @header-padding; */
       border-radius:@header-border-radius;
       font-weight: bold;
       font-size: @title-font-size;
       padding: 15px 0 8px 15px;
+      margin: 0;
       .ocrext-settings-link {
         display: inline-block;
         float: right;
         margin: -4px 25px 0 0;
+        padding: 0;
         height: 24px;
         width:24px;
         background: url('chrome-extension://__MSG_@@extension_id__/images/gear.png');
@@ -72,7 +134,7 @@
 
     /*Canvas container*/
     .ocrext-canvas-container {
-      margin:5px auto 15px auto;
+      margin:5px auto 10px auto;
       min-width: @canvas-min-width;
       max-height: @canvas-max-height;
       width: 100%;
@@ -97,6 +159,7 @@
       position: relative;
       .transition-height();
       .ocrext-status {
+        text-align: center;
         padding: 0 10px;
         margin: 0 7px 5px 0;
         height: 0px;
@@ -134,17 +197,25 @@
         margin:10px 0 0 0;
         text-align: left;
       } */
-      .mdl-grid {
+      .ocrext-grid {
         padding: 0 8px;
+        box-sizing:border-box;
         &:last-child{
           margin:14px auto 0 auto;
         }
       }
-      .mdl-cell {
+      .ocrext-cell {
+        float: left;
         margin: 0;
         /* &:nth-child(2) {
           margin-left: 25px;
         } */
+        &.ocrext-cell-small {
+          width:20%;
+        }
+        &.ocrext-cell-large{
+          width: 80%;
+        }
       }
       h5.ocrext-label {
         /*margin:0 0 5px 0;*/
@@ -153,7 +224,11 @@
         font-weight: bold;
         font-size: 16px;
         word-wrap: break-word;
+        text-align: center;
         span {
+          font:inherit;
+          font-size: 14px;
+          line-height: 1.5;
           display: inline-block;
           width: 100%;
           padding: 2px 2px 0 0;
@@ -164,7 +239,7 @@
       p.ocrext-result {
         /*margin:10px 0 15px 0;*/
         box-sizing:border-box;
-        padding: 3px 0 0 15px;
+        padding: 5px 0 0 15px;
         height: 85px;
         overflow-y: auto;
         -webkit-user-select:text;
@@ -197,7 +272,8 @@
     /*Output Error*/
     &.ocrext-error {
       .ocrext-ocr-output {
-        .ocrext-ocr-message {
+        .ocrext-ocr-message,
+        .ocrext-message {
           color: @error;
         }
       }
@@ -241,7 +317,7 @@
         }
       } 
       .ocrext-btn-container {
-        float: none;
+        /*float: none;*/
         button.ocrext-btn {
           margin-right:10px;
           padding: 0 8px;

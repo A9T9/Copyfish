@@ -1,131 +1,3 @@
-/* http://meyerweb.com/eric/tools/css/reset/ 
-   v2.0 | 20110126
-   License: none (public domain)
-*/
-html,
-body,
-div,
-span,
-applet,
-object,
-iframe,
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-p,
-blockquote,
-pre,
-a,
-abbr,
-acronym,
-address,
-big,
-cite,
-code,
-del,
-dfn,
-em,
-img,
-ins,
-kbd,
-q,
-s,
-samp,
-small,
-strike,
-strong,
-sub,
-sup,
-tt,
-var,
-b,
-u,
-i,
-center,
-dl,
-dt,
-dd,
-ol,
-ul,
-li,
-fieldset,
-form,
-label,
-legend,
-table,
-caption,
-tbody,
-tfoot,
-thead,
-tr,
-th,
-td,
-article,
-aside,
-canvas,
-details,
-embed,
-figure,
-figcaption,
-footer,
-header,
-hgroup,
-menu,
-nav,
-output,
-ruby,
-section,
-summary,
-time,
-mark,
-audio,
-video {
-  margin: 0;
-  padding: 0;
-  border: 0;
-  font-size: 100%;
-  font: inherit;
-  vertical-align: baseline;
-}
-/* HTML5 display-role reset for older browsers */
-article,
-aside,
-details,
-figcaption,
-figure,
-footer,
-header,
-hgroup,
-menu,
-nav,
-section {
-  display: block;
-}
-body {
-  line-height: 1;
-}
-ol,
-ul {
-  list-style: none;
-}
-blockquote,
-q {
-  quotes: none;
-}
-blockquote:before,
-blockquote:after,
-q:before,
-q:after {
-  content: '';
-  content: none;
-}
-table {
-  border-collapse: collapse;
-  border-spacing: 0;
-}
 /*right*/
 .ocrext-ch {
   cursor: crosshair;
@@ -140,12 +12,43 @@ table {
   transition: opacity 0.25 ease;
   -webkit-transition: opacity 0.25s ease;
   cursor: crosshair;
+  transform: none;
+  min-height: initial;
+  min-width: intial;
+  max-width: 100%;
+  max-height: 100%;
+}
+.ocrext-overlay .ocrext-mask p.ocrext-element {
+  font-size: 54px;
+  top: 25%;
+  color: #000;
+  text-align: center;
+  transform: scale(0, 0);
+  transition: all 0.25 ease;
+  -webkit-transition: all 0.25s ease;
+  position: relative;
+  /*text-shadow: 5px 3px 5px #DECECE;*/
 }
 .ocrext-overlay .ocrext-selector {
   background: none;
   position: absolute;
   border: 3px solid #ff5722;
   border-radius: 5px;
+}
+.ocrext-element {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  vertical-align: baseline;
+  font: inherit;
+  line-height: normal;
+  text-decoration: none;
+  text-transform: none;
+  color: #757575;
+  font-family: 'Roboto', Helvetica, Arial, serif;
+  font-size: 16px;
+  font-variant: normal;
 }
 .ocrext-wrapper {
   background: #ffffff;
@@ -157,17 +60,45 @@ table {
   display: none;
   font-family: 'Roboto', Helvetica, Arial, serif;
   font-size: 16px;
+  font-weight: normal;
+  font-variant: normal;
   right: 2%;
   width: 65%;
   max-width: 1020px;
   min-height: 200px;
-  min-width: 640px;
+  min-width: 680px;
   position: fixed;
-  transition: bottom 0.3s;
-  -webkit-transition: bottom 0.3s;
+  /*.transition-bottom();*/
+  transition: all 0.25 ease;
+  -webkit-transition: all 0.25s ease;
+  /* start commented backslash hack \*/
+  /* close commented backslash hack */
   /*Header*/
   /*Content*/
   /* Minimized State*/
+}
+.ocrext-wrapper * {
+  font: inherit;
+  line-height: normal;
+  color: inherit;
+  text-transform: none;
+}
+.ocrext-wrapper .ocrext-clearfix:after {
+  visibility: hidden;
+  display: block;
+  font-size: 0;
+  content: " ";
+  clear: both;
+  height: 0;
+}
+.ocrext-wrapper .ocrext-clearfix {
+  display: inline-block;
+}
+.ocrext-wrapper * html .ocrext-clearfix {
+  height: 1%;
+}
+.ocrext-wrapper .ocrext-clearfix {
+  display: block;
 }
 .ocrext-wrapper header.ocrext-header {
   background: #2196f3;
@@ -177,6 +108,12 @@ table {
   top: 0;
   height: auto;
   padding: 0;
+  margin: 0;
+  min-width: initial;
+  min-height: 45px;
+  height: 45px;
+  box-sizing: border-box;
+  overflow: hidden;
   box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
   -webkit-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
   cursor: pointer;
@@ -184,16 +121,18 @@ table {
 .ocrext-wrapper header.ocrext-header .ocrext-title {
   color: #ffffff;
   text-align: left;
-  padding: 15px 20px;
+  /*padding: @header-padding; */
   border-radius: 10px 10px 0 0;
   font-weight: bold;
   font-size: 20px;
   padding: 15px 0 8px 15px;
+  margin: 0;
 }
 .ocrext-wrapper header.ocrext-header .ocrext-title .ocrext-settings-link {
   display: inline-block;
   float: right;
   margin: -4px 25px 0 0;
+  padding: 0;
   height: 24px;
   width: 24px;
   background: url('chrome-extension://__MSG_@@extension_id__/images/gear.png');
@@ -207,7 +146,7 @@ table {
   /*Output Error*/
 }
 .ocrext-wrapper .ocrext-content .ocrext-canvas-container {
-  margin: 5px auto 15px auto;
+  margin: 5px auto 10px auto;
   min-width: 430px;
   max-height: 200px;
   width: 100%;
@@ -239,6 +178,7 @@ table {
   /*padding:5px;*/
 }
 .ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-status {
+  text-align: center;
   padding: 0 10px;
   margin: 0 7px 5px 0;
   height: 0px;
@@ -272,17 +212,25 @@ table {
   position: relative;
   left: -50%;
 }
-.ocrext-wrapper .ocrext-content .ocrext-ocr-output .mdl-grid {
+.ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-grid {
   padding: 0 8px;
+  box-sizing: border-box;
 }
-.ocrext-wrapper .ocrext-content .ocrext-ocr-output .mdl-grid:last-child {
+.ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-grid:last-child {
   margin: 14px auto 0 auto;
 }
-.ocrext-wrapper .ocrext-content .ocrext-ocr-output .mdl-cell {
+.ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-cell {
+  float: left;
   margin: 0;
   /* &:nth-child(2) {
           margin-left: 25px;
         } */
+}
+.ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-cell.ocrext-cell-small {
+  width: 20%;
+}
+.ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-cell.ocrext-cell-large {
+  width: 80%;
 }
 .ocrext-wrapper .ocrext-content .ocrext-ocr-output h5.ocrext-label {
   /*margin:0 0 5px 0;*/
@@ -291,8 +239,12 @@ table {
   font-weight: bold;
   font-size: 16px;
   word-wrap: break-word;
+  text-align: center;
 }
 .ocrext-wrapper .ocrext-content .ocrext-ocr-output h5.ocrext-label span {
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.5;
   display: inline-block;
   width: 100%;
   padding: 2px 2px 0 0;
@@ -304,7 +256,7 @@ table {
 .ocrext-wrapper .ocrext-content .ocrext-ocr-output p.ocrext-result {
   /*margin:10px 0 15px 0;*/
   box-sizing: border-box;
-  padding: 3px 0 0 15px;
+  padding: 5px 0 0 15px;
   height: 85px;
   overflow-y: auto;
   -webkit-user-select: text;
@@ -325,7 +277,8 @@ table {
 .ocrext-wrapper .ocrext-content .ocrext-btn-container .ocrext-ocr-close {
   margin-right: 0;
 }
-.ocrext-wrapper .ocrext-content.ocrext-error .ocrext-ocr-output .ocrext-ocr-message {
+.ocrext-wrapper .ocrext-content.ocrext-error .ocrext-ocr-output .ocrext-ocr-message,
+.ocrext-wrapper .ocrext-content.ocrext-error .ocrext-ocr-output .ocrext-message {
   color: #d9534f;
 }
 .ocrext-wrapper.ocrext-wrapper-minimized .ocrext-content .ocrext-canvas-container {
@@ -350,7 +303,7 @@ table {
     max-width: 70px;
   }
   .ocrext-wrapper .ocrext-content .ocrext-btn-container {
-    float: none;
+    /*float: none;*/
   }
   .ocrext-wrapper .ocrext-content .ocrext-btn-container button.ocrext-btn {
     margin-right: 10px;

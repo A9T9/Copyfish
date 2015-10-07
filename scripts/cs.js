@@ -1,5 +1,5 @@
 /* globals jQuery, unescape, componentHandler */
-(function() {
+jQuery(function() {
     'use strict';
     // pseudo-private members
     var $ = jQuery;
@@ -13,6 +13,7 @@
     var $SELECTOR;
     var OPTIONS;
     var MAX_ZINDEX = 2147483647;
+    var WIDGETBOTTOM = -8;
     var OCR_LIMIT = {
         min: {
             width: 40,
@@ -23,11 +24,12 @@
             height: 2600
         }
     };
+    var ISPOSITIONED = false;
 
     var OCR_DIMENSION_ERROR = 'The parameter is incorrect.Image size is not supported. Each image dimension must be between 40 and 2600 pixels.';
 
 
-    // functions
+    /*Utility functions*/
     var logError = function(msg, err) {
         err = err || '';
         msg = msg || 'An error occurred.';
@@ -63,6 +65,7 @@
             });
     };
 
+    // Background mask
     var Mask = (function() {
         var $body = $('body');
         var $MASK;
@@ -70,7 +73,7 @@
         return {
             addToBody: function() {
                 if (!$MASK && !$body.find('.ocrext-mask').length) {
-                    $MASK = $('<div class="ocrext-mask"></div>')
+                    $MASK = $('<div class="ocrext-element ocrext-mask"><p class="ocrext-element">Please select text to grab.</p></div>')
                         .css({
                             left: 0,
                             top: 0,
@@ -89,8 +92,10 @@
                 // result? - no smooth tranisition
                 setTimeout(function() {
                     $MASK.css({
-                        opacity: 0.5
+                        opacity: 1,
+                        background: 'rgba(117,117,117,0.5)'
                     });
+                    $MASK.find('p.ocrext-element').css('transform', 'scale(1,1)');
                 }, (noTimeout ? 0 : 50));
                 return this;
             },
@@ -133,6 +138,9 @@
         return $optsDfd;
     }
 
+    /*
+     * Loads the config, HTML and options before activating the widget
+     */
     function _bootStrapResources() {
         var $dfd = $.Deferred();
 
@@ -163,6 +171,9 @@
         return $dfd;
     }
 
+    /*
+     * Converts dataURI to a blob instance
+     */
     function dataURItoBlob(dataURI) {
         // convert base64/URLEncoded data component to raw binary data held in a string
         var byteString;
@@ -228,7 +239,7 @@
                             ctx.drawImage(img, sx, sy, width, height, 0, 0, width, height); // Or at whatever offset you like
                             $dialog.css({
                                 opacity: 1,
-                                bottom: '-8px'
+                                bottom: WIDGETBOTTOM
                             });
                             $captureComplete.resolve();
                         });
@@ -373,7 +384,7 @@
                 timeout: APPCONFIG.ocr_timeout,
                 type: 'POST',
                 success: function(data) {
-                    var result = data.ParsedResults[0];
+                    var result;
                     data = data || {};
                     if (data.IsErroredOnProcessing) {
                         $ocr.reject({
@@ -386,6 +397,7 @@
                     } else if (data.OCRExitCode === 1) {
                         $ocr.resolve(data.ParsedResults[0].ParsedText);
                     } else {
+                        result = data.ParsedResults[0];
                         $ocr.reject({
                             type: 'OCR',
                             stat: 'OCR conversion failed',
@@ -421,26 +433,28 @@
         });
     }
 
+    /*Utility functions - end*/
+
+
+    /* Event handlers*/
     /*
-     * Use current viewport coords to capture, process and translate screen
-     * There is no separate button to re-submit captured image, so redoOCR can be reused for that
+     * Mouse move event handler. Attached on mousedown and removed on mouseup
      */
-    function redoOCR() {
-        $('header.ocrext-header').removeClass('minimized');
-        $('.ocrext-wrapper').removeClass('ocrext-wrapper-minimized');
-        $('.ocrext-wrapper').css('opacity', 0);
-        // timeout to ensure that a render is done before initiating next capture cycle
-        setTimeout(function() {
-            _captureImageOntoCanvas().done(function() {
-                _processOCRTranslate();
-
-            });
-        }, 20);
-    }
-
     function onOCRMouseMove(e) {
-        endX = e.pageX;
-        endY = e.pageY;
+        if (ISPOSITIONED) {
+            endX = e.pageX - $('body').scrollLeft();
+            endY = e.pageY - $('body').scrollTop();
+            $SELECTOR.css({
+                'position': 'fixed'
+            });
+        } else {
+            endX = e.pageX;
+            endY = e.pageY;
+            $SELECTOR.css({
+                'position': 'absolute'
+            });
+        }
+
         $SELECTOR.css({
             left: Math.min(startX, endX),
             top: Math.min(startY, endY),
@@ -450,6 +464,7 @@
     }
 
     /*
+     * mousedown event handler
      * once mousedown occurs, selection starts. Captures the initial coords and adds the selector
      * rectangle onto the page. 
      * Adds the mousemove and mouseup events
@@ -461,12 +476,25 @@
             return true;
         }
         var $body = $('body');
+        $('.ocrext-mask p.ocrext-element').css('transform', 'scale(0,0)');
         $SELECTOR = $('<div class="ocrext-selector"></div>');
         $SELECTOR.appendTo($body);
-        startX = e.pageX;
-        startY = e.pageY;
+        if (ISPOSITIONED) {
+            startX = e.pageX - $body.scrollLeft();
+            startY = e.pageY - $body.scrollTop();
+            $SELECTOR.css({
+                'position': 'fixed'
+            });
+        } else {
+            startX = e.pageX;
+            startY = e.pageY;
+            $SELECTOR.css({
+                'position': 'absolute'
+            });
+        }
         startCx = e.clientX;
         startCy = e.clientY;
+
 
         $SELECTOR.css({
             left: 0,
@@ -479,10 +507,10 @@
         $body.on('mousemove', onOCRMouseMove);
 
         // we need the closure here. `.one` would automagically remove the listener when done
-        $body.one('mouseup', function(e) {
+        $body.one('mouseup', function(evt) {
             var $dialog;
-            endCx = e.clientX;
-            endCy = e.clientY;
+            endCx = evt.clientX;
+            endCy = evt.clientY;
 
             // turn off the mousemove event, we no longer need it
             $body.off('mousemove', onOCRMouseMove);
@@ -508,20 +536,33 @@
                     _processOCRTranslate();
                 }
             });
-
-
         });
     }
 
     /*
+     * Redo OCR button click handler
+     * Use current viewport coords to capture, process and translate screen
+     * There is no separate button to re-submit captured image, so onOCRRedo can be reused for that
+     */
+    function onOCRRedo() {
+        // $('header.ocrext-header').removeClass('minimized');
+        // $('.ocrext-wrapper').removeClass('ocrext-wrapper-minimized');
+        $('.ocrext-wrapper').css('opacity', 0);
+        // timeout to ensure that a render is done before initiating next capture cycle
+        setTimeout(function() {
+            _captureImageOntoCanvas().done(function() {
+                _processOCRTranslate();
+            });
+        }, 20);
+    }
+
+    /*
+     * Recapture button click handler
      * Hands control back to the user to recapture the viewport
      */
     function onOCRRecapture() {
-        var $dialog = $('.ocrext-wrapper');
         IS_CAPTURED = false;
-        $dialog.css({
-            bottom: -$dialog.height()
-        });
+        OCRTranslator.slideDown();
         // reset stuff
         OCRTranslator.reset();
         Mask.addToBody().show();
@@ -529,10 +570,11 @@
     }
 
     /*
+     * Close button click handler. Also called on press of ESC
      * Close the current session and communicate this to the bg page (main extension)
      * Release any global state captured in between
      */
-    function onClose() {
+    function onOCRClose() {
         if (OCRTranslator.state === 'disabled') {
             return true;
         }
@@ -547,10 +589,12 @@
     }
 
     /*
+     * @module: OCRTranslator
      * The main translator module. Simple module pattern, no fancy constructors or factories
      */
     var OCRTranslator = {
         /*
+         * Pseudo constructor
          * init: load resources and bind runtime listener, once the $ready deferred 
          * resolves, render HTML on 'enableselection' event
          * Nothing gets rendered until the user presses the browserAction atleast 
@@ -559,6 +603,7 @@
          */
         init: function() {
             // get config information
+            ISPOSITIONED = ['absolute', 'relative', 'fixed'].indexOf($('body').css('position')) >= 0;
             $ready = _bootStrapResources();
 
             // listen to runtime messages from other pages, mainly the background page
@@ -575,6 +620,11 @@
                 });
             });
             this.bindEvents();
+            // tell the background page that the tab is ready
+            chrome.runtime.sendMessage({
+                evt: 'ready'
+            });
+            return this;
         },
 
         /*
@@ -585,15 +635,17 @@
             var $body = $('body');
             $body
                 .on('click', '.ocrext-ocr-recapture', onOCRRecapture)
-                .on('click', '.ocrext-ocr-sendocr', redoOCR)
-                .on('click', '.ocrext-ocr-close', onClose)
+                .on('click', '.ocrext-ocr-sendocr', onOCRRedo)
+                .on('click', '.ocrext-ocr-close', onOCRClose)
                 .on('click', '.ocrext-ocr-copy', function() {
+                    /*Copy button click handler*/
                     chrome.runtime.sendMessage({
                         evt: 'copy',
                         text: $('.ocrext-ocr-message').text()
                     });
                 })
                 .on('click', 'header.ocrext-header', function() {
+                    /*click handler for header*/
                     var $this = $(this);
 
                     if ($this.hasClass('minimized')) {
@@ -604,17 +656,21 @@
                         $this.addClass('minimized');
                     }
                 })
-                .on('click','a.ocrext-settings-link',function(e){
+                .on('click', 'a.ocrext-settings-link', function(e) {
+                    /*Settings  (gear icon) click handler*/
                     e.stopPropagation();
                     chrome.runtime.sendMessage({
                         evt: 'open-settings'
                     });
                 });
+
+            /*ESC handler. */
             $(document).on('keyup', function(e) {
                 if (e.keyCode === 27) {
-                    onClose();
+                    onOCRClose();
                 }
             });
+            return this;
         },
 
         /*
@@ -636,6 +692,7 @@
             Mask.addToBody().show();
             $body.on('mousedown', onOCRMouseDown);
             OCRTranslator.state = 'enabled';
+            return this;
         },
 
         /*
@@ -651,6 +708,7 @@
             OCRTranslator.state = 'disabled';
             Mask.remove();
             IS_CAPTURED = false;
+            return this;
         },
 
         // reset anything that requires resetting
@@ -660,6 +718,7 @@
             $('.ocrext-result').attr({
                 title: ''
             });
+            return this;
         },
 
         // spinner logic
@@ -667,6 +726,7 @@
             $('.ocrext-spinner').removeClass('is-active');
             $('.ocrext-content').removeClass('ocrext-disabled');
             $('.ocrext-btn-container .ocrext-btn').removeClass('disabled').removeAttr('disabled');
+            return this;
         },
 
         // spinner logic
@@ -674,6 +734,7 @@
             $('.ocrext-spinner').addClass('is-active');
             $('.ocrext-content').addClass('ocrext-disabled');
             $('.ocrext-btn-container .ocrext-btn').addClass('disabled').attr('disabled', 'disabled');
+            return this;
         },
 
         // Utility to set the status - progress, error and success are supported
@@ -693,8 +754,19 @@
                     $('.ocrext-status').removeClass('ocrext-success ocrext-error ocrext-progress');
                 }, 10000);
             }
+        },
+
+        slideDown: function() {
+            var $dialog = $('.ocrext-wrapper');
+            $dialog.css({
+                bottom: -$dialog.height()
+            });
+        },
+
+        slideUp: function() {
+            $('.ocrext-wrapper').css('bottom', WIDGETBOTTOM);
         }
     };
 
     OCRTranslator.init();
-}());
+});
