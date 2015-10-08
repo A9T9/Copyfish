@@ -1,10 +1,10 @@
 {
   "appName": {
-    "message": "Copyfish OCR",
+    "message": "Copyfish - Fresh Online OCR",
     "description": "The name of the application"
   },
   "appDescription": {
-    "message": "Copy and paste and translate text from any image or video.",
+    "message": "Copy, paste and translate text from any image, video or PDF.",
     "description": "The description of the application"
   }
 }
