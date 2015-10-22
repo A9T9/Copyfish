@@ -6,5 +6,53 @@
   "appDescription": {
     "message": "Copy, paste and translate text from any image, video or PDF.",
     "description": "The description of the application"
+  },
+  "permWarning":{
+    "message":"Please grant permission to use this feature",
+    "description":"Error message when user denies permission"
+  },
+  "captureError":{
+    "message":"Unable to capture screen. Please try again when the page has loaded.",
+    "description": "If page load is not yet done, throw an error"
+  },
+  "screenCapture":{
+    "message":"Screen Capture",
+    "description":"Title of the screen capture page"
+  },
+  "userMediaUnsupported":{
+    "message":"Your browser does not support desktop capture",
+    "description":"getUserMedia is unsupported"
+  },
+  "captureFailure":{
+    "message":"Media capture failed",
+    "description":"Could not capture media stream"
+  },
+  "screenCaptureWaitMessage":{
+    "message":"Waiting for screen capture . . .",
+    "description":"Waiting for screen capture . . ."
+  },
+  "screenCaptureNotify":{
+    "message":"Click on the extension icon to begin selection.",
+    "description":"Click on the extension icon to begin selection"
+  },
+  "ocrDimensionError":{
+    "message":"The parameter is incorrect.Image size is not supported. Each image dimension must be between 40 and 2600 pixels.",
+    "description":"Invalid dimensions for OCR"
+  },
+  "ocrSuccessStatus":{
+    "message":"OCR successful",
+    "description":"OCR was successful"
+  },
+  "translationSuccessStatus":{
+    "message":"Translation successful",
+    "description":"Translation was successful"
+  },
+  "ocrProgressStatus":{
+    "message":"OCR conversion in progress ...",
+    "description":"OCR conversion in progress"
+  },
+  "translationProgressStatus":{
+    "message":"Translation in progress ...",
+    "description":"Translation in progress"
   }
 }
