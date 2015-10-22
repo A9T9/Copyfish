@@ -12,6 +12,7 @@
   "default_locale": "en",
   "background": {
     "scripts": [
+      "scripts/jquery.min.js",
       "scripts/chromereload.js",
       "scripts/background.js"
     ]
@@ -25,8 +26,7 @@
   "content_scripts": [
     {
       "matches": [
-        "http://*/*",
-        "https://*/*"
+        "<all_urls>"
       ],
       "css": [
         "styles/material.min.css",
@@ -47,10 +47,15 @@
     "default_title": "__MSG_appName__"
   },
   "permissions": [
+    "contextMenus",
     "tabs",
     "activeTab",
     "storage",
     "http://*/*",
-    "https://*/*"
+    "https://*/*",
+    "clipboardWrite"
+  ],
+  "optional_permissions": [
+    "desktopCapture"
   ]
 }
