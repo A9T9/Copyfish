@@ -74,6 +74,17 @@ jQuery(function() {
             .addClass('ocrext-font-' + OPTIONS.visualCopyOCRFontSize);
     };
 
+    var _setZIndex = function() {
+        /*
+         * Google Translate - 1201 Perapera - 7777 GDict - 99997 Transover - 2147483647
+         */
+        if (OPTIONS.visualCopySupportDicts) {
+            $('.ocrext-wrapper').css('zIndex', 1200);
+        } else {
+            $('.ocrext-wrapper').css('zIndex', MAX_ZINDEX);
+        }
+    };
+
     // Background mask
     var Mask = (function() {
         var $body = $('body');
@@ -116,21 +127,21 @@ jQuery(function() {
                 }
                 $MASK.width($(document).width());
                 $MASK.height($(document).width());
-                if(['absolute', 'relative', 'fixed'].indexOf($('body').css('position')) >= 0){
-                    $MASK.css('position','fixed');
+                if (['absolute', 'relative', 'fixed'].indexOf($('body').css('position')) >= 0) {
+                    $MASK.css('position', 'fixed');
                 }
                 return this;
             },
 
-            width:function(w){
-                if(w === undefined){
+            width: function(w) {
+                if (w === undefined) {
                     return $MASK.width();
                 }
                 $MASK.width(w);
             },
 
-            height:function(h){
-                if(h === undefined){
+            height: function(h) {
+                if (h === undefined) {
                     return $MASK.height();
                 }
                 $MASK.height(h);
@@ -226,7 +237,8 @@ jQuery(function() {
             visualCopyTranslateLang: '',
             // visualCopyAutoProcess: '',
             visualCopyAutoTranslate: '',
-            visualCopyOCRFontSize: ''
+            visualCopyOCRFontSize: '',
+            visualCopySupportDicts: ''
         };
         chrome.storage.sync.get(theseOptions, function(opts) {
             OPTIONS = opts;
@@ -527,11 +539,11 @@ jQuery(function() {
                     } catch (e) {
                         errData = '';
                     }
-                    if(t === 'timeout'){
+                    if (t === 'timeout') {
                         stat = 'OCR request timed out';
-                    }else if(x.status === 404){
+                    } else if (x.status === 404) {
                         stat = 'OCR service is currently unavailable';
-                    }else{
+                    } else {
                         stat = 'An error occurred during OCR';
                     }
                     $ocr.reject({
@@ -653,10 +665,11 @@ jQuery(function() {
             $SELECTOR.remove();
             Mask.hide();
             // show the widget
+            _setZIndex();
             $dialog = $body.find('.ocrext-wrapper');
             $dialog
                 .css({
-                    zIndex: MAX_ZINDEX,
+                    // zIndex: MAX_ZINDEX,
                     // opacity: 0,
                     bottom: -$dialog.height()
                 })
@@ -685,6 +698,7 @@ jQuery(function() {
         setTimeout(function() {
             _captureImageOntoCanvas().done(function() {
                 _processOCRTranslate();
+                _setZIndex();
             });
         }, 20);
     }
