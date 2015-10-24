@@ -1,4 +1,7 @@
 /*right*/
+.ocrext-preserve-whitespace {
+  white-space: pre;
+}
 .ocrext-ch {
   cursor: crosshair;
 }
@@ -6,34 +9,45 @@
   -webkit-user-select: none;
 }
 .ocrext-overlay .ocrext-mask {
-  position: fixed;
-  background: #757575;
-  opacity: 0;
-  transition: opacity 0.25 ease;
-  -webkit-transition: opacity 0.25s ease;
-  cursor: crosshair;
-  transform: none;
+  position: absolute;
+  /*background: @black;
+    opacity: 1;
+    .transition-opacity();*/
+  /*cursor: crosshair;
+    transform:none;*/
   min-height: initial;
   min-width: intial;
-  max-width: 100%;
-  max-height: 100%;
+  /* max-width: 100%;
+    max-height: 100%; */
+}
+.ocrext-overlay .ocrext-mask .ocrext-overlay-corner {
+  /*.transition-opacity();*/
+  /*opacity: 0;*/
+  background: #757575;
+  cursor: crosshair;
+  transform: none;
+  position: absolute;
+  background: rgba(117, 117, 117, 0.3);
+  top: 0;
+  left: 0;
+  /*width: 100%;
+      height: 100%;*/
 }
 .ocrext-overlay .ocrext-mask p.ocrext-element {
   font-size: 54px;
   top: 25%;
   color: #000;
   text-align: center;
-  transform: scale(0, 0);
-  transition: all 0.25 ease;
-  -webkit-transition: all 0.25s ease;
+  /*transform:scale(0,0);
+      .transition-all();*/
   position: relative;
   /*text-shadow: 5px 3px 5px #DECECE;*/
 }
 .ocrext-overlay .ocrext-selector {
   background: none;
   position: absolute;
-  border: 3px solid #ff5722;
-  border-radius: 5px;
+  border: 2px solid #ff5252;
+  border-radius: 2px;
 }
 .ocrext-element {
   margin: 0;
@@ -266,6 +280,59 @@
   line-height: 22px;
   word-wrap: break-word;
 }
+.ocrext-wrapper .ocrext-content .ocrext-ocr-output p.ocrext-ocr-message.ocrext-font-48px,
+.ocrext-wrapper .ocrext-content .ocrext-ocr-output p.ocrext-ocr-translated.ocrext-font-48px {
+  font-size: 48px;
+  line-height: 48px;
+}
+.ocrext-wrapper .ocrext-content .ocrext-ocr-output p.ocrext-ocr-message.ocrext-font-42px,
+.ocrext-wrapper .ocrext-content .ocrext-ocr-output p.ocrext-ocr-translated.ocrext-font-42px {
+  font-size: 42px;
+  line-height: 42px;
+}
+.ocrext-wrapper .ocrext-content .ocrext-ocr-output p.ocrext-ocr-message.ocrext-font-36px,
+.ocrext-wrapper .ocrext-content .ocrext-ocr-output p.ocrext-ocr-translated.ocrext-font-36px {
+  font-size: 36px;
+  line-height: 36px;
+}
+.ocrext-wrapper .ocrext-content .ocrext-ocr-output p.ocrext-ocr-message.ocrext-font-32px,
+.ocrext-wrapper .ocrext-content .ocrext-ocr-output p.ocrext-ocr-translated.ocrext-font-32px {
+  font-size: 32px;
+  line-height: 32px;
+}
+.ocrext-wrapper .ocrext-content .ocrext-ocr-output p.ocrext-ocr-message.ocrext-font-28px,
+.ocrext-wrapper .ocrext-content .ocrext-ocr-output p.ocrext-ocr-translated.ocrext-font-28px {
+  font-size: 28px;
+  line-height: 28px;
+}
+.ocrext-wrapper .ocrext-content .ocrext-ocr-output p.ocrext-ocr-message.ocrext-font-24px,
+.ocrext-wrapper .ocrext-content .ocrext-ocr-output p.ocrext-ocr-translated.ocrext-font-24px {
+  font-size: 24px;
+  line-height: 24px;
+}
+.ocrext-wrapper .ocrext-content .ocrext-ocr-output p.ocrext-ocr-message.ocrext-font-20px,
+.ocrext-wrapper .ocrext-content .ocrext-ocr-output p.ocrext-ocr-translated.ocrext-font-20px {
+  font-size: 20px;
+}
+.ocrext-wrapper .ocrext-content .ocrext-ocr-output p.ocrext-ocr-message.ocrext-font-18px,
+.ocrext-wrapper .ocrext-content .ocrext-ocr-output p.ocrext-ocr-translated.ocrext-font-18px {
+  font-size: 18px;
+}
+.ocrext-wrapper .ocrext-content .ocrext-ocr-output p.ocrext-ocr-message.ocrext-font-16px,
+.ocrext-wrapper .ocrext-content .ocrext-ocr-output p.ocrext-ocr-translated.ocrext-font-16px {
+  font-size: 16px;
+}
+.ocrext-wrapper .ocrext-content .ocrext-ocr-output p.ocrext-ocr-message.ocrext-font-14px,
+.ocrext-wrapper .ocrext-content .ocrext-ocr-output p.ocrext-ocr-translated.ocrext-font-14px {
+  font-size: 14px;
+}
+.ocrext-wrapper .ocrext-content .ocrext-ocr-output p.ocrext-ocr-message.ocrext-font-12px,
+.ocrext-wrapper .ocrext-content .ocrext-ocr-output p.ocrext-ocr-translated.ocrext-font-12px {
+  font-size: 12px;
+}
+.ocrext-wrapper .ocrext-content .ocrext-ocr-output p.ocrext-ocr-message.expanded {
+  height: 170px;
+}
 .ocrext-wrapper .ocrext-content .ocrext-btn-container {
   float: right;
   margin-bottom: 5px;
@@ -288,6 +355,9 @@
 .ocrext-wrapper.ocrext-wrapper-minimized .ocrext-content .ocrext-ocr-output {
   height: 100px;
   overflow-y: auto;
+}
+.ocrext-wrapper.ocrext-wrapper-minimized .ocrext-content .ocrext-ocr-output p.ocrext-ocr-message.expanded {
+  height: auto;
 }
 @media screen and (max-width: 960px) {
   .ocrext-wrapper {

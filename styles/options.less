@@ -10,10 +10,10 @@ body {
 	padding: 20px;
 	box-sizing:border-box;
 	h1 {
-		text-align: center;
-		margin-bottom: 10px;
-	  padding-bottom: 20px;
-	  border-bottom: 4px solid @primary;
+	   text-align: center;
+	   margin-bottom: 10px;
+	   padding-bottom: 20px;
+	   border-bottom: 4px solid @primary;
 	}
 	.inner-wrapper {
 		margin: 40px 0 0 0;
@@ -33,14 +33,19 @@ body {
 			font-size: @fontSize;
 		}
     label.auto-process,
-    label.auto-translate {
-      margin-top: 5px;
+    label.auto-translate,
+    label.popup-dicts {
+      margin-top: 8px;
     }
     .btn {
       padding:0 20px;
       &:nth-child(2){
         margin-left:15px;
       }
+    }
+    .extension-link {
+        color:@primary;
+        font-size: 18px;
     }
     .status-text {
       color:@primary;

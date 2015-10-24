@@ -1,4 +1,7 @@
 /*right*/
+.ocrext-preserve-whitespace {
+  white-space: pre;
+}
 body {
   font-size: 16px;
   color: #757575;
@@ -34,14 +37,19 @@ body {
   font-size: 16px;
 }
 .container .inner-wrapper label.auto-process,
-.container .inner-wrapper label.auto-translate {
-  margin-top: 5px;
+.container .inner-wrapper label.auto-translate,
+.container .inner-wrapper label.popup-dicts {
+  margin-top: 8px;
 }
 .container .inner-wrapper .btn {
   padding: 0 20px;
 }
 .container .inner-wrapper .btn:nth-child(2) {
   margin-left: 15px;
+}
+.container .inner-wrapper .extension-link {
+  color: #2196f3;
+  font-size: 18px;
 }
 .container .inner-wrapper .status-text {
   color: #2196f3;
