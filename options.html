@@ -112,7 +112,8 @@
             </select>
           </div>
         </div>
-        <div class="mdl-grid options-container translate-options">
+
+        <!-- <div class="mdl-grid options-container translate-options">
           <div class="mdl-cell mdl-cell--5-col label">
             <label>Process on Capture</label>
           </div>
@@ -122,7 +123,7 @@
               <span class="mdl-switch__label"></span>
             </label>
           </div>
-        </div>
+        </div> -->
         <div class="mdl-grid options-container translate-options">
           <div class="mdl-cell mdl-cell--5-col label">
             <label title="Automatically translate text after OCR processing">Translate after OCR</label>
@@ -134,11 +135,46 @@
             </label>
           </div>
         </div>
-        <div class="mdl-grid options-container buttons">
-          <div class="mdl-cell mdl-cell--5-col label"></div>
+
+        <div class="mdl-grid options-container font-size-options">
+          <div class="mdl-cell mdl-cell--5-col label">
+            <label>OCR Font Size</label>
+          </div>
           <div class="mdl-cell mdl-cell--7-col">
+            <select id="ocr-fontsize" name="outputlang">
+              <option value="48px">48 px</option>
+              <option value="42px">42 px</option>
+              <option value="36px">36 px</option>
+              <option value="32px">32 px</option>
+              <option value="28px">28 px</option>
+              <option value="24px">24 px</option>
+              <option value="20px">20 px</option>
+              <option value="18px">18 px</option>
+              <option value="16px" selected>16 px</option>
+              <option value="14px">14 px</option>
+              <option value="12px">12 px</option>
+            </select>
+          </div>
+        </div>
+        <div class="mdl-grid options-container translate-options">
+          <div class="mdl-cell mdl-cell--5-col label">
+            <label title="Support popup dictionaries">Support popup dictionaries</label>
+          </div>
+          <div class="mdl-cell mdl-cell--7-col">
+            <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect popup-dicts" for="switch-popup-dicts">
+              <input type="checkbox" id="switch-popup-dicts" class="mdl-switch__input" checked  />
+              <span class="mdl-switch__label"></span>
+            </label>
+          </div>
+        </div>
+        <div class="mdl-grid options-container buttons">
+          <div class="mdl-cell mdl-cell--3-col label"></div>
+          <div class="mdl-cell mdl-cell--5-col">
             <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent btn btn-reset" title="Reset">Reset</button>
             <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent btn btn-save" title="Save">Save</button>
+          </div>
+          <div class="mdl-cell mdl-cell--3-col label">
+            <a class="extension-link" href="http://blog.a9t9.com/p/copyfish.html" target="_blank">Copyfish Website</a>
           </div>
         </div>
         <div class="status-text">Settings saved successfully.</div>
