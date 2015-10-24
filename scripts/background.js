@@ -142,7 +142,8 @@ chrome.storage.sync.get({
     visualCopyTranslateLang: '',
     // visualCopyAutoProcess: '',
     visualCopyAutoTranslate: '',
-    visualCopyOCRFontSize: ''
+    visualCopyOCRFontSize: '',
+    visualCopySupportDicts:''
 }, function(items) {
     if (!items.visualCopyOCRLang) {
         chrome.storage.sync.set({
@@ -150,7 +151,8 @@ chrome.storage.sync.get({
             visualCopyTranslateLang: 'en',
             // visualCopyAutoProcess: true,
             visualCopyAutoTranslate: true,
-            visualCopyOCRFontSize: '16px'
+            visualCopyOCRFontSize: '16px',
+            visualCopySupportDicts: false
         }, function() {
 
         });
