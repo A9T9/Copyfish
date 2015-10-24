@@ -346,10 +346,14 @@ jQuery(function() {
                         .done(function() {
                             var sx, sy, width, height;
                             var ctx;
-                            sx = Math.min(startCx, endCx) * zf;
-                            sy = Math.min(startCy, endCy) * zf;
-                            width = Math.abs(endCx * zf - startCx * zf);
-                            height = Math.abs(endCy * zf - startCy * zf);
+                            // the screencapture is messed up when pixel density changes; compare the window width
+                            // and image width to determine if it needs to be fixed
+                            var dpf = window.innerWidth/img.width;
+                            var scaleFactor = zf/dpf;
+                            sx = Math.min(startCx, endCx) * scaleFactor;
+                            sy = Math.min(startCy, endCy) * scaleFactor;
+                            width = Math.abs(endCx * scaleFactor - startCx * scaleFactor);
+                            height = Math.abs(endCy * scaleFactor - startCy * scaleFactor);
 
                             $can.attr({
                                 width: width,
