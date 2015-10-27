@@ -31,6 +31,12 @@ body {
   padding: 8px 20px 0 0;
   text-align: right;
 }
+.container .inner-wrapper .label label a.tip {
+  font-size: 14px;
+  color: #2196f3;
+  display: inline-block;
+  width: 170px;
+}
 .container .inner-wrapper select {
   width: 400px;
   padding: 8px 4px;
