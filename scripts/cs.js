@@ -3,7 +3,7 @@ jQuery(function() {
     'use strict';
     // pseudo-private members
     var $ = jQuery;
-    var appName = chrome.i18n.getMessage('appName');
+    var appName = "Copyfish"; //chrome.i18n.getMessage('appShortName');
     var $ready;
     var HTMLSTRCOPY;
     var APPCONFIG;
@@ -33,7 +33,7 @@ jQuery(function() {
     var logError = function(msg, err) {
         err = err || '';
         msg = msg || 'An error occurred.';
-        console.error('Extension ' + appName + ': ' + msg, err);
+        console.error('Extension ' + appShortName + ': ' + msg, err);
     };
 
     var _getLanguage = function(type, code) {

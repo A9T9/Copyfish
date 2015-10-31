@@ -124,7 +124,7 @@ function isTabAvailable(tabId) {
 
 chrome.contextMenus.create({
     contexts: ['browser_action'],
-    title: 'Capture Desktop',
+    title: 'Desktop Text Capture',
     id: 'capture-desktop',
     onclick: captureScreen
 });
@@ -168,7 +168,7 @@ chrome.browserAction.onClicked.addListener(function(tab) {
             });
         })
         .fail(function() {
-            window.alert(chrome.i18n.getMessage('appName') + ': ' + chrome.i18n.getMessage('captureError'));
+            window.alert(chrome.i18n.getMessage('captureError'));
             enableIcon(tab.id);
         });
 });

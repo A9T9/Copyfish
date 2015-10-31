@@ -1,8 +1,14 @@
-{
+﻿{
   "appName": {
-    "message": "Copyfish - Fresh Online OCR",
-    "description": "The name of the application"
+        "message": "Copyfish 🐟 Free OCR Software"
+    },
+  "appShortName": {
+    "message": "Copyfish 🐟"
   },
+  "appDescription": {
+    "message": "Copy, paste and translate text from any image, video or PDF."
+  },
+
   "appDescription": {
     "message": "Copy, paste and translate text from any image, video or PDF.",
     "description": "The description of the application"
@@ -28,7 +34,7 @@
     "description":"Could not capture media stream"
   },
   "screenCaptureWaitMessage":{
-    "message":"Waiting for screen capture . . .",
+    "message":"Waiting for screen selection . . .",
     "description":"Waiting for screen capture . . ."
   },
   "screenCaptureNotify":{
