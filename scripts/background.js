@@ -143,8 +143,13 @@ chrome.storage.sync.get({
     // visualCopyAutoProcess: '',
     visualCopyAutoTranslate: '',
     visualCopyOCRFontSize: '',
-    visualCopySupportDicts:''
+    visualCopySupportDicts:'',
+    visualCopyQuickSelectLangs:[]
 }, function(items) {
+    /* 
+    *  visualCopyOCRLang must always be set. This is a simple check to see if it is actually set.
+    *  Ideally this should be in a separate config.
+    */ 
     if (!items.visualCopyOCRLang) {
         chrome.storage.sync.set({
             visualCopyOCRLang: 'eng',
@@ -152,7 +157,8 @@ chrome.storage.sync.get({
             // visualCopyAutoProcess: true,
             visualCopyAutoTranslate: true,
             visualCopyOCRFontSize: '16px',
-            visualCopySupportDicts: false
+            visualCopySupportDicts: false,
+            visualCopyQuickSelectLangs:[]
         }, function() {
 
         });

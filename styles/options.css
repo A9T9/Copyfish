@@ -42,6 +42,9 @@ body {
   padding: 8px 4px;
   font-size: 16px;
 }
+.container .inner-wrapper select.lang-quickselect {
+  width: 120px;
+}
 .container .inner-wrapper label.auto-process,
 .container .inner-wrapper label.auto-translate,
 .container .inner-wrapper label.popup-dicts {
