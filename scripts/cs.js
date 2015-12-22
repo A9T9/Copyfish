@@ -3,7 +3,7 @@ jQuery(function() {
     'use strict';
     // pseudo-private members
     var $ = jQuery;
-    var appName = "Copyfish"; //chrome.i18n.getMessage('appShortName');
+    var appName = 'Copyfish'; //chrome.i18n.getMessage('appShortName');
     var $ready;
     var HTMLSTRCOPY;
     var APPCONFIG;
@@ -27,6 +27,13 @@ jQuery(function() {
     };
     var ISPOSITIONED = false;
     var OCR_DIMENSION_ERROR = chrome.i18n.getMessage('ocrDimensionError');
+
+    /* 
+    *  Set to true to use a JPEG image. Default is PNG
+    *  JPEG_QUALITY ranges from 0.1 to 1 and is valid only if USE_JPEG is true
+    */
+    var USE_JPEG = true;
+    var JPEG_QUALITY = 0.1;
 
 
     /*Utility functions*/
@@ -399,8 +406,14 @@ jQuery(function() {
             _setOCRFontSize();
             data.append('apikey', APPCONFIG.ocr_api_key);
             data.append('language', OPTIONS.visualCopyOCRLang);
-            dataURI = $can.get(0).toDataURL();
-            data.append('file', dataURItoBlob(dataURI), 'ocr-file.png');
+            if (USE_JPEG) {
+                dataURI = $can.get(0).toDataURL('image/jpeg', JPEG_QUALITY);
+                data.append('file', dataURItoBlob(dataURI), 'ocr-file.jpg');
+            } else {
+                dataURI = $can.get(0).toDataURL();
+                data.append('file', dataURItoBlob(dataURI), 'ocr-file.png');
+            }
+            
 
             $process
                 .done(function(txt, fromOCR) {
