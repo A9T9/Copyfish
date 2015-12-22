@@ -137,31 +137,27 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
     }
 });
 
+
 chrome.storage.sync.get({
     visualCopyOCRLang: '',
     visualCopyTranslateLang: '',
     // visualCopyAutoProcess: '',
     visualCopyAutoTranslate: '',
     visualCopyOCRFontSize: '',
-    visualCopySupportDicts:'',
-    visualCopyQuickSelectLangs:[]
+    visualCopySupportDicts: '',
+    visualCopyQuickSelectLangs: []
 }, function(items) {
     /* 
-    *  visualCopyOCRLang must always be set. This is a simple check to see if it is actually set.
-    *  Ideally this should be in a separate config.
-    */ 
+     *  visualCopyOCRLang must always be set. This is a simple check to see if it is actually set.
+     *  Ideally this should be in a separate config.
+     */
     if (!items.visualCopyOCRLang) {
-        chrome.storage.sync.set({
-            visualCopyOCRLang: 'eng',
-            visualCopyTranslateLang: 'en',
-            // visualCopyAutoProcess: true,
-            visualCopyAutoTranslate: true,
-            visualCopyOCRFontSize: '16px',
-            visualCopySupportDicts: false,
-            visualCopyQuickSelectLangs:[]
-        }, function() {
+        $.getJSON(chrome.extension.getURL('config/config.json'))
+            .done(function(data) {
+                chrome.storage.sync.set(data.defaults, function() {
 
-        });
+                });
+            });
     }
 });
 

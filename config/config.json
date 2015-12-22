@@ -1,4 +1,12 @@
 {
+    "defaults":{
+        "visualCopyOCRLang": "eng",
+        "visualCopyTranslateLang": "en",
+        "visualCopyAutoTranslate": true,
+        "visualCopyOCRFontSize": "16px",
+        "visualCopySupportDicts": false,
+        "visualCopyQuickSelectLangs": []
+    },
     "yandex_api_key": "trnsl.1.1.20150620T072324Z.a834e7d6392b1be7.bd45ef6d33866baf8a48a67dcf2c6b1174b315d8",
 	"yandex_api_url": "https://translate.yandex.net/api/v1.5/tr.json/translate",
 	"ocr_api_key": "Copyfish",
