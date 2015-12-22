@@ -1,7 +1,7 @@
 $(function() {
     'use strict';
-    var DEFAULT_OCR_name = 'eng';
-    var DEFAULT_TO_name = 'en';
+    var DEFAULT_OCR_LANG = 'eng';
+    var DEFAULT_TO_LANG = 'en';
     // var DEFAULT_AUTO_PROCESS = true;
     var DEFAULT_AUTO_TRANSLATE = true;
     var DEFAULT_OCR_FONTSIZE = '16px';
@@ -111,16 +111,16 @@ $(function() {
     htmlStrArr.splice(0, htmlStrArr.length);
 
     chrome.storage.sync.get({
-        visualCopyOCRname: DEFAULT_OCR_name,
-        visualCopyTranslatename: DEFAULT_TO_name,
+        visualCopyOCRLang: DEFAULT_OCR_LANG,
+        visualCopyTranslateLang: DEFAULT_TO_LANG,
         // visualCopyAutoProcess: DEFAULT_AUTO_PROCESS,
         visualCopyAutoTranslate: DEFAULT_AUTO_TRANSLATE,
         visualCopyOCRFontSize: DEFAULT_OCR_FONTSIZE,
         visualCopySupportDicts: DEFAULT_POP_DICT,
         visualCopyQuickSelectLangs:[]
     }, function(items) {
-        $('#input-lang').val(items.visualCopyOCRname);
-        $('#output-lang').val(items.visualCopyTranslatename);
+        $('#input-lang').val(items.visualCopyOCRLang);
+        $('#output-lang').val(items.visualCopyTranslateLang);
         $('#ocr-fontsize').val(items.visualCopyOCRFontSize);
         /*set checkbox state(s)*/
         $.each(checkBoxes, function(key, value) {
@@ -135,7 +135,7 @@ $(function() {
             });
         } else {
             $.each(items.visualCopyQuickSelectLangs, function(i, language) {
-                $('#input-lang-' + i).val(language);
+                $('#input-lang-' + (i+1)).val(language);
             });
         }
     });
@@ -148,8 +148,8 @@ $(function() {
                 quickSelectLangs.push($node.val());
             });
             chrome.storage.sync.set({
-                visualCopyOCRname: $('#input-name').val(),
-                visualCopyTranslatename: $('#output-name').val(),
+                visualCopyOCRLang: $('#input-lang').val(),
+                visualCopyTranslateLang: $('#output-lang').val(),
                 visualCopyOCRFontSize: $('#ocr-fontsize').val(),
                 // visualCopyAutoProcess: $('.auto-process').hasClass('is-checked'),
                 visualCopyAutoTranslate: $('.auto-translate').hasClass('is-checked'),
@@ -164,8 +164,8 @@ $(function() {
             });
         })
         .on('click', '.btn-reset', function() {
-            $('#input-name').val(DEFAULT_OCR_name);
-            $('#output-name').val(DEFAULT_TO_name);
+            $('#input-lang').val(DEFAULT_OCR_LANG);
+            $('#output-lang').val(DEFAULT_TO_LANG);
             $('#ocr-fontsize').val(DEFAULT_OCR_FONTSIZE);
             $.each(checkBoxes, function(key, value) {
                 if ((!value[1] && $(value[0]).hasClass('is-checked')) ||

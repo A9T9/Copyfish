@@ -317,7 +317,12 @@
         margin-bottom: 5px;
         button.ocrext-btn {
           margin-right:5px;
-          padding: 0 16px;
+          padding: 0 8px;
+          min-width: 46px;
+          &.selected {
+            cursor: default;
+            opacity: 0.6;
+          }
         }
         button.ocrext-btn:last-child {
           margin-right: 0;

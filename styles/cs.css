@@ -339,7 +339,12 @@
 }
 .ocrext-wrapper .ocrext-content .ocrext-footer .ocrext-quickselect-btn-container button.ocrext-btn {
   margin-right: 5px;
-  padding: 0 16px;
+  padding: 0 8px;
+  min-width: 46px;
+}
+.ocrext-wrapper .ocrext-content .ocrext-footer .ocrext-quickselect-btn-container button.ocrext-btn.selected {
+  cursor: default;
+  opacity: 0.6;
 }
 .ocrext-wrapper .ocrext-content .ocrext-footer .ocrext-quickselect-btn-container button.ocrext-btn:last-child {
   margin-right: 0;

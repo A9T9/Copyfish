@@ -118,8 +118,14 @@ jQuery(function() {
                 '<button class="ocrext-element ocrext-ocr-quickselect ocrext-btn mdl-button',
                 'mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"></button>'
             ].join(' '));
-            $btn.attr('data-lang',ocrLang.lang)
-                .text(ocrLang.short);
+            $btn.attr({
+                'data-lang': ocrLang.lang,
+                'title': ocrLang.name
+            }).text(ocrLang.short);
+
+            if(OPTIONS.visualCopyOCRLang === ocrLang.lang){
+                $btn.addClass('selected');
+            }
             $btnContainer.append($btn);
             // upgrade button to mdl-button
             componentHandler.upgradeElement($btn.get(0));
@@ -803,6 +809,7 @@ jQuery(function() {
         });
     }
 
+
     /*
      * @module: OCRTranslator
      * The main translator module. Simple module pattern, no fancy constructors or factories
@@ -866,6 +873,19 @@ jQuery(function() {
                     chrome.runtime.sendMessage({
                         evt: 'copy',
                         text: $('.ocrext-ocr-message').text()
+                    });
+                })
+                .on('click','.ocrext-ocr-quickselect',function(){
+                    var $el = $(this);
+                    /*if($el.hasClass('selected')){
+                        return false;
+                    }*/
+                    $el.siblings().removeClass('selected');
+                    $el.addClass('selected');
+                    setOptions({
+                        visualCopyOCRLang:$(this).attr('data-lang')
+                    }).done(function(){
+                        onOCRRedo();
                     });
                 })
                 .on('click', 'header.ocrext-header', function() {
@@ -951,6 +971,7 @@ jQuery(function() {
             $('.ocrext-spinner').removeClass('is-active');
             $('.ocrext-content').removeClass('ocrext-disabled');
             $('.ocrext-btn-container .ocrext-btn').removeClass('disabled').removeAttr('disabled');
+            $('.ocrext-quickselect-btn-container .ocrext-btn').removeClass('disabled').removeAttr('disabled');
             return this;
         },
 
@@ -959,6 +980,7 @@ jQuery(function() {
             $('.ocrext-spinner').addClass('is-active');
             $('.ocrext-content').addClass('ocrext-disabled');
             $('.ocrext-btn-container .ocrext-btn').addClass('disabled').attr('disabled', 'disabled');
+            $('.ocrext-quickselect-btn-container .ocrext-btn').addClass('disabled').attr('disabled', 'disabled');
             return this;
         },
 
