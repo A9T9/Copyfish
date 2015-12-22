@@ -113,6 +113,9 @@ jQuery(function() {
         var ocrLang;
         $btnContainer.empty();
         $.each(OPTIONS.visualCopyQuickSelectLangs, function(i, language) {
+            if(language === 'none'){
+                return true;
+            }
             ocrLang = _searchOCRLanguageList(language);
             $btn = $([
                 '<button class="ocrext-element ocrext-ocr-quickselect ocrext-btn mdl-button',

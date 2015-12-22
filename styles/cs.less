@@ -313,9 +313,13 @@
     /*Bottom buttons container*/
     .ocrext-footer {
       .ocrext-quickselect-btn-container {
-        float: left;
-        margin-bottom: 5px;
+        /*float: left;*/
+        
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
         button.ocrext-btn {
+          margin-bottom: 5px;
           margin-right:5px;
           padding: 0 8px;
           min-width: 46px;
@@ -329,9 +333,10 @@
         }
       }
       .ocrext-btn-container {
-        float: right;
-        margin-bottom: 5px;
+        /*float: right;*/
+        
         button.ocrext-btn {
+          margin-bottom: 5px;
           margin-right:15px;
           padding: 0 16px;
         }
@@ -395,11 +400,16 @@
           }
         }
       } 
-      .ocrext-btn-container {
-        /*float: none;*/
-        button.ocrext-btn {
-          margin-right:10px;
-          padding: 0 8px;
+      .ocrext-footer {
+        .ocrext-quickselect-btn-container {
+          justify-content:flex-start;
+        }
+        .ocrext-btn-container {
+          /*float: none;*/
+          button.ocrext-btn {
+            margin-right:10px;
+            padding: 0 8px;
+          }
         }
       }
     }
