@@ -34,7 +34,7 @@ jQuery(function() {
      *  JPEG_QUALITY ranges from 0.1 to 1 and is valid only if USE_JPEG is true
      */
     var USE_JPEG = false;
-    var JPEG_QUALITY = 0.1;
+    var JPEG_QUALITY = 0.6;
 
 
     /*Utility functions*/
