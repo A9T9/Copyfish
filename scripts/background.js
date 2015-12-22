@@ -133,7 +133,7 @@ $.getJSON(chrome.extension.getURL('config/config.json'))
         var OcrDS = (function() {
             var _maxResponseTime = 99;
             var _randNotEqual = function(serverList, server) {
-                var idx = Math.floor(1+(Math.random() * serverList.length));
+                var idx = Math.floor(1 + (Math.random() * serverList.length));
                 if (serverList[idx].id !== server.id) {
                     return serverList[idx];
                 } else {
@@ -186,7 +186,12 @@ $.getJSON(chrome.extension.getURL('config/config.json'))
                         });
 
                         if (allValuesSame) {
-                            self.currentBest = _randNotEqual(serverList, self.currentBest);
+                            // if all values are same and one of them is zero, use the first occurrence
+                            if (serverList[0].responseTime === 0) {
+                                self.currentBest = serverList[0];
+                            } else {
+                                self.currentBest = _randNotEqual(serverList, self.currentBest);
+                            }
                             return $dfd.resolve(self.currentBest);
                         }
 
