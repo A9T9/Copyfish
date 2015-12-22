@@ -456,15 +456,18 @@ jQuery(function() {
 
     function _postToOCR($ocrPromise, postData, attempt) {
         var formData = new FormData();
-        formData.append('language',postData.language);
-        formData.append('file',postData.blob,postData.fileName);
+        formData.append('language', postData.language);
+        formData.append('file', postData.blob, postData.fileName);
         _getOCRServer().done(function(serverId) {
+            var startTime;
             var serverList = APPCONFIG.ocr_api_list;
+            var maxAttempts = serverList.length;
             var ocrAPIInfo = $.grep(serverList, function(el) {
                 return el.id === serverId;
             })[0];
             formData.append('apikey', ocrAPIInfo.ocr_api_key);
             attempt += 1;
+            startTime = Date.now();
             $.ajax({
                 url: ocrAPIInfo.ocr_api_url,
                 data: formData,
@@ -477,18 +480,17 @@ jQuery(function() {
                 success: function(data) {
                     var result;
                     data = data || {};
-                    // retry if any error condition is met and if any servers are still available (attempt < 3)
+                    // retry if any error condition is met and if any servers are still available
                     if ((typeof data === 'string' ||
                             data.IsErroredOnProcessing ||
                             data.OCRExitCode !== 1) &&
-                        attempt < 3) {
+                        attempt < maxAttempts) {
                         // sometimes an error string is returned
                         chrome.runtime.sendMessage({
                             evt: 'set-server-responsetime',
                             serverId: ocrAPIInfo.id,
                             serverResponseTime: -1
                         }, function() {
-                            /*TODO: number of attempts = 3 is now hard-coded*/
                             OCRTranslator.setStatus('progress',
                                 chrome.i18n.getMessage('ocrProgressStatusStillWorking'), true);
                             formData = null;
@@ -505,7 +507,14 @@ jQuery(function() {
                             code: data.OCRExitCode
                         });
                     } else if (data.OCRExitCode === 1) {
+
+                        chrome.runtime.sendMessage({
+                            evt: 'set-server-responsetime',
+                            serverId: ocrAPIInfo.id,
+                            serverResponseTime: (Date.now() - startTime)/1000
+                        }, function() {});
                         $ocrPromise.resolve(data.ParsedResults[0].ParsedText);
+
                     } else {
                         result = data.ParsedResults[0];
                         $ocrPromise.reject({
@@ -520,13 +529,12 @@ jQuery(function() {
                 error: function(x, t) {
                     var errData;
                     var stat;
-                    if (attempt < 3) {
+                    if (attempt < maxAttempts) {
                         chrome.runtime.sendMessage({
                             evt: 'set-server-responsetime',
                             serverId: ocrAPIInfo.id,
                             serverResponseTime: -1
                         }, function() {
-                            /*TODO: number of attempts = 3 is now hard-coded*/
                             OCRTranslator.setStatus('progress',
                                 chrome.i18n.getMessage('ocrProgressStatusStillWorking'), true);
                             formData = null;

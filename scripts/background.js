@@ -132,8 +132,17 @@ $.getJSON(chrome.extension.getURL('config/config.json'))
          */
         var OcrDS = (function() {
             var _maxResponseTime = 99;
+            var _randNotEqual = function(serverList, server) {
+                var idx = Math.floor(1+(Math.random() * serverList.length));
+                if (serverList[idx].id !== server.id) {
+                    return serverList[idx];
+                } else {
+                    return _randNotEqual(serverList, server);
+                }
+            };
             var _ocrDSAPI = {
                 resetTime: appConfig.ocr_server_reset_time,
+                currentBest: {},
                 reset: function() {
                     this.getAll().done(function(items) {
                         if (Date.now() - items.ocrServerLastReset > this.resetTime) {
@@ -155,8 +164,40 @@ $.getJSON(chrome.extension.getURL('config/config.json'))
                 },
                 getBest: function() {
                     var $dfd = $.Deferred();
+                    var self = this;
                     this.getAll().done(function(items) {
-                        $dfd.resolve(items.ocrServerList[0]);
+                        var serverList = items.ocrServerList;
+                        var best = serverList[0];
+                        var allValuesSame = true;
+
+                        // 1. check if all values are same
+                        var cmp;
+                        $.each($.map(serverList, function(s) {
+                            return s.responseTime;
+                        }), function(i, s) {
+                            if (i === 0) {
+                                cmp = s;
+                                return true;
+                            }
+                            if (cmp !== s) {
+                                allValuesSame = false;
+                                return false;
+                            }
+                        });
+
+                        if (allValuesSame) {
+                            self.currentBest = _randNotEqual(serverList, self.currentBest);
+                            return $dfd.resolve(self.currentBest);
+                        }
+
+                        // 2. Linear search to find best server
+                        $.each(serverList, function(i, server) {
+                            if (server.responseTime < best.responseTime) {
+                                best = server;
+                            }
+                        });
+                        self.currentBest = best;
+                        $dfd.resolve(self.currentBest);
                     });
                     return $dfd;
                 },
@@ -171,16 +212,6 @@ $.getJSON(chrome.extension.getURL('config/config.json'))
                             if (id === server.id) {
                                 server.responseTime = responseTime;
                                 return false;
-                            }
-                        });
-                        // sort on setting a value, the smallest value is always at the head
-                        serverList.sort(function(a, b) {
-                            if (a.responseTime > b.responseTime) {
-                                return 1;
-                            } else if (a.responseTime < b.responseTime) {
-                                return -1;
-                            } else {
-                                return 0;
                             }
                         });
                         chrome.storage.sync.set({
@@ -313,7 +344,6 @@ $.getJSON(chrome.extension.getURL('config/config.json'))
                 });
             } else if (request.evt === 'get-best-server') {
                 OcrDS.getBest().done(function(server) {
-                    console.log(server);
                     sendResponse({
                         server: server
                     });

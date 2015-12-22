@@ -17,10 +17,6 @@
         "id":"2",
         "ocr_api_key": "Copyfish",
         "ocr_api_url": "https://ocrapi.a9t9.com/api/Parse/Image"
-    }, {
-        "id":"3",
-        "ocr_api_key": "",
-        "ocr_api_url": ""
     }],
     "ocr_server_reset_time": 86400,
     "ocr_timeout": 60000,
