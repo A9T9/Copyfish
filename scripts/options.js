@@ -10,12 +10,14 @@ $(function() {
                 visualCopySupportDicts: ['.popup-dicts', defaults.visualCopySupportDicts]
             };
 
+            // render the Input Language select box
             var htmlStrArr = $(ocrnameArray).map(function(i, val) {
                 return '<option value="' + val.lang + '">' + val.name + '</option>';
             });
             $('#input-lang').html(htmlStrArr.toArray().join(' '));
             htmlStrArr.splice(0, htmlStrArr.length);
 
+            // render the quick select checkboxes
             htmlStrArr = $(ocrnameArray).map(function(i, val) {
                 return '<option value="' + val.lang + '" data-short="' + val.short + '">' + val.name + '-' + val.short + '</option>';
             });
@@ -24,6 +26,7 @@ $(function() {
             });
             htmlStrArr.splice(0, htmlStrArr.length);
 
+            // fetch options while defaulting them when unavailable
             chrome.storage.sync.get({
                 visualCopyOCRLang: defaults.visualCopyOCRLang,
                 visualCopyTranslateLang: defaults.visualCopyTranslateLang,
@@ -91,98 +94,4 @@ $(function() {
                     });
                 });
         });
-    // var DEFAULT_OCR_LANG = 'eng';
-    // var DEFAULT_TO_LANG = 'en';
-    // // var DEFAULT_AUTO_PROCESS = true;
-    // var DEFAULT_AUTO_TRANSLATE = true;
-    // var DEFAULT_OCR_FONTSIZE = '16px';
-    // var DEFAULT_POP_DICT = false;
-
-    /*var ocrnameArray = [{
-        'lang': 'ce',
-        'name': 'Czech',
-        'short': 'CS'
-    }, {
-        'lang': 'chs',
-        'name': 'ChineseSimplified',
-        'short': '繁'
-    }, {
-        'lang': 'cht',
-        'name': 'ChineseTraditional',
-        'short': '简'
-    }, {
-        'lang': 'dan',
-        'name': 'Danish',
-        'short': 'DA'
-    }, {
-        'lang': 'dut',
-        'name': 'Dutch',
-        'short': 'NL'
-    }, {
-        'lang': 'eng',
-        'name': 'English',
-        'short': 'EN'
-    }, {
-        'lang': 'fin',
-        'name': 'Finnish',
-        'short': 'FI'
-    }, {
-        'lang': 'fre',
-        'name': 'French',
-        'short': 'FR'
-    }, {
-        'lang': 'ger',
-        'name': 'German',
-        'short': 'DE'
-    }, {
-        'lang': 'gre',
-        'name': 'Greek',
-        'short': 'EL'
-    }, {
-        'lang': 'hun',
-        'name': 'Hungarian',
-        'short': 'HU'
-    }, {
-        'lang': 'ita',
-        'name': 'Italian',
-        'short': 'IT'
-    }, {
-        'lang': 'jpn',
-        'name': 'Japanese',
-        'short': 'JP'
-    }, {
-        'lang': 'kor',
-        'name': 'Korean',
-        'short': 'KO'
-    }, {
-        'lang': 'nor',
-        'name': 'Norwegian',
-        'short': 'NN'
-    }, {
-        'lang': 'pol',
-        'name': 'Polish',
-        'short': 'PL'
-    }, {
-        'lang': 'por',
-        'name': 'Portuguese',
-        'short': 'PT'
-    }, {
-        'lang': 'rus',
-        'name': 'Russian',
-        'short': 'RU'
-    }, {
-        'lang': 'spa',
-        'name': 'Spanish',
-        'short': 'ES'
-    }, {
-        'lang': 'swe',
-        'name': 'Swedish',
-        'short': 'SV'
-    }, {
-        'lang': 'tur',
-        'name': 'Turkish',
-        'short': 'TR'
-    }];
-*/
-
 });
