@@ -47,7 +47,7 @@ jQuery(function() {
     var _searchOCRLanguageList = function(lang) {
         var result = '';
         $.each(APPCONFIG.ocr_languages, function(i, v) {
-            if(v.lang === lang){
+            if (v.lang === lang) {
                 result = v;
                 return false;
             }
@@ -113,7 +113,7 @@ jQuery(function() {
         var ocrLang;
         $btnContainer.empty();
         $.each(OPTIONS.visualCopyQuickSelectLangs, function(i, language) {
-            if(language === 'none'){
+            if (language === 'none') {
                 return true;
             }
             ocrLang = _searchOCRLanguageList(language);
@@ -126,7 +126,7 @@ jQuery(function() {
                 'title': ocrLang.name
             }).text(ocrLang.short);
 
-            if(OPTIONS.visualCopyOCRLang === ocrLang.lang){
+            if (OPTIONS.visualCopyOCRLang === ocrLang.lang) {
                 $btn.addClass('selected');
             }
             $btnContainer.append($btn);
@@ -306,7 +306,7 @@ jQuery(function() {
     function setOptions(opts) {
         var $optsDfd = $.Deferred();
         chrome.storage.sync.set(opts, function() {
-            $.extend(OPTIONS,opts);
+            $.extend(OPTIONS, opts);
             // set the global options here
             $optsDfd.resolve();
         });
@@ -442,6 +442,124 @@ jQuery(function() {
     }
 
     /*
+     * Returns the ID of the most responsive server
+     */
+    function _getOCRServer() {
+        var $dfd = $.Deferred();
+        chrome.runtime.sendMessage({
+            evt: 'get-best-server'
+        }, function(response) {
+            $dfd.resolve(response.server.id);
+        });
+        return $dfd;
+    }
+
+    function _postToOCR($ocrPromise, postData, attempt) {
+        var formData = new FormData();
+        formData.append('language',postData.language);
+        formData.append('file',postData.blob,postData.fileName);
+        _getOCRServer().done(function(serverId) {
+            var serverList = APPCONFIG.ocr_api_list;
+            var ocrAPIInfo = $.grep(serverList, function(el) {
+                return el.id === serverId;
+            })[0];
+            formData.append('apikey', ocrAPIInfo.ocr_api_key);
+            attempt += 1;
+            $.ajax({
+                url: ocrAPIInfo.ocr_api_url,
+                data: formData,
+                dataType: 'json',
+                cache: false,
+                contentType: false,
+                processData: false,
+                timeout: APPCONFIG.ocr_timeout,
+                type: 'POST',
+                success: function(data) {
+                    var result;
+                    data = data || {};
+                    // retry if any error condition is met and if any servers are still available (attempt < 3)
+                    if ((typeof data === 'string' ||
+                            data.IsErroredOnProcessing ||
+                            data.OCRExitCode !== 1) &&
+                        attempt < 3) {
+                        // sometimes an error string is returned
+                        chrome.runtime.sendMessage({
+                            evt: 'set-server-responsetime',
+                            serverId: ocrAPIInfo.id,
+                            serverResponseTime: -1
+                        }, function() {
+                            /*TODO: number of attempts = 3 is now hard-coded*/
+                            OCRTranslator.setStatus('progress',
+                                chrome.i18n.getMessage('ocrProgressStatusStillWorking'), true);
+                            formData = null;
+                            _postToOCR($ocrPromise, postData, attempt);
+                        });
+                        return false;
+                    }
+                    if (data.IsErroredOnProcessing) {
+                        $ocrPromise.reject({
+                            type: 'OCR',
+                            stat: 'OCR conversion failed',
+                            message: data.ErrorMessage,
+                            details: data.ErrorDetails,
+                            code: data.OCRExitCode
+                        });
+                    } else if (data.OCRExitCode === 1) {
+                        $ocrPromise.resolve(data.ParsedResults[0].ParsedText);
+                    } else {
+                        result = data.ParsedResults[0];
+                        $ocrPromise.reject({
+                            type: 'OCR',
+                            stat: 'OCR conversion failed',
+                            message: result.ErrorMessage,
+                            details: result.ErrorDetails,
+                            code: result.FileParseExitCode
+                        });
+                    }
+                },
+                error: function(x, t) {
+                    var errData;
+                    var stat;
+                    if (attempt < 3) {
+                        chrome.runtime.sendMessage({
+                            evt: 'set-server-responsetime',
+                            serverId: ocrAPIInfo.id,
+                            serverResponseTime: -1
+                        }, function() {
+                            /*TODO: number of attempts = 3 is now hard-coded*/
+                            OCRTranslator.setStatus('progress',
+                                chrome.i18n.getMessage('ocrProgressStatusStillWorking'), true);
+                            formData = null;
+                            _postToOCR($ocrPromise, postData, attempt);
+                        });
+                        return false;
+                    }
+                    try {
+                        errData = JSON.parse(x.responseText);
+                    } catch (e) {
+                        errData = '';
+                    }
+                    if (t === 'timeout') {
+                        stat = 'OCR request timed out';
+                    } else if (x.status === 404) {
+                        stat = 'OCR service is currently unavailable';
+                    } else {
+                        stat = 'An error occurred during OCR';
+                    }
+                    $ocrPromise.reject({
+                        type: 'OCR',
+                        stat: stat,
+                        message: stat,
+                        details: null,
+                        code: null,
+                        data: errData
+                    });
+                }
+            });
+        });
+    }
+
+    /*
      * Responsible for:
      * 1. Rolling up the canvas data into a form object along with API key and language
      * 2. POST to OCR API
@@ -450,8 +568,9 @@ jQuery(function() {
      *
      */
     function _processOCRTranslate() {
-        var data = new FormData();
+        // var data = new FormData();
         var dataURI;
+        var ocrPostData;
         var $ocr = $.Deferred();
         var $process = $.Deferred();
         var $can = $('#ocrext-can');
@@ -464,17 +583,6 @@ jQuery(function() {
         // in settings are transferred to existing sessions as well
         getOptions().done(function() {
             _setOCRFontSize();
-            data.append('apikey', APPCONFIG.ocr_api_key);
-            data.append('language', OPTIONS.visualCopyOCRLang);
-            if (USE_JPEG) {
-                dataURI = $can.get(0).toDataURL('image/jpeg', JPEG_QUALITY);
-                data.append('file', dataURItoBlob(dataURI), 'ocr-file.jpg');
-            } else {
-                dataURI = $can.get(0).toDataURL();
-                data.append('file', dataURItoBlob(dataURI), 'ocr-file.png');
-            }
-
-
             $process
                 .done(function(txt, fromOCR) {
                     if (txt === 'no-translate') {
@@ -575,64 +683,21 @@ jQuery(function() {
                 chrome.i18n.getMessage('ocrProgressStatus'), true);
 
             // POST to OCR.
-            $.ajax({
-                url: APPCONFIG.ocr_api_url,
-                data: data,
-                dataType: 'json',
-                cache: false,
-                contentType: false,
-                processData: false,
-                timeout: APPCONFIG.ocr_timeout,
-                type: 'POST',
-                success: function(data) {
-                    var result;
-                    data = data || {};
-                    if (data.IsErroredOnProcessing) {
-                        $ocr.reject({
-                            type: 'OCR',
-                            stat: 'OCR conversion failed',
-                            message: data.ErrorMessage,
-                            details: data.ErrorDetails,
-                            code: data.OCRExitCode
-                        });
-                    } else if (data.OCRExitCode === 1) {
-                        $ocr.resolve(data.ParsedResults[0].ParsedText);
-                    } else {
-                        result = data.ParsedResults[0];
-                        $ocr.reject({
-                            type: 'OCR',
-                            stat: 'OCR conversion failed',
-                            message: result.ErrorMessage,
-                            details: result.ErrorDetails,
-                            code: result.FileParseExitCode
-                        });
-                    }
-                },
-                error: function(x, t) {
-                    var errData;
-                    var stat;
-                    try {
-                        errData = JSON.parse(x.responseText);
-                    } catch (e) {
-                        errData = '';
-                    }
-                    if (t === 'timeout') {
-                        stat = 'OCR request timed out';
-                    } else if (x.status === 404) {
-                        stat = 'OCR service is currently unavailable';
-                    } else {
-                        stat = 'An error occurred during OCR';
-                    }
-                    $ocr.reject({
-                        type: 'OCR',
-                        stat: stat,
-                        message: stat,
-                        details: null,
-                        code: null,
-                        data: errData
-                    });
-                }
-            });
+            ocrPostData = {};
+            ocrPostData.language = OPTIONS.visualCopyOCRLang;
+            // data.append('language', OPTIONS.visualCopyOCRLang);
+            if (USE_JPEG) {
+                dataURI = $can.get(0).toDataURL('image/jpeg', JPEG_QUALITY);
+                ocrPostData.blob = dataURItoBlob(dataURI);
+                ocrPostData.fileName = 'ocr-file.jpg';
+                // data.append('file', dataURItoBlob(dataURI), 'ocr-file.jpg');
+            } else {
+                dataURI = $can.get(0).toDataURL();
+                ocrPostData.blob = dataURItoBlob(dataURI);
+                ocrPostData.fileName = 'ocr-file.png';
+                // data.append('file', dataURItoBlob(dataURI), 'ocr-file.png');
+            }
+            _postToOCR($ocr, ocrPostData, 0);
 
             /*
              * $process::done can be called only if OCR and translation succeed
@@ -878,7 +943,7 @@ jQuery(function() {
                         text: $('.ocrext-ocr-message').text()
                     });
                 })
-                .on('click','.ocrext-ocr-quickselect',function(){
+                .on('click', '.ocrext-ocr-quickselect', function() {
                     var $el = $(this);
                     /*if($el.hasClass('selected')){
                         return false;
@@ -886,8 +951,8 @@ jQuery(function() {
                     $el.siblings().removeClass('selected');
                     $el.addClass('selected');
                     setOptions({
-                        visualCopyOCRLang:$(this).attr('data-lang')
-                    }).done(function(){
+                        visualCopyOCRLang: $(this).attr('data-lang')
+                    }).done(function() {
                         onOCRRedo();
                     });
                 })
@@ -988,6 +1053,7 @@ jQuery(function() {
         },
 
         // Utility to set the status - progress, error and success are supported
+        // pass noAutoClose as true if the status message must be persisted beyond 10s
         setStatus: function(status, txt, noAutoClose) {
             if (status === 'error') {
                 $('.ocrext-content').addClass('ocrext-error');

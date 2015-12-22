@@ -57,6 +57,10 @@
     "message":"OCR conversion in progress ...",
     "description":"OCR conversion in progress"
   },
+  "ocrProgressStatusStillWorking":{
+    "message":"Still working hard ...",
+    "description":"Still working hard"
+  },
   "translationProgressStatus":{
     "message":"Translation in progress ...",
     "description":"Translation in progress"

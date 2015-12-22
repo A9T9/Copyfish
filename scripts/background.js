@@ -2,10 +2,10 @@
 var TAB_AVAILABILITY_TIMEOUT = 15;
 /*
  * how does the enable/disable icon work?
- * website:document.ready -> 'ready' message to background -> enables icon
+ * Ans: website:document.ready -> 'ready' message to background -> enables icon
  *
  * how does clicking on the extension icon work?
- * browserAction:onclick -> 'enableselection' event to specific tab -> selection enabled in that tab
+ * Ans: browserAction:onclick -> 'enableselection' event to specific tab -> selection enabled in that tab
  */
 
 function enableIcon(tabId) {
@@ -122,105 +122,211 @@ function isTabAvailable(tabId) {
     return _checkAvailability();
 }
 
-chrome.contextMenus.create({
-    contexts: ['browser_action'],
-    title: 'Desktop Text Capture',
-    id: 'capture-desktop',
-    onclick: captureScreen
-});
+// ensure the config is available before doing anything else 
+$.getJSON(chrome.extension.getURL('config/config.json'))
+    .done(function(appConfig) {
+        /*
+         * Should ideally be a BST, but a tree for 3 nodes is overkill. 
+         * The underlying structure can be converted to a BST in future if required. Since the methods exposed remain the
+         * same, side effects should be near zero
+         */
+        var OcrDS = (function() {
+            var _maxResponseTime = 99;
+            var _ocrDSAPI = {
+                resetTime: appConfig.ocr_server_reset_time,
+                reset: function() {
+                    this.getAll().done(function(items) {
+                        if (Date.now() - items.ocrServerLastReset > this.resetTime) {
+                            $.each(items.ocrServerList, function(i, server) {
+                                server.responseTime = 0;
+                            });
+                        }
+                    });
+                },
+                getAll: function() {
+                    var $dfd = $.Deferred();
+                    chrome.storage.sync.get({
+                        ocrServerLastReset: -1,
+                        ocrServerList: []
+                    }, function(items) {
+                        $dfd.resolve(items);
+                    });
+                    return $dfd;
+                },
+                getBest: function() {
+                    var $dfd = $.Deferred();
+                    this.getAll().done(function(items) {
+                        $dfd.resolve(items.ocrServerList[0]);
+                    });
+                    return $dfd;
+                },
+                set: function(id, responseTime) {
+                    var $dfd = $.Deferred();
+                    this.getAll().done(function(items) {
+                        var serverList = items.ocrServerList;
+                        if (responseTime === -1) {
+                            responseTime = _maxResponseTime;
+                        }
+                        $.each(serverList, function(i, server) {
+                            if (id === server.id) {
+                                server.responseTime = responseTime;
+                                return false;
+                            }
+                        });
+                        // sort on setting a value, the smallest value is always at the head
+                        serverList.sort(function(a, b) {
+                            if (a.responseTime > b.responseTime) {
+                                return 1;
+                            } else if (a.responseTime < b.responseTime) {
+                                return -1;
+                            } else {
+                                return 0;
+                            }
+                        });
+                        chrome.storage.sync.set({
+                            ocrServerList: serverList
+                        }, function() {
+                            $dfd.resolve();
+                        });
+                    });
+                    return $dfd;
+                }
+            };
 
-// disableIcon();
-chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
-    var url = changeInfo.url || tab.url || !1;
-    if (url && (/^chrome\-extension:\/\//.test(url) || /^chrome:\/\//.test(url) || /^https:\/\/chrome\.google\.com\/webstore\//.test(url))) {
-        disableIcon(tabId);
-    }
-});
+            // init
+            chrome.storage.sync.get({
+                ocrServerLastReset: -1,
+                ocrServerList: []
+            }, function(items) {
+                var serverList;
+                if (items.ocrServerLastReset === -1) {
+                    serverList = [];
+                    // if -1, then the store is empty. Populate it 
+                    $.each(appConfig.ocr_api_list, function(i, api) {
+                        serverList.push({
+                            id: api.id,
+                            responseTime: 0
+                        });
+                    });
+                    chrome.storage.sync.set({
+                        ocrServerList: serverList,
+                        ocrServerLastReset: Date.now()
+                    });
+                } else {
+                    // store is not empty, reset if required 
+                    _ocrDSAPI.reset();
+                }
+            });
+
+            return _ocrDSAPI;
+        }());
+
+        chrome.contextMenus.create({
+            contexts: ['browser_action'],
+            title: 'Desktop Text Capture',
+            id: 'capture-desktop',
+            onclick: captureScreen
+        });
+
+        // disableIcon();
+        chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
+            var url = changeInfo.url || tab.url || !1;
+            if (url && (/^chrome\-extension:\/\//.test(url) || /^chrome:\/\//.test(url) || /^https:\/\/chrome\.google\.com\/webstore\//.test(url))) {
+                disableIcon(tabId);
+            }
+        });
 
 
-chrome.storage.sync.get({
-    visualCopyOCRLang: '',
-    visualCopyTranslateLang: '',
-    // visualCopyAutoProcess: '',
-    visualCopyAutoTranslate: '',
-    visualCopyOCRFontSize: '',
-    visualCopySupportDicts: '',
-    visualCopyQuickSelectLangs: []
-}, function(items) {
-    /* 
-     *  visualCopyOCRLang must always be set. This is a simple check to see if it is actually set.
-     *  Ideally this should be in a separate config.
-     */
-    if (!items.visualCopyOCRLang) {
-        $.getJSON(chrome.extension.getURL('config/config.json'))
-            .done(function(data) {
-                chrome.storage.sync.set(data.defaults, function() {
+        chrome.storage.sync.get({
+            visualCopyOCRLang: '',
+            visualCopyTranslateLang: '',
+            visualCopyAutoTranslate: '',
+            visualCopyOCRFontSize: '',
+            visualCopySupportDicts: '',
+            visualCopyQuickSelectLangs: []
+        }, function(items) {
+            if (!items.visualCopyOCRLang) {
+                chrome.storage.sync.set(appConfig.defaults, function() {});
+            }
+        });
 
+        chrome.browserAction.onClicked.addListener(function(tab) {
+            disableIcon(tab.id);
+            isTabAvailable(tab.id)
+                .done(function() {
+                    chrome.tabs.sendMessage(tab.id, {
+                        evt: 'enableselection'
+                    });
+                })
+                .fail(function() {
+                    window.alert(chrome.i18n.getMessage('captureError'));
+                    enableIcon(tab.id);
                 });
-            });
-    }
-});
-
-chrome.browserAction.onClicked.addListener(function(tab) {
-    disableIcon(tab.id);
-    isTabAvailable(tab.id)
-        .done(function() {
-            chrome.tabs.sendMessage(tab.id, {
-                evt: 'enableselection'
-            });
-        })
-        .fail(function() {
-            window.alert(chrome.i18n.getMessage('captureError'));
-            enableIcon(tab.id);
         });
-});
 
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-    var tab = sender.tab;
-    var copyDiv;
-    if (!tab) {
-        return false;
-    }
-    if (request.evt === 'ready') {
-        enableIcon(tab.id);
-        sendResponse({
-            farewell: 'ready:OK'
-        });
-        return true;
-    } else if (request.evt === 'capture-screen') {
-        chrome.tabs.captureVisibleTab(function(dataURL) {
-            chrome.tabs.getZoom(tab.id, function(zf) {
+        chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+            var tab = sender.tab;
+            var copyDiv;
+            if (!tab) {
+                return false;
+            }
+            if (request.evt === 'ready') {
+                enableIcon(tab.id);
                 sendResponse({
-                    dataURL: dataURL,
-                    zf: zf
+                    farewell: 'ready:OK'
                 });
-            });
+                return true;
+            } else if (request.evt === 'capture-screen') {
+                chrome.tabs.captureVisibleTab(function(dataURL) {
+                    chrome.tabs.getZoom(tab.id, function(zf) {
+                        sendResponse({
+                            dataURL: dataURL,
+                            zf: zf
+                        });
+                    });
+                });
+                return true;
+            } else if (request.evt === 'capture-done') {
+                enableIcon(tab.id);
+                sendResponse({
+                    farewell: 'capture-done:OK'
+                });
+            } else if (request.evt === 'copy') {
+                copyDiv = document.createElement('div');
+                copyDiv.contentEditable = true;
+                document.body.appendChild(copyDiv);
+                copyDiv.innerText = request.text;
+                copyDiv.unselectable = 'off';
+                copyDiv.focus();
+                document.execCommand('SelectAll');
+                document.execCommand('Copy', false, null);
+                document.body.removeChild(copyDiv);
+                sendResponse({
+                    farewell: 'copy:OK'
+                });
+            } else if (request.evt === 'open-settings') {
+                chrome.tabs.create({
+                    'url': chrome.extension.getURL('options.html')
+                });
+                sendResponse({
+                    farewell: 'open-settings:OK'
+                });
+            } else if (request.evt === 'get-best-server') {
+                OcrDS.getBest().done(function(server) {
+                    console.log(server);
+                    sendResponse({
+                        server: server
+                    });
+                });
+                return true;
+            } else if (request.evt === 'set-server-responsetime') {
+                OcrDS.set(request.serverId, request.serverResponseTime).done(function() {
+                    sendResponse({
+                        farewell: 'set-server-responsetime:OK'
+                    });
+                });
+                return true;
+            }
         });
-        return true;
-    } else if (request.evt === 'capture-done') {
-        enableIcon(tab.id);
-        sendResponse({
-            farewell: 'capture-done:OK'
-        });
-    } else if (request.evt === 'copy') {
-        copyDiv = document.createElement('div');
-        copyDiv.contentEditable = true;
-        document.body.appendChild(copyDiv);
-        copyDiv.innerText = request.text;
-        copyDiv.unselectable = 'off';
-        copyDiv.focus();
-        document.execCommand('SelectAll');
-        document.execCommand('Copy', false, null);
-        document.body.removeChild(copyDiv);
-        sendResponse({
-            farewell: 'copy:OK'
-        });
-    } else if (request.evt === 'open-settings') {
-        chrome.tabs.create({
-            'url': chrome.extension.getURL('options.html')
-        });
-        sendResponse({
-            farewell: 'open-settings:OK'
-        });
-    }
-});
+
+    });
