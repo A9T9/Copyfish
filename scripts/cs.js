@@ -4,6 +4,7 @@ jQuery(function() {
     // pseudo-private members
     var $ = jQuery;
     var appName = 'Copyfish'; //chrome.i18n.getMessage('appShortName');
+    var appShortName = 'Copyfish';
     var $ready;
     var HTMLSTRCOPY;
     var APPCONFIG;
@@ -29,10 +30,10 @@ jQuery(function() {
     var OCR_DIMENSION_ERROR = chrome.i18n.getMessage('ocrDimensionError');
 
     /* 
-    *  Set to true to use a JPEG image. Default is PNG
-    *  JPEG_QUALITY ranges from 0.1 to 1 and is valid only if USE_JPEG is true
-    */
-    var USE_JPEG = true;
+     *  Set to true to use a JPEG image. Default is PNG
+     *  JPEG_QUALITY ranges from 0.1 to 1 and is valid only if USE_JPEG is true
+     */
+    var USE_JPEG = false;
     var JPEG_QUALITY = 0.1;
 
 
@@ -43,17 +44,31 @@ jQuery(function() {
         console.error('Extension ' + appShortName + ': ' + msg, err);
     };
 
-    var _getLanguage = function(type, code) {
-        var langList = APPCONFIG[type === 'OCR' ? 'ocr_languages' : 'yandex_languages'];
-        code = (code || 'en').toLowerCase();
-        var res = '';
-        $.each(langList, function(k, v) {
-            if (code in v) {
-                res = v[code];
+    var _searchOCRLanguageList = function(lang) {
+        var result = '';
+        $.each(APPCONFIG.ocr_languages, function(i, v) {
+            if(v.lang === lang){
+                result = v;
                 return false;
             }
         });
+        return result;
+    };
 
+    var _getLanguage = function(type, lang) {
+        // var langList = APPCONFIG[type === 'OCR' ? 'ocr_languages' : 'yandex_languages'];
+        var res = '';
+        lang = (lang || 'en').toLowerCase();
+        if (type === 'OCR') {
+            res = (_searchOCRLanguageList(lang) || {}).name;
+        } else {
+            $.each(APPCONFIG.yandex_languages, function(k, v) {
+                if (lang in v) {
+                    res = v[lang];
+                    return false;
+                }
+            });
+        }
         return res;
     };
 
@@ -90,6 +105,25 @@ jQuery(function() {
         } else {
             $('.ocrext-wrapper').css('zIndex', MAX_ZINDEX);
         }
+    };
+
+    var _drawQuickSelectButtons = function() {
+        var $btnContainer = $('.ocrext-quickselect-btn-container');
+        var $btn;
+        var ocrLang;
+        $btnContainer.empty();
+        $.each(OPTIONS.visualCopyQuickSelectLangs, function(i, language) {
+            ocrLang = _searchOCRLanguageList(language);
+            $btn = $([
+                '<button class="ocrext-element ocrext-ocr-quickselect ocrext-btn mdl-button',
+                'mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"></button>'
+            ].join(' '));
+            $btn.attr('data-lang',ocrLang.lang)
+                .text(ocrLang.short);
+            $btnContainer.append($btn);
+            // upgrade button to mdl-button
+            componentHandler.upgradeElement($btn.get(0));
+        });
     };
 
     // Background mask
@@ -245,7 +279,8 @@ jQuery(function() {
             // visualCopyAutoProcess: '',
             visualCopyAutoTranslate: '',
             visualCopyOCRFontSize: '',
-            visualCopySupportDicts: ''
+            visualCopySupportDicts: '',
+            visualCopyQuickSelectLangs: []
         };
         chrome.storage.sync.get(theseOptions, function(opts) {
             OPTIONS = opts;
@@ -253,6 +288,19 @@ jQuery(function() {
             $optsDfd.resolve();
         });
 
+        return $optsDfd;
+    }
+
+    /*
+     * Mutates global state by setting the OPTIONS value
+     */
+    function setOptions(opts) {
+        var $optsDfd = $.Deferred();
+        chrome.storage.sync.set(opts, function() {
+            $.extend(OPTIONS,opts);
+            // set the global options here
+            $optsDfd.resolve();
+        });
         return $optsDfd;
     }
 
@@ -281,6 +329,8 @@ jQuery(function() {
                 _setLanguageOnUI();
                 // set OCR font size
                 _setOCRFontSize();
+                // draw quick selection buttons
+                _drawQuickSelectButtons();
                 // upgrade buttons
                 $('button.ocrext-btn').each(function(i, el) {
                     componentHandler.upgradeElement(el);
@@ -325,7 +375,7 @@ jQuery(function() {
     }
 
     /*depends on the global variables startCx,startCy,endCx,endCy
-     * will not work if layout changes in between calls, but there is no way to detect this
+     * will not work if layout changes in between calls, but there is no way to detect this.
      * is asynchronous, returns a promise
      */
     function _captureImageOntoCanvas() {
@@ -337,6 +387,7 @@ jQuery(function() {
         getOptions().done(function() {
             _setLanguageOnUI();
             _setOCRFontSize();
+            _drawQuickSelectButtons();
             setTimeout(function() {
                 chrome.runtime.sendMessage({
                     evt: 'capture-screen'
@@ -355,8 +406,8 @@ jQuery(function() {
                             var ctx;
                             // the screencapture is messed up when pixel density changes; compare the window width
                             // and image width to determine if it needs to be fixed
-                            var dpf = window.innerWidth/img.width;
-                            var scaleFactor = zf/dpf;
+                            var dpf = window.innerWidth / img.width;
+                            var scaleFactor = zf / dpf;
                             sx = Math.min(startCx, endCx) * scaleFactor;
                             sy = Math.min(startCy, endCy) * scaleFactor;
                             width = Math.abs(endCx * scaleFactor - startCx * scaleFactor);
@@ -413,7 +464,7 @@ jQuery(function() {
                 dataURI = $can.get(0).toDataURL();
                 data.append('file', dataURItoBlob(dataURI), 'ocr-file.png');
             }
-            
+
 
             $process
                 .done(function(txt, fromOCR) {

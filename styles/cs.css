@@ -333,15 +333,26 @@
 .ocrext-wrapper .ocrext-content .ocrext-ocr-output p.ocrext-ocr-message.expanded {
   height: 170px;
 }
-.ocrext-wrapper .ocrext-content .ocrext-btn-container {
+.ocrext-wrapper .ocrext-content .ocrext-footer .ocrext-quickselect-btn-container {
+  float: left;
+  margin-bottom: 5px;
+}
+.ocrext-wrapper .ocrext-content .ocrext-footer .ocrext-quickselect-btn-container button.ocrext-btn {
+  margin-right: 5px;
+  padding: 0 16px;
+}
+.ocrext-wrapper .ocrext-content .ocrext-footer .ocrext-quickselect-btn-container button.ocrext-btn:last-child {
+  margin-right: 0;
+}
+.ocrext-wrapper .ocrext-content .ocrext-footer .ocrext-btn-container {
   float: right;
   margin-bottom: 5px;
 }
-.ocrext-wrapper .ocrext-content .ocrext-btn-container button.ocrext-btn {
+.ocrext-wrapper .ocrext-content .ocrext-footer .ocrext-btn-container button.ocrext-btn {
   margin-right: 15px;
   padding: 0 16px;
 }
-.ocrext-wrapper .ocrext-content .ocrext-btn-container .ocrext-ocr-close {
+.ocrext-wrapper .ocrext-content .ocrext-footer .ocrext-btn-container .ocrext-ocr-close {
   margin-right: 0;
 }
 .ocrext-wrapper .ocrext-content.ocrext-error .ocrext-ocr-output .ocrext-ocr-message,

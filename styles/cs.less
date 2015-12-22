@@ -311,15 +311,28 @@
     }
     
     /*Bottom buttons container*/
-    .ocrext-btn-container {
-      float: right;
-      margin-bottom: 5px;
-      button.ocrext-btn {
-        margin-right:15px;
-        padding: 0 16px;
+    .ocrext-footer {
+      .ocrext-quickselect-btn-container {
+        float: left;
+        margin-bottom: 5px;
+        button.ocrext-btn {
+          margin-right:5px;
+          padding: 0 16px;
+        }
+        button.ocrext-btn:last-child {
+          margin-right: 0;
+        }
       }
-      .ocrext-ocr-close {
-        margin-right: 0;
+      .ocrext-btn-container {
+        float: right;
+        margin-bottom: 5px;
+        button.ocrext-btn {
+          margin-right:15px;
+          padding: 0 16px;
+        }
+        .ocrext-ocr-close {
+          margin-right: 0;
+        }
       }
     }
     
