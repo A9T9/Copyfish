@@ -988,7 +988,7 @@ jQuery(function() {
 
                 } else {
                     logError('Overlay is unavailable.');
-                    window.alert('Sorry. Text overlay is curr unavailable.');
+                    window.alert('Sorry. Text overlay is currently unavailable.');
                 }
                 return this;
             },
