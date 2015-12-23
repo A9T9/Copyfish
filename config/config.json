@@ -11,13 +11,18 @@
     "yandex_api_url": "https://translate.yandex.net/api/v1.5/tr.json/translate",
     "ocr_api_list": [{
         "id":"1",
-        "ocr_api_key": "helloworld",
-        "ocr_api_url": "https://ocr.a9t9.com/api/Parse/Image"
+        "ocr_api_key": "ttt",
+        "ocr_api_url": "http://api.ocrapi.xyz/api/parse/image"
     }, {
         "id":"2",
         "ocr_api_key": "Copyfish",
         "ocr_api_url": "https://ocrapi.a9t9.com/api/Parse/Image"
-    }],
+    },{
+        "id":"3",
+        "ocr_api_key": "helloworld",
+        "ocr_api_url": "https://ocr.a9t9.com/api/Parse/Image"
+    }
+    ],
     "ocr_server_reset_time": 86400,
     "ocr_timeout": 60000,
     "yandex_timeout": 60000,

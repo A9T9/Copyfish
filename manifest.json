@@ -22,7 +22,8 @@
   "web_accessible_resources": [
     "dialog.html",
     "config/config.json",
-    "images/gear.png"
+    "images/gear.png",
+    "images/close.png"
   ],
   "content_scripts": [
     {

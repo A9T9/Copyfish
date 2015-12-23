@@ -454,10 +454,15 @@ jQuery(function() {
         return $dfd;
     }
 
+    /*
+     * Handles the AJAX POST calls to OCR API.
+     * Failover logic happens here!
+     */
     function _postToOCR($ocrPromise, postData, attempt) {
         var formData = new FormData();
         formData.append('language', postData.language);
         formData.append('file', postData.blob, postData.fileName);
+        formData.append('isOverlayRequired', true);
         _getOCRServer().done(function(serverId) {
             var startTime;
             var serverList = APPCONFIG.ocr_api_list;
@@ -511,9 +516,9 @@ jQuery(function() {
                         chrome.runtime.sendMessage({
                             evt: 'set-server-responsetime',
                             serverId: ocrAPIInfo.id,
-                            serverResponseTime: (Date.now() - startTime)/1000
+                            serverResponseTime: (Date.now() - startTime) / 1000
                         }, function() {});
-                        $ocrPromise.resolve(data.ParsedResults[0].ParsedText);
+                        $ocrPromise.resolve(data.ParsedResults[0].ParsedText, data.ParsedResults[0].TextOverlay);
 
                     } else {
                         result = data.ParsedResults[0];
@@ -591,6 +596,7 @@ jQuery(function() {
         // in settings are transferred to existing sessions as well
         getOptions().done(function() {
             _setOCRFontSize();
+            OCRTranslator.textOverlay.reset();
             $process
                 .done(function(txt, fromOCR) {
                     if (txt === 'no-translate') {
@@ -622,12 +628,24 @@ jQuery(function() {
                     $('.ocrext-ocr-translated').text('N/A');
                     OCRTranslator.enableContent();
                     console.error('Visual Copy Exception', err);
+                })
+                .always(function() {
+                    // dereference expensive objects, just in case
+                    // everything terminates with $process, single point of extry/exit
+                    dataURI = null;
+                    ocrPostData = null;
+                    $can = null;
+                    $ocr = null;
                 });
 
             $ocr
-                .done(function(text) {
+                .done(function(text, overlayInfo) {
                     $('.ocrext-ocr-message')
                         .text(text);
+
+                    // dataURI should be visible as it is encapsulated within _processOCRTranslate
+                    // the mad-world of async programming
+                    OCRTranslator.textOverlay.setOverlayInformation(overlayInfo, dataURI);
 
                     if (!OPTIONS.visualCopyAutoTranslate) {
                         $process.resolve('no-translate', true);
@@ -884,7 +902,109 @@ jQuery(function() {
 
         });
     }
+    var TextOverlay = function() {
+        var _overlay;
+        var _imgDataURI;
 
+        var _isOverlayAvailable = function() {
+            return !!_overlay && _overlay.HasOverlay;
+        };
+        var $body = $('body');
+        var htmlString = [
+            '<div class="ocrext-element ocrext-text-overlay">',
+            '<div class="ocrext-element ocrext-text-overlay-word-wrapper">',
+            '<a class="ocrext-close-link" title="Close">',
+            '</a>',
+            '<img class="ocrext-element ocrext-text-overlay-img" id="text-overlay-img"/>',
+            '</div>',
+            '</div>'
+        ].join('');
+        var wordString = '<span class="ocrext-element ocrext-text-overlay-word"></span>';
+
+        var $overlay;
+        var _overlayInstance;
+        var _init = function() {
+            $overlay = $(htmlString);
+            $overlay.appendTo($body);
+
+            $overlay.on('click', '.ocrext-close-link', function() {
+                _overlayInstance.hide();
+            });
+        };
+
+        _overlayInstance = {
+            reset: function() {
+                _overlay = null;
+                _imgDataURI = null;
+            },
+            setOverlayInformation: function(overlayInfo, img) {
+                _overlay = overlayInfo;
+                _imgDataURI = img;
+                this.render();
+            },
+            getOverlayInformation: function() {
+                return _overlay;
+            },
+            render: function() {
+                if (_isOverlayAvailable()) {
+                    var lines = _overlay.Lines;
+                    var $wordWrapper = $overlay.find('.ocrext-text-overlay-word-wrapper');
+                    var $word;
+                    $.each(lines, function(i, line) {
+                        var maxLineHeight = line.MaxHeight;
+                        var minLineTopDist = line.MinTop;
+                        $.each(line.Words, function(j, word) {
+                            $word = $(wordString);
+                            $word
+                                .text(word.WordText)
+                                .css({
+                                    left: word.Left,
+                                    top: minLineTopDist,
+                                    height: maxLineHeight,
+                                    width: word.Width,
+                                    fontSize: maxLineHeight*0.8
+                                })
+                                .appendTo($wordWrapper);
+                            $word = null;
+                        });
+
+                    });
+                    $overlay.find('img').attr('src', _imgDataURI);
+
+                    // destroy the JS image reference after render
+                    _imgDataURI = null;
+                }
+            },
+            show: function() {
+
+                if (_isOverlayAvailable()) {
+                    this.position();
+                    $overlay.show();
+
+                } else {
+                    logError('Overlay is unavailable.');
+                    window.alert('Sorry. Text overlay is curr unavailable.');
+                }
+                return this;
+            },
+            hide: function() {
+                $overlay.hide();
+                return this;
+            },
+            position: function() {
+                var bodyWidth, bodyHeight;
+                bodyWidth = $body.width();
+                bodyHeight = $(window).height();
+                $overlay.css({
+                    left: bodyWidth / 2 - $overlay.width() / 2,
+                    top: 150
+                });
+                return this;
+            }
+        };
+        _init();
+        return _overlayInstance;
+    };
 
     /*
      * @module: OCRTranslator
@@ -926,6 +1046,7 @@ jQuery(function() {
                     farewell: 'enableselection:OK'
                 });
             });
+            this.textOverlay = TextOverlay();
             this.bindEvents();
             // tell the background page that the tab is ready
             chrome.runtime.sendMessage({
@@ -940,7 +1061,11 @@ jQuery(function() {
          */
         bindEvents: function() {
             var $body = $('body');
+            var self = this;
             $body
+                .on('dblclick', '#ocrext-can', function() {
+                    self.textOverlay.show();
+                })
                 .on('click', '.ocrext-ocr-recapture', onOCRRecapture)
                 .on('click', '.ocrext-ocr-sendocr', onOCRRedo)
                 .on('click', '.ocrext-ocr-close', onOCRClose)
