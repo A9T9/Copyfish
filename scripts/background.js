@@ -133,7 +133,7 @@ $.getJSON(chrome.extension.getURL('config/config.json'))
         var OcrDS = (function() {
             var _maxResponseTime = 99;
             var _randNotEqual = function(serverList, server) {
-                var idx = Math.floor(1 + (Math.random() * serverList.length));
+                var idx = Math.floor(Math.random() * serverList.length);
                 if (serverList[idx].id !== server.id) {
                     return serverList[idx];
                 } else {
