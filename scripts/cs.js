@@ -289,7 +289,8 @@ jQuery(function() {
             visualCopyAutoTranslate: '',
             visualCopyOCRFontSize: '',
             visualCopySupportDicts: '',
-            visualCopyQuickSelectLangs: []
+            visualCopyQuickSelectLangs: [],
+            visualCopyTextOverlay:''
         };
         chrome.storage.sync.get(theseOptions, function(opts) {
             OPTIONS = opts;
@@ -462,7 +463,9 @@ jQuery(function() {
         var formData = new FormData();
         formData.append('language', postData.language);
         formData.append('file', postData.blob, postData.fileName);
-        formData.append('isOverlayRequired', true);
+        if(OPTIONS.visualCopyTextOverlay){
+            formData.append('isOverlayRequired', true);
+        }
         _getOCRServer().done(function(serverId) {
             var startTime;
             var serverList = APPCONFIG.ocr_api_list;
@@ -936,6 +939,8 @@ jQuery(function() {
             reset: function() {
                 _overlay = null;
                 _imgDataURI = null;
+                $overlay.find('.ocrext-text-overlay-word-wrapper span').remove();
+                $overlay.find('#text-overlay-img').attr('src','');
             },
             setOverlayInformation: function(overlayInfo, img) {
                 _overlay = overlayInfo;
@@ -1064,7 +1069,11 @@ jQuery(function() {
             var self = this;
             $body
                 .on('dblclick', '#ocrext-can', function() {
-                    self.textOverlay.show();
+                    if(OPTIONS.visualCopyTextOverlay){
+                        self.textOverlay.show();
+                    }else{
+                        window.alert('Please enable the "Show Text Overlay" option to view text overlays.');
+                    }
                 })
                 .on('click', '.ocrext-ocr-recapture', onOCRRecapture)
                 .on('click', '.ocrext-ocr-sendocr', onOCRRedo)

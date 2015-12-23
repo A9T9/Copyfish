@@ -7,7 +7,8 @@ $(function() {
 
             var checkBoxes = {
                 visualCopyAutoTranslate: ['.auto-translate', defaults.visualCopyAutoTranslate],
-                visualCopySupportDicts: ['.popup-dicts', defaults.visualCopySupportDicts]
+                visualCopySupportDicts: ['.popup-dicts', defaults.visualCopySupportDicts],
+                visualCopyTextOverlay:['.text-overlay',defaults.visualCopyTextOverlay]
             };
 
             // render the Input Language select box
@@ -33,7 +34,8 @@ $(function() {
                 visualCopyAutoTranslate: defaults.visualCopyAutoTranslate,
                 visualCopyOCRFontSize: defaults.visualCopyOCRFontSize,
                 visualCopySupportDicts: defaults.visualCopySupportDicts,
-                visualCopyQuickSelectLangs: defaults.visualCopyQuickSelectLangs
+                visualCopyQuickSelectLangs: defaults.visualCopyQuickSelectLangs,
+                visualCopyTextOverlay: defaults.visualCopyTextOverlay
             }, function(items) {
                 $('#input-lang').val(items.visualCopyOCRLang);
                 $('#output-lang').val(items.visualCopyTranslateLang);
@@ -69,7 +71,8 @@ $(function() {
                         visualCopyOCRFontSize: $('#ocr-fontsize').val(),
                         visualCopyAutoTranslate: $('.auto-translate').hasClass('is-checked'),
                         visualCopySupportDicts: $('.popup-dicts').hasClass('is-checked'),
-                        visualCopyQuickSelectLangs: quickSelectLangs
+                        visualCopyQuickSelectLangs: quickSelectLangs,
+                        visualCopyTextOverlay: $('.text-overlay').hasClass('is-checked')
                     }, function() {
                         // Update status to let user know options were saved.
                         $('.status-text').addClass('visible');

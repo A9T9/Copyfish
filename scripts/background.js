@@ -279,10 +279,24 @@ $.getJSON(chrome.extension.getURL('config/config.json'))
             visualCopyAutoTranslate: '',
             visualCopyOCRFontSize: '',
             visualCopySupportDicts: '',
-            visualCopyQuickSelectLangs: []
+            visualCopyQuickSelectLangs: [],
+            visualCopyTextOverlay: ''
         }, function(items) {
+            var itemsToBeSet;
             if (!items.visualCopyOCRLang) {
+                // first run of the extension, set everything
                 chrome.storage.sync.set(appConfig.defaults, function() {});
+            }else{
+                // if any of these fields return '', they have not been set yet.
+                itemsToBeSet = {};
+                $.each(items,function(k,item){
+                    if(item === ''){
+                        itemsToBeSet[k] = appConfig.defaults[k];
+                    }
+                });
+                if(Object.keys(itemsToBeSet).length){
+                    chrome.storage.sync.set(itemsToBeSet, function() {});
+                }
             }
         });
 
