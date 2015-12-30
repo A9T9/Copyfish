@@ -506,7 +506,15 @@ jQuery(function() {
                         });
                         return false;
                     }
-                    if (data.IsErroredOnProcessing) {
+                    if(typeof data === 'string'){
+                        $ocrPromise.reject({
+                            type: 'OCR',
+                            stat: 'OCR conversion failed',
+                            message: data,
+                            details: data,
+                            code: data
+                        });
+                    }else if (data.IsErroredOnProcessing) {
                         $ocrPromise.reject({
                             type: 'OCR',
                             stat: 'OCR conversion failed',
