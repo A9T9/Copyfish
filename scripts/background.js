@@ -286,15 +286,15 @@ $.getJSON(chrome.extension.getURL('config/config.json'))
             if (!items.visualCopyOCRLang) {
                 // first run of the extension, set everything
                 chrome.storage.sync.set(appConfig.defaults, function() {});
-            }else{
+            } else {
                 // if any of these fields return '', they have not been set yet.
                 itemsToBeSet = {};
-                $.each(items,function(k,item){
-                    if(item === ''){
+                $.each(items, function(k, item) {
+                    if (item === '') {
                         itemsToBeSet[k] = appConfig.defaults[k];
                     }
                 });
-                if(Object.keys(itemsToBeSet).length){
+                if (Object.keys(itemsToBeSet).length) {
                     chrome.storage.sync.set(itemsToBeSet, function() {});
                 }
             }
@@ -317,6 +317,8 @@ $.getJSON(chrome.extension.getURL('config/config.json'))
         chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
             var tab = sender.tab;
             var copyDiv;
+            var overlayInfo;
+            var imgDataURI;
             if (!tab) {
                 return false;
             }
@@ -373,6 +375,32 @@ $.getJSON(chrome.extension.getURL('config/config.json'))
                     sendResponse({
                         farewell: 'set-server-responsetime:OK'
                     });
+                });
+                return true;
+            } else if (request.evt === 'show-overlay-tab') {
+                // trap them props
+                overlayInfo = request.overlayInfo;
+                imgDataURI = request.imgDataURI;
+                chrome.tabs.create({
+                    url: chrome.extension.getURL('/overlay.html')
+                }, function(destTab) {
+                    console.log(destTab.id);
+                    setTimeout(function() {
+                        chrome.tabs.sendMessage(destTab.id, {
+                            evt: 'init-overlay-tab',
+                            overlayInfo: overlayInfo,
+                            imgDataURI: imgDataURI
+                        }, function() {
+                            // chrome.tabs.sendMessage(destTab.id, {
+                            //     evt: 'enableselection'
+                            // });
+                            sendResponse({
+                                farewell: 'show-overlay-tab:OK'
+                            });
+                        });
+                    },300);
+
+
                 });
                 return true;
             }

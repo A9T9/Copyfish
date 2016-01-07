@@ -25,6 +25,10 @@
     "message":"Screen Capture",
     "description":"Title of the screen capture page"
   },
+  "overlayTab":{
+    "message":"Result Overlay",
+    "description":"Title of the overlay page"
+  },
   "userMediaUnsupported":{
     "message":"Your browser does not support desktop capture",
     "description":"getUserMedia is unsupported"

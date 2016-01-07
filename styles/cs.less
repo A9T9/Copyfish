@@ -45,35 +45,6 @@
     border:@selector-border-width solid @accent;
     border-radius: @selector-border-radius; 
 	}
-  .ocrext-text-overlay {
-    display: none;
-    position: absolute;
-    .ocrext-text-overlay-word-wrapper {
-      position: relative;
-      border: 1px solid black;
-      .ocrext-close-link {
-        display: inline-block;
-        position: absolute;
-        padding: 0;
-        height: 36px;
-        width:36px;
-        background: url('chrome-extension://__MSG_@@extension_id__/images/close.png');
-        background-size: 36px; 
-        top:-19px;
-        right: -19px;
-        cursor: pointer;
-      }
-      .ocrext-text-overlay-word {
-        color:@word-color;
-        text-align: center;
-        font-size: 20px;
-        font-weight: bold;
-        position: absolute;
-        background: rgba(255, 215, 15, 0.5);
-      }
-    }
-
-  }
 }
 
 .ocrext-element {
@@ -92,6 +63,38 @@
   font-size: @fontSize;
   font-variant: normal;
 }
+.ocrext-text-overlay {
+  display: none;
+  &.visible {
+    display: flex;
+    justify-content:space-around;
+  }
+  .ocrext-text-overlay-word-wrapper {
+    position: relative;
+    border: 1px solid black;
+    .ocrext-close-link {
+      display: inline-block;
+      position: absolute;
+      padding: 0;
+      height: 36px;
+      width:36px;
+      background: url('chrome-extension://__MSG_@@extension_id__/images/close.png');
+      background-size: 36px; 
+      top:-19px;
+      right: -19px;
+      cursor: pointer;
+    }
+    .ocrext-text-overlay-word {
+      color:@word-color;
+      text-align: center;
+      font-size: 20px;
+      font-weight: bold;
+      position: absolute;
+      background: rgba(255, 215, 15, 0.5);
+    }
+  }
+}
+
 .ocrext-wrapper {
   background: @bg;
   border:none;
