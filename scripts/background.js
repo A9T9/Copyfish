@@ -134,6 +134,9 @@ $.getJSON(chrome.extension.getURL('config/config.json'))
             var _maxResponseTime = 99;
             var _randNotEqual = function(serverList, server) {
                 var idx = Math.floor(Math.random() * serverList.length);
+                if(serverList.length === 1){
+                    return serverList[0];
+                }
                 if (serverList[idx].id !== server.id) {
                     return serverList[idx];
                 } else {
