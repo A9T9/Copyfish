@@ -107,6 +107,10 @@ jQuery(function() {
         }
     };
 
+    var _isImageParseError = function(data){
+        return data && data.ParsedResults && data.ParsedResults.length && data.ParsedResults[0].FileParseExitCode === -10;
+    };
+
     var _drawQuickSelectButtons = function() {
         var $btnContainer = $('.ocrext-quickselect-btn-container');
         var $btn;
@@ -490,8 +494,10 @@ jQuery(function() {
                     data = data || {};
                     // retry if any error condition is met and if any servers are still available
                     if ((typeof data === 'string' ||
+                            // OCRExitCode = -10 corresponds to a parse error due to malformed/blurry image. Not the server's fault
                             data.IsErroredOnProcessing ||
                             data.OCRExitCode !== 1) &&
+                        !_isImageParseError(data) &&
                         attempt < maxAttempts) {
                         // sometimes an error string is returned
                         chrome.runtime.sendMessage({
@@ -975,7 +981,7 @@ jQuery(function() {
             var self = this;
             $body
                 .on('dblclick', '#ocrext-can', function() {
-                    if (OPTIONS.visualCopyTextOverlay) {
+                    if ( OPTIONS.visualCopyTextOverlay) {
                         // self.textOverlay.show();
                         self.showOverlayTab();
                     } else {
