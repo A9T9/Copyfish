@@ -981,6 +981,9 @@ jQuery(function() {
             var self = this;
             $body
                 .on('dblclick', '#ocrext-can', function() {
+                    if($(this).parents('.ocrext-content').hasClass('ocrext-disabled')){
+                        return true;
+                    }
                     if ( OPTIONS.visualCopyTextOverlay) {
                         // self.textOverlay.show();
                         self.showOverlayTab();

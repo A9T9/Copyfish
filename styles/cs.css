@@ -399,6 +399,9 @@
   /*margin-right:15px;*/
   padding: 0 16px;
 }
+.ocrext-wrapper .ocrext-content.ocrext-disabled .ocrext-canvas-container #ocrext-can {
+  cursor: default;
+}
 .ocrext-wrapper .ocrext-content.ocrext-error .ocrext-ocr-output .ocrext-ocr-message,
 .ocrext-wrapper .ocrext-content.ocrext-error .ocrext-ocr-output .ocrext-message {
   color: #d9534f;
