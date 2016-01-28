@@ -21,6 +21,19 @@ body {
 .container .inner-wrapper {
   margin: 40px 0 0 0;
 }
+.container .inner-wrapper .status-text {
+  color: #2196f3;
+  width: 100%;
+  text-align: center;
+  transition: opacity 0.6s;
+  opacity: 0;
+  padding-left: 45px;
+  margin-top: 30px;
+  font-size: 18px;
+}
+.container .inner-wrapper .status-text.visible {
+  opacity: 1;
+}
 .container .inner-wrapper .options-container {
   margin-top: 25px;
 }
@@ -59,19 +72,6 @@ body {
 .container .inner-wrapper .extension-link {
   color: #2196f3;
   font-size: 18px;
-}
-.container .inner-wrapper .status-text {
-  color: #2196f3;
-  width: 100%;
-  text-align: center;
-  transition: opacity 0.6s;
-  opacity: 0;
-  padding-left: 45px;
-  margin-top: 30px;
-  font-size: 18px;
-}
-.container .inner-wrapper .status-text.visible {
-  opacity: 1;
 }
 @media screen and (max-width: 959px) {
   .container {
