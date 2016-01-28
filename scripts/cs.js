@@ -1072,6 +1072,7 @@ jQuery(function() {
             $body.off('mousedown', onOCRMouseDown);
             OCRTranslator.state = 'disabled';
             Mask.remove();
+            OCRTranslator.reset();
             IS_CAPTURED = false;
             return this;
         },
