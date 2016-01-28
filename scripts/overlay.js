@@ -2,18 +2,16 @@
     'use strict';
     var TextOverlay = function() {
         var _overlay;
-        var _imgDataURI;
 
         var _isOverlayAvailable = function() {
             return !!_overlay && _overlay.HasOverlay;
         };
-        var $container = $('.container');
+        var $container = $('.ocrext-textoverlay-container');
         var htmlString = [
             '<div class="ocrext-element ocrext-text-overlay">',
             '<div class="ocrext-element ocrext-text-overlay-word-wrapper">',
-            // '<a class="ocrext-close-link" title="Close">',
-            '</a>',
-            '<img class="ocrext-element ocrext-text-overlay-img" id="text-overlay-img"/>',
+            '<a class="ocrext-close-link" title="Close"></a>',
+            // '<img class="ocrext-element ocrext-text-overlay-img" id="text-overlay-img"/>',
             '</div>',
             '</div>'
         ].join('');
@@ -22,7 +20,7 @@
         var $overlay;
         var _overlayInstance;
         var _init = function(self) {
-            $('title,.title').text(chrome.i18n.getMessage('appName') + ' - ' + chrome.i18n.getMessage('overlayTab'));
+            // $('title,.title').text(chrome.i18n.getMessage('appName') + ' - ' + chrome.i18n.getMessage('overlayTab'));
             // `self` is passed; pythonic!
             $overlay = $(htmlString);
             $overlay.appendTo($container);
@@ -30,7 +28,7 @@
             $overlay.on('click', '.ocrext-close-link', function() {
                 _overlayInstance.hide();
             });
-            chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+            /*chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
                 if (sender.tab) {
                     return true;
                 }
@@ -44,29 +42,30 @@
                     });
                     return true;
                 }
-            });
+            });*/
         };
 
         _overlayInstance = {
-            reset: function() {
-                _overlay = null;
-                _imgDataURI = null;
-                $overlay.find('.ocrext-text-overlay-word-wrapper span').remove();
-                $overlay.find('#text-overlay-img').attr('src', '');
-            },
-            setOverlayInformation: function(overlayInfo, img) {
-                _overlay = overlayInfo;
-                _imgDataURI = img;
-                this.render();
+
+            setOverlayInformation: function(overlayInfo, canvasWidth, canHeight) {
+                // if setOverlayInformation is called when _overlay is already set, do nothing!
+                if (!_overlay) {
+                    _overlay = overlayInfo;
+                    this.render(canvasWidth, canHeight);
+                }
+                return this;
             },
             getOverlayInformation: function() {
                 return _overlay;
             },
-            render: function() {
+            render: function(canvasWidth, canvasHeight) {
                 if (_isOverlayAvailable()) {
                     var lines = _overlay.Lines;
                     var $wordWrapper = $overlay.find('.ocrext-text-overlay-word-wrapper');
                     var $word;
+
+
+                    this.setDimensions(canvasWidth, canvasHeight);
                     $.each(lines, function(i, line) {
                         var maxLineHeight = line.MaxHeight;
                         var minLineTopDist = line.MinTop;
@@ -86,16 +85,28 @@
                         });
 
                     });
-                    $overlay.find('img').attr('src', _imgDataURI);
-
-                    // destroy the JS image reference after render
-                    _imgDataURI = null;
                 }
+                return this;
             },
+
+            setDimensions: function(width, height) {
+                $([$overlay, $overlay.find('.ocrext-text-overlay-word-wrapper')]).each(function() {
+                    this.width(width).height(height);
+                });
+                return this;
+            },
+
+            reset: function() {
+                _overlay = null;
+                $overlay.find('.ocrext-text-overlay-word-wrapper span').remove();
+                return this;
+            },
+
             show: function() {
 
                 if (_isOverlayAvailable()) {
                     // this.position();
+                    $container.addClass('visible');
                     $overlay.addClass('visible');
 
                 } else {
@@ -104,10 +115,13 @@
                 }
                 return this;
             },
+
             hide: function() {
-                $overlay.hide();
+                $container.removeClass('visible');
+                $overlay.removeClass('visible');
                 return this;
             },
+            
             position: function() {
                 var bodyWidth, bodyHeight;
                 var $body = $('body');
@@ -119,11 +133,13 @@
                 });
                 return this;
             }
+
         };
         _init(_overlayInstance);
         return _overlayInstance;
     };
 
     // future proofing
-    var textOverlay = TextOverlay();
+    // var textOverlay = TextOverlay();
+    window.__TextOverlay__ = TextOverlay;
 }());

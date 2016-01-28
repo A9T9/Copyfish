@@ -37,6 +37,7 @@
       "js": [
         "scripts/jquery.min.js",
         "scripts/material.min.js",
+        "scripts/overlay.js",
         "scripts/cs.js"
       ]
     }

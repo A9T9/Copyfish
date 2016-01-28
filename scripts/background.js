@@ -382,30 +382,30 @@ $.getJSON(chrome.extension.getURL('config/config.json'))
                 return true;
             } else if (request.evt === 'show-overlay-tab') {
                 // trap them props
-                overlayInfo = request.overlayInfo;
-                imgDataURI = request.imgDataURI;
-                chrome.tabs.create({
-                    url: chrome.extension.getURL('/overlay.html')
-                }, function(destTab) {
-                    console.log(destTab.id);
-                    setTimeout(function() {
-                        chrome.tabs.sendMessage(destTab.id, {
-                            evt: 'init-overlay-tab',
-                            overlayInfo: overlayInfo,
-                            imgDataURI: imgDataURI
-                        }, function() {
-                            // chrome.tabs.sendMessage(destTab.id, {
-                            //     evt: 'enableselection'
-                            // });
-                            sendResponse({
-                                farewell: 'show-overlay-tab:OK'
-                            });
-                        });
-                    },300);
+                // overlayInfo = request.overlayInfo;
+                // imgDataURI = request.imgDataURI;
+                // chrome.tabs.create({
+                //     url: chrome.extension.getURL('/overlay.html')
+                // }, function(destTab) {
+                //     console.log(destTab.id);
+                //     setTimeout(function() {
+                //         chrome.tabs.sendMessage(destTab.id, {
+                //             evt: 'init-overlay-tab',
+                //             overlayInfo: overlayInfo,
+                //             imgDataURI: imgDataURI
+                //         }, function() {
+                //             // chrome.tabs.sendMessage(destTab.id, {
+                //             //     evt: 'enableselection'
+                //             // });
+                //             sendResponse({
+                //                 farewell: 'show-overlay-tab:OK'
+                //             });
+                //         });
+                //     },300);
 
 
-                });
-                return true;
+                // });
+                // return true;
             }
         });
 

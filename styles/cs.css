@@ -64,19 +64,30 @@
   font-size: 16px;
   font-variant: normal;
 }
-.ocrext-text-overlay {
+.ocrext-textoverlay-container {
   display: none;
-  margin: 40px 0 0 0;
+  border: none;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 100%;
 }
-.ocrext-text-overlay.visible {
+.ocrext-textoverlay-container.visible {
+  display: block;
+}
+.ocrext-textoverlay-container .ocrext-text-overlay {
+  display: none;
+  margin: 15px auto;
+}
+.ocrext-textoverlay-container .ocrext-text-overlay.visible {
   display: flex;
   justify-content: space-around;
 }
-.ocrext-text-overlay .ocrext-text-overlay-word-wrapper {
+.ocrext-textoverlay-container .ocrext-text-overlay .ocrext-text-overlay-word-wrapper {
   position: relative;
-  border: 1px solid black;
+  border: none;
 }
-.ocrext-text-overlay .ocrext-text-overlay-word-wrapper .ocrext-close-link {
+.ocrext-textoverlay-container .ocrext-text-overlay .ocrext-text-overlay-word-wrapper .ocrext-close-link {
   display: inline-block;
   position: absolute;
   padding: 0;
@@ -88,7 +99,7 @@
   right: -19px;
   cursor: pointer;
 }
-.ocrext-text-overlay .ocrext-text-overlay-word-wrapper .ocrext-text-overlay-word {
+.ocrext-textoverlay-container .ocrext-text-overlay .ocrext-text-overlay-word-wrapper .ocrext-text-overlay-word {
   color: #ff0000;
   text-align: center;
   font-size: 20px;
@@ -192,6 +203,7 @@
   /*Output Error*/
 }
 .ocrext-wrapper .ocrext-content .ocrext-canvas-container {
+  position: relative;
   margin: 5px auto 10px auto;
   min-width: 430px;
   max-height: 200px;

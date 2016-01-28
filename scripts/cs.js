@@ -28,6 +28,7 @@ jQuery(function() {
     };
     var ISPOSITIONED = false;
     var OCR_DIMENSION_ERROR = chrome.i18n.getMessage('ocrDimensionError');
+    var TextOverlay = window.__TextOverlay__;
 
     /* 
      *  Set to true to use a JPEG image. Default is PNG
@@ -107,7 +108,7 @@ jQuery(function() {
         }
     };
 
-    var _isImageParseError = function(data){
+    var _isImageParseError = function(data) {
         return data && data.ParsedResults && data.ParsedResults.length && data.ParsedResults[0].FileParseExitCode === -10;
     };
 
@@ -330,7 +331,6 @@ jQuery(function() {
                 getOptions()
             )
             .done(function(config, htmlStr) {
-                // var $body = $('body');
                 HTMLSTRCOPY = htmlStr[0];
                 OCRTranslator.APPCONFIG = APPCONFIG = JSON.parse(config[0]);
                 $('body').append(HTMLSTRCOPY);
@@ -512,7 +512,7 @@ jQuery(function() {
                         });
                         return false;
                     }
-                    if(typeof data === 'string'){
+                    if (typeof data === 'string') {
                         $ocrPromise.reject({
                             type: 'OCR',
                             stat: 'OCR conversion failed',
@@ -520,7 +520,7 @@ jQuery(function() {
                             details: data,
                             code: data
                         });
-                    }else if (data.IsErroredOnProcessing) {
+                    } else if (data.IsErroredOnProcessing) {
                         $ocrPromise.reject({
                             type: 'OCR',
                             stat: 'OCR conversion failed',
@@ -613,7 +613,6 @@ jQuery(function() {
         // in settings are transferred to existing sessions as well
         getOptions().done(function() {
             _setOCRFontSize();
-            // OCRTranslator.textOverlay.reset();
             OCRTranslator.resetOverlayInformation();
             $process
                 .done(function(txt, fromOCR) {
@@ -730,17 +729,14 @@ jQuery(function() {
             // POST to OCR.
             ocrPostData = {};
             ocrPostData.language = OPTIONS.visualCopyOCRLang;
-            // data.append('language', OPTIONS.visualCopyOCRLang);
             if (USE_JPEG) {
                 dataURI = $can.get(0).toDataURL('image/jpeg', JPEG_QUALITY);
                 ocrPostData.blob = dataURItoBlob(dataURI);
                 ocrPostData.fileName = 'ocr-file.jpg';
-                // data.append('file', dataURItoBlob(dataURI), 'ocr-file.jpg');
             } else {
                 dataURI = $can.get(0).toDataURL();
                 ocrPostData.blob = dataURItoBlob(dataURI);
                 ocrPostData.fileName = 'ocr-file.png';
-                // data.append('file', dataURItoBlob(dataURI), 'ocr-file.png');
             }
             _postToOCR($ocr, ocrPostData, 0);
 
@@ -864,10 +860,7 @@ jQuery(function() {
 
             // initiate image capture 
             _captureImageOntoCanvas().done(function() {
-                // if autoprocess is enabled begin processing for OCR
-                // if (OPTIONS.visualCopyAutoProcess) {
                 _processOCRTranslate();
-                // }
             });
         });
     }
@@ -878,9 +871,8 @@ jQuery(function() {
      * There is no separate button to re-submit captured image, so onOCRRedo can be reused for that
      */
     function onOCRRedo() {
-        // $('header.ocrext-header').removeClass('minimized');
-        // $('.ocrext-wrapper').removeClass('ocrext-wrapper-minimized');
         $('.ocrext-wrapper').css('opacity', 0);
+        OCRTranslator.reset();
         // timeout to ensure that a render is done before initiating next capture cycle
         setTimeout(function() {
             _captureImageOntoCanvas().done(function() {
@@ -963,7 +955,6 @@ jQuery(function() {
                     farewell: 'enableselection:OK'
                 });
             });
-            // this.textOverlay = TextOverlay();
             this.bindEvents();
             // tell the background page that the tab is ready
             chrome.runtime.sendMessage({
@@ -981,12 +972,12 @@ jQuery(function() {
             var self = this;
             $body
                 .on('dblclick', '#ocrext-can', function() {
-                    if($(this).parents('.ocrext-content').hasClass('ocrext-disabled')){
+                    if ($(this).parents('.ocrext-content').hasClass('ocrext-disabled')) {
                         return true;
                     }
-                    if ( OPTIONS.visualCopyTextOverlay) {
+                    if (OPTIONS.visualCopyTextOverlay) {
                         // self.textOverlay.show();
-                        self.showOverlayTab();
+                        self.showOverlay();
                     } else {
                         window.alert('Please enable the "Show Text Overlay" option to view text overlays.');
                     }
@@ -1060,7 +1051,10 @@ jQuery(function() {
                 .hide();
             $('.ocrext-title span').text(appName);
             OCRTranslator.reset();
+            // show mask
             Mask.addToBody().show();
+            // instantiate overlay
+            this.textOverlay = TextOverlay();
             $body.on('mousedown', onOCRMouseDown);
             OCRTranslator.state = 'enabled';
             return this;
@@ -1089,6 +1083,10 @@ jQuery(function() {
             $('.ocrext-result').attr({
                 title: ''
             });
+            if (this.textOverlay) {
+                this.resetOverlay();
+            }
+
             return this;
         },
 
@@ -1143,30 +1141,38 @@ jQuery(function() {
 
         setOverlayInformation: function(overlay, imgDataURI) {
             this._overlay = overlay;
-            this._imgDataURI = imgDataURI;
+            // this._imgDataURI = imgDataURI;
         },
 
         resetOverlayInformation: function() {
             this._overlay = null;
-            this._imgDataURI = null;
+            // this._imgDataURI = null;
         },
 
-        showOverlayTab: function() {
-            chrome.runtime.sendMessage({
-                evt: 'show-overlay-tab',
-                overlayInfo:this._overlay,
-                imgDataURI: this._imgDataURI
-            }, function() {
-                /* done */
-            });
+        // TODO: Remove this when done
+        // showOverlayTab: function() {
+        //     chrome.runtime.sendMessage({
+        //         evt: 'show-overlay-tab',
+        //         overlayInfo: this._overlay,
+        //         imgDataURI: this._imgDataURI
+        //     }, function() {
+        //         /* done */
+        //     });
+        // },
+
+        showOverlay: function() {
+            var $canvas = $('#ocrext-can');
+            this.textOverlay
+                .setOverlayInformation(this._overlay, $canvas.width(), $canvas.height())
+                .show();
         },
 
-        hideTranslate: function() {
-
+        hideOverlay: function() {
+            this.textOverlay.hide();
         },
 
-        showTranslate: function() {
-
+        resetOverlay: function(){
+            this.textOverlay.reset().hide();
         }
     };
 
