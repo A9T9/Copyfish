@@ -10,7 +10,6 @@
         var htmlString = [
             '<div class="ocrext-element ocrext-text-overlay">',
             '<div class="ocrext-element ocrext-text-overlay-word-wrapper">',
-            '<a class="ocrext-close-link" title="Close"></a>',
             // '<img class="ocrext-element ocrext-text-overlay-img" id="text-overlay-img"/>',
             '</div>',
             '</div>'
@@ -25,7 +24,7 @@
             $overlay = $(htmlString);
             $overlay.appendTo($container);
 
-            $overlay.on('click', '.ocrext-close-link', function() {
+            $container.on('click', '.ocrext-close-link', function() {
                 _overlayInstance.hide();
             });
             /*chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
@@ -90,7 +89,7 @@
             },
 
             setDimensions: function(width, height) {
-                $([$overlay, $overlay.find('.ocrext-text-overlay-word-wrapper')]).each(function() {
+                $.each([$overlay, $overlay.find('.ocrext-text-overlay-word-wrapper')],function() {
                     this.width(width).height(height);
                 });
                 return this;
@@ -121,7 +120,7 @@
                 $overlay.removeClass('visible');
                 return this;
             },
-            
+
             position: function() {
                 var bodyWidth, bodyHeight;
                 var $body = $('body');

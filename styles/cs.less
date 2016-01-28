@@ -73,6 +73,19 @@
   &.visible {
     display: block;
   }
+  
+  .ocrext-close-link {
+    display: inline-block;
+    position: absolute;
+    padding: 0;
+    height: 24px;
+    width:24px;
+    background: url('chrome-extension://__MSG_@@extension_id__/images/close.png');
+    background-size: 24px; 
+    top:0;
+    right: 0;
+    cursor: pointer;
+  }
   .ocrext-text-overlay {
     display: none;
     margin: @canvas-margin;
@@ -83,18 +96,6 @@
     .ocrext-text-overlay-word-wrapper {
       position: relative;
       border: none;
-      .ocrext-close-link {
-        display: inline-block;
-        position: absolute;
-        padding: 0;
-        height: 36px;
-        width:36px;
-        background: url('chrome-extension://__MSG_@@extension_id__/images/close.png');
-        background-size: 36px; 
-        top:-19px;
-        right: -19px;
-        cursor: pointer;
-      }
       .ocrext-text-overlay-word {
         color:@word-color;
         text-align: center;

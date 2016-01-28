@@ -75,6 +75,18 @@
 .ocrext-textoverlay-container.visible {
   display: block;
 }
+.ocrext-textoverlay-container .ocrext-close-link {
+  display: inline-block;
+  position: absolute;
+  padding: 0;
+  height: 24px;
+  width: 24px;
+  background: url('chrome-extension://__MSG_@@extension_id__/images/close.png');
+  background-size: 24px;
+  top: 0;
+  right: 0;
+  cursor: pointer;
+}
 .ocrext-textoverlay-container .ocrext-text-overlay {
   display: none;
   margin: 15px auto;
@@ -86,18 +98,6 @@
 .ocrext-textoverlay-container .ocrext-text-overlay .ocrext-text-overlay-word-wrapper {
   position: relative;
   border: none;
-}
-.ocrext-textoverlay-container .ocrext-text-overlay .ocrext-text-overlay-word-wrapper .ocrext-close-link {
-  display: inline-block;
-  position: absolute;
-  padding: 0;
-  height: 36px;
-  width: 36px;
-  background: url('chrome-extension://__MSG_@@extension_id__/images/close.png');
-  background-size: 36px;
-  top: -19px;
-  right: -19px;
-  cursor: pointer;
 }
 .ocrext-textoverlay-container .ocrext-text-overlay .ocrext-text-overlay-word-wrapper .ocrext-text-overlay-word {
   color: #ff0000;
