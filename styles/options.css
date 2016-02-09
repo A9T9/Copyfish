@@ -35,7 +35,7 @@ body {
   opacity: 1;
 }
 .container .inner-wrapper .options-container {
-  margin-top: 25px;
+  margin-top: 15px;
 }
 .container .inner-wrapper .options-container:nth-child(1) {
   margin-top: 0px;
