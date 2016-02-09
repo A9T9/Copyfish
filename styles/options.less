@@ -2,16 +2,18 @@
 body {
 	font-size: @fontSize;
 	color:@fontColor;
+  padding: 0;
+  margin: 0;
 }
 
 .container {
 	width:960px;
 	margin: 0 auto;
-	padding: 20px;
+	padding: 10px 20px 20px 20px;
 	box-sizing:border-box;
 	h1 {
 	   text-align: center;
-	   margin-bottom: 10px;
+	   margin: @options-header-vertical-space 0 10px 0;
 	   padding-bottom: 20px;
 	   border-bottom: 4px solid @primary;
 	}
