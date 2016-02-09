@@ -664,7 +664,10 @@ jQuery(function() {
                     // the mad-world of async programming
                     // OCRTranslator.textOverlay.setOverlayInformation(overlayInfo, dataURI);
                     OCRTranslator.setOverlayInformation(overlayInfo, dataURI);
-                    OCRTranslator.showOverlay();
+                    if (OPTIONS.visualCopyTextOverlay) {
+                        OCRTranslator.showOverlay();
+                    }
+                    
 
                     if (!OPTIONS.visualCopyAutoTranslate) {
                         $process.resolve('no-translate', true);
