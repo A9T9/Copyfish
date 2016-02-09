@@ -2,23 +2,30 @@
     'use strict';
     var TextOverlay = function() {
         var _overlay;
+        var $container;
+        var htmlString;
+        var wordString;
+        var $overlay;
+        var _overlayInstance;
+        var _init;
+
+
 
         var _isOverlayAvailable = function() {
             return !!_overlay && _overlay.HasOverlay;
         };
-        var $container = $('.ocrext-textoverlay-container');
-        var htmlString = [
+        $container = $('.ocrext-textoverlay-container');
+        htmlString = [
             '<div class="ocrext-element ocrext-text-overlay">',
             '<div class="ocrext-element ocrext-text-overlay-word-wrapper">',
-            // '<img class="ocrext-element ocrext-text-overlay-img" id="text-overlay-img"/>',
+            '<img class="ocrext-element ocrext-text-overlay-img" id="text-overlay-img"/>',
             '</div>',
             '</div>'
         ].join('');
-        var wordString = '<span class="ocrext-element ocrext-text-overlay-word"></span>';
+        wordString = '<span class="ocrext-element ocrext-text-overlay-word"></span>';
 
-        var $overlay;
-        var _overlayInstance;
-        var _init = function(self) {
+        _init = function(self) {
+            var run;
             // $('title,.title').text(chrome.i18n.getMessage('appName') + ' - ' + chrome.i18n.getMessage('overlayTab'));
             // `self` is passed; pythonic!
             $overlay = $(htmlString);
@@ -27,42 +34,30 @@
             $container.on('click', '.ocrext-close-link', function() {
                 _overlayInstance.hide();
             });
-            /*chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-                if (sender.tab) {
-                    return true;
-                }
-
-                if (request.evt === 'init-overlay-tab') {
-                    self.setOverlayInformation(request.overlayInfo, request.imgDataURI);
-                    // self.position();
-                    self.show();
-                    sendResponse({
-                        farewell: 'init-overlay-tab:OK'
-                    });
-                    return true;
-                }
-            });*/
         };
 
         _overlayInstance = {
 
-            setOverlayInformation: function(overlayInfo, canvasWidth, canHeight) {
+            setOverlayInformation: function(overlayInfo, canvasWidth, canHeight, imgDataURI) {
                 // if setOverlayInformation is called when _overlay is already set, do nothing!
                 if (!_overlay) {
                     _overlay = overlayInfo;
-                    this.render(canvasWidth, canHeight);
+                    this.render(canvasWidth, canHeight, imgDataURI);
                 }
                 return this;
             },
             getOverlayInformation: function() {
                 return _overlay;
             },
-            render: function(canvasWidth, canvasHeight) {
+            render: function(canvasWidth, canvasHeight, imgDataURI) {
                 if (_isOverlayAvailable()) {
                     var lines = _overlay.Lines;
                     var $wordWrapper = $overlay.find('.ocrext-text-overlay-word-wrapper');
                     var $word;
 
+                    if (imgDataURI) {
+                        $container.find('#text-overlay-img').attr('src', imgDataURI);
+                    }
 
                     this.setDimensions(canvasWidth, canvasHeight);
                     $.each(lines, function(i, line) {
@@ -89,7 +84,7 @@
             },
 
             setDimensions: function(width, height) {
-                $.each([$overlay, $overlay.find('.ocrext-text-overlay-word-wrapper')],function() {
+                $.each([$overlay, $overlay.find('.ocrext-text-overlay-word-wrapper')], function() {
                     this.width(width).height(height);
                 });
                 return this;
@@ -131,6 +126,30 @@
                     top: 150
                 });
                 return this;
+            },
+
+            setTitle: function() {
+                $('title,.ocrext-textoverlay-title').text(chrome.i18n.getMessage('appName') + ' - ' + chrome.i18n.getMessage('overlayTab'));
+                return this;
+            },
+
+            listenToBackgroundEvents: function() {
+                var self = this;
+                chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+                    if (sender.tab) {
+                        return true;
+                    }
+
+                    if (request.evt === 'init-overlay-tab') {
+                        self.setOverlayInformation(request.overlayInfo, request.canWidth, request.canHeight, request.imgDataURI);
+                        // self.position();
+                        self.show();
+                        sendResponse({
+                            farewell: 'init-overlay-tab:OK'
+                        });
+                        return true;
+                    }
+                });
             }
 
         };
@@ -139,6 +158,13 @@
     };
 
     // future proofing
-    // var textOverlay = TextOverlay();
+    var run = $('body').attr('data-ocrext-run');
+    var textOverlay;
+    if (run) {
+        textOverlay = TextOverlay();
+        textOverlay.listenToBackgroundEvents();
+        textOverlay.setTitle();
+    }
+
     window.__TextOverlay__ = TextOverlay;
 }());

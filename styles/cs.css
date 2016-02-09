@@ -453,3 +453,16 @@
           } */
   }
 }
+body.ocrext-textoverlay-page {
+  font-family: 'Roboto', Helvetica, Arial, serif;
+  padding: 20px;
+}
+body.ocrext-textoverlay-page .ocrext-textoverlay-title {
+  text-align: center;
+}
+body.ocrext-textoverlay-page .ocrext-textoverlay-container {
+  margin-top: 100px;
+}
+body.ocrext-textoverlay-page .ocrext-textoverlay-container a.ocrext-close-link {
+  display: none;
+}

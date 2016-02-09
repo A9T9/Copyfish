@@ -977,7 +977,8 @@ jQuery(function() {
                     }
                     if (OPTIONS.visualCopyTextOverlay) {
                         // self.textOverlay.show();
-                        self.showOverlay();
+                        // self.showOverlay();
+                        self.showOverlayTab();
                     } else {
                         window.alert('Please enable the "Show Text Overlay" option to view text overlays.');
                     }
@@ -1150,17 +1151,6 @@ jQuery(function() {
             // this._imgDataURI = null;
         },
 
-        // TODO: Remove this when done
-        // showOverlayTab: function() {
-        //     chrome.runtime.sendMessage({
-        //         evt: 'show-overlay-tab',
-        //         overlayInfo: this._overlay,
-        //         imgDataURI: this._imgDataURI
-        //     }, function() {
-        //         /* done */
-        //     });
-        // },
-
         showOverlay: function() {
             var $canvas = $('#ocrext-can');
             this.textOverlay
@@ -1168,11 +1158,24 @@ jQuery(function() {
                 .show();
         },
 
+        showOverlayTab: function() {
+            var $canvas = $('#ocrext-can');
+            chrome.runtime.sendMessage({
+                evt: 'show-overlay-tab',
+                overlayInfo: this._overlay,
+                imgDataURI: $canvas.get(0).toDataURL(),
+                canWidth: $canvas.width(),
+                canHeight: $canvas.height()
+            }, function() {
+                /* done */
+            });
+        },
+
         hideOverlay: function() {
             this.textOverlay.hide();
         },
 
-        resetOverlay: function(){
+        resetOverlay: function() {
             this.textOverlay.reset().hide();
         }
     };
