@@ -664,6 +664,7 @@ jQuery(function() {
                     // the mad-world of async programming
                     // OCRTranslator.textOverlay.setOverlayInformation(overlayInfo, dataURI);
                     OCRTranslator.setOverlayInformation(overlayInfo, dataURI);
+                    OCRTranslator.showOverlay();
 
                     if (!OPTIONS.visualCopyAutoTranslate) {
                         $process.resolve('no-translate', true);
@@ -976,8 +977,6 @@ jQuery(function() {
                         return true;
                     }
                     if (OPTIONS.visualCopyTextOverlay) {
-                        // self.textOverlay.show();
-                        // self.showOverlay();
                         self.showOverlayTab();
                     } else {
                         window.alert('Please enable the "Show Text Overlay" option to view text overlays.');
