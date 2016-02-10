@@ -975,6 +975,16 @@ jQuery(function() {
             var $body = $('body');
             var self = this;
             $body
+                .on('dblclick', '.ocrext-textoverlay-container', function() {
+                    if ($('#ocrext-can').parents('.ocrext-content').hasClass('ocrext-disabled')) {
+                        return true;
+                    }
+                    if (OPTIONS.visualCopyTextOverlay) {
+                        self.showOverlayTab();
+                    } else {
+                        window.alert('Please enable the "Show Text Overlay" option to view text overlays.');
+                    }
+                })
                 .on('dblclick', '#ocrext-can', function() {
                     if ($(this).parents('.ocrext-content').hasClass('ocrext-disabled')) {
                         return true;
