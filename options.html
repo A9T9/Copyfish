@@ -1,116 +1,117 @@
 ﻿<!doctype html>
 <html>
-  <head>
+<head>
     <meta charset="utf-8">
-    <link rel="stylesheet" href="styles/material.min.css" />
+    <link rel="stylesheet" href="styles/material.min.css"/>
     <link href="styles/options.css" rel="stylesheet">
     <title>Copyfish Options</title>
-  </head>
-  <body>
-    <div class="container">
-      <h1>Copyfish Options</h1>
-      <div class="inner-wrapper">
-        <div class="status-text">Settings saved successfully. Changes will be active after the next conversion.</div>
+</head>
+<body>
+<div class="container">
+    <h1>Copyfish Options</h1>
+
+    <div class="inner-wrapper">
+        <div class="status-text">Settings saved successfully. Changes will be visible after the next conversion.</div>
         <div class="mdl-grid options-container input-language">
-          <div class="mdl-cell mdl-cell--5-col label">
-            <label>Input Language (OCR Language)</label>
-          </div>
-          <div class="mdl-cell mdl-cell--7-col">
-            <select id="input-lang" name="inputlang">
-            </select>
-          </div>
+            <div class="mdl-cell mdl-cell--5-col label">
+                <label>Input Language (OCR Language)</label>
+            </div>
+            <div class="mdl-cell mdl-cell--7-col">
+                <select id="input-lang" name="inputlang">
+                </select>
+            </div>
         </div>
         <div class="mdl-grid options-container input-language-quickselect">
-          <div class="mdl-cell mdl-cell--5-col label">
-            <label>Input Language Quickselect</label>
-          </div>
-          <div class="mdl-cell mdl-cell--2-col">
-            <select id="input-lang-1" name="inputlang" class="lang-quickselect">
-              <option value="none" selected="selected">None</option>
-            </select>
-          </div>
-          <div class="mdl-cell mdl-cell--2-col">
-            <select id="input-lang-2" name="inputlang" class="lang-quickselect">
-              <option value="none" selected="selected">None</option>
-            </select>
-          </div>
-          <div class="mdl-cell mdl-cell--2-col">
-            <select id="input-lang-3" name="inputlang" class="lang-quickselect">
-              <option value="none" selected="selected">None</option>
-            </select>
-          </div>
+            <div class="mdl-cell mdl-cell--5-col label">
+                <label>Input Language Quickselect</label>
+            </div>
+            <div class="mdl-cell mdl-cell--2-col">
+                <select id="input-lang-1" name="inputlang" class="lang-quickselect">
+                    <option value="none" selected="selected">None</option>
+                </select>
+            </div>
+            <div class="mdl-cell mdl-cell--2-col">
+                <select id="input-lang-2" name="inputlang" class="lang-quickselect">
+                    <option value="none" selected="selected">None</option>
+                </select>
+            </div>
+            <div class="mdl-cell mdl-cell--2-col">
+                <select id="input-lang-3" name="inputlang" class="lang-quickselect">
+                    <option value="none" selected="selected">None</option>
+                </select>
+            </div>
         </div>
         <div class="mdl-grid options-container translate-options">
-          <div class="mdl-cell mdl-cell--5-col label">
-            <label>Translate to</label>
-          </div>
-          <div class="mdl-cell mdl-cell--7-col">
-            <select id="output-lang" name="outputlang">
-              <option value="af">Afrikaans</option>
-              <option value="sq">Albanian</option>
-              <option value="ar">Arabian</option>
-              <option value="hy">Armenian</option>
-              <option value="az">Azeri</option>
-              <option value="eu">Basque</option>
-              <option value="be">Belarusian</option>
-              <option value="bs">Bosnian</option>
-              <option value="bg">Bulgarian</option>
-              <option value="ca">Catalan</option>
-              <option value="hr">Croatian</option>
-              <option value="cs">Czech</option>
-              <option value="zh">Chinese</option>
-              <option value="da">Danish</option>
-              <option value="nl">Dutch</option>
-              <option value="en">English</option>
-              <option value="et">Estonian</option>
-              <option value="fi">Finnish</option>
-              <option value="fr">French</option>
-              <option value="gl">Galician</option>
-              <option value="ka">Georgian</option>
-              <option value="de">German</option>
-              <option value="el">Greek</option>
-              <option value="ht">Haitian (Creole)</option>
-              <option value="he">Hebrew</option>
-              <option value="hu">Hungarian</option>
-              <option value="is">Icelandic</option>
-              <option value="id">Indonesian</option>
-              <option value="ga">Irish</option>
-              <option value="it">Italian</option>
-              <option value="ja">Japanese</option>
-              <option value="kk">Kazakh</option>
-              <option value="ko">Korean</option>
-              <option value="ky">Kyrgyz</option>
-              <option value="la">Latin</option>
-              <option value="lv">Latvian</option>
-              <option value="lt">Lithuanian</option>
-              <option value="mk">Macedonian</option>
-              <option value="mg">Malagasy</option>
-              <option value="ms">Malay</option>
-              <option value="mt">Maltese</option>
-              <option value="mn">Mongolian</option>
-              <option value="no">Norwegian</option>
-              <option value="fa">Persian</option>
-              <option value="pl">Polish</option>
-              <option value="pt">Portuguese</option>
-              <option value="ro">Romanian</option>
-              <option value="ru">Russian</option>
-              <option value="es">Spanish</option>
-              <option value="sr">Serbian</option>
-              <option value="sk">Slovak</option>
-              <option value="sl">Slovenian</option>
-              <option value="sw">Swahili</option>
-              <option value="sv">Swedish</option>
-              <option value="tl">Tagalog</option>
-              <option value="tg">Tajik</option>
-              <option value="tt">Tatar</option>
-              <option value="th">Thai</option>
-              <option value="tr">Turkish</option>
-              <option value="uz">Uzbek</option>
-              <option value="uk">Ukrainian</option>
-              <option value="vi">Vietnamese</option>
-              <option value="cy">Welsh</option>
-            </select>
-          </div>
+            <div class="mdl-cell mdl-cell--5-col label">
+                <label>Translate to</label>
+            </div>
+            <div class="mdl-cell mdl-cell--7-col">
+                <select id="output-lang" name="outputlang">
+                    <option value="af">Afrikaans</option>
+                    <option value="sq">Albanian</option>
+                    <option value="ar">Arabian</option>
+                    <option value="hy">Armenian</option>
+                    <option value="az">Azeri</option>
+                    <option value="eu">Basque</option>
+                    <option value="be">Belarusian</option>
+                    <option value="bs">Bosnian</option>
+                    <option value="bg">Bulgarian</option>
+                    <option value="ca">Catalan</option>
+                    <option value="hr">Croatian</option>
+                    <option value="cs">Czech</option>
+                    <option value="zh">Chinese</option>
+                    <option value="da">Danish</option>
+                    <option value="nl">Dutch</option>
+                    <option value="en">English</option>
+                    <option value="et">Estonian</option>
+                    <option value="fi">Finnish</option>
+                    <option value="fr">French</option>
+                    <option value="gl">Galician</option>
+                    <option value="ka">Georgian</option>
+                    <option value="de">German</option>
+                    <option value="el">Greek</option>
+                    <option value="ht">Haitian (Creole)</option>
+                    <option value="he">Hebrew</option>
+                    <option value="hu">Hungarian</option>
+                    <option value="is">Icelandic</option>
+                    <option value="id">Indonesian</option>
+                    <option value="ga">Irish</option>
+                    <option value="it">Italian</option>
+                    <option value="ja">Japanese</option>
+                    <option value="kk">Kazakh</option>
+                    <option value="ko">Korean</option>
+                    <option value="ky">Kyrgyz</option>
+                    <option value="la">Latin</option>
+                    <option value="lv">Latvian</option>
+                    <option value="lt">Lithuanian</option>
+                    <option value="mk">Macedonian</option>
+                    <option value="mg">Malagasy</option>
+                    <option value="ms">Malay</option>
+                    <option value="mt">Maltese</option>
+                    <option value="mn">Mongolian</option>
+                    <option value="no">Norwegian</option>
+                    <option value="fa">Persian</option>
+                    <option value="pl">Polish</option>
+                    <option value="pt">Portuguese</option>
+                    <option value="ro">Romanian</option>
+                    <option value="ru">Russian</option>
+                    <option value="es">Spanish</option>
+                    <option value="sr">Serbian</option>
+                    <option value="sk">Slovak</option>
+                    <option value="sl">Slovenian</option>
+                    <option value="sw">Swahili</option>
+                    <option value="sv">Swedish</option>
+                    <option value="tl">Tagalog</option>
+                    <option value="tg">Tajik</option>
+                    <option value="tt">Tatar</option>
+                    <option value="th">Thai</option>
+                    <option value="tr">Turkish</option>
+                    <option value="uz">Uzbek</option>
+                    <option value="uk">Ukrainian</option>
+                    <option value="vi">Vietnamese</option>
+                    <option value="cy">Welsh</option>
+                </select>
+            </div>
         </div>
         <!-- <div class="mdl-grid options-container translate-options">
           <div class="mdl-cell mdl-cell--5-col label">
@@ -124,74 +125,233 @@
           </div>
         </div> -->
         <div class="mdl-grid options-container ocr-textoverlay-options">
-          <div class="mdl-cell mdl-cell--5-col label">
-            <label title="Double-click on screenshot image shows overlay">Show Text Overlay</label>
-          </div>
-          <div class="mdl-cell mdl-cell--7-col">
-            <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect text-overlay" for="switch-text-overlay">
-              <input type="checkbox" id="switch-text-overlay" class="mdl-switch__input" checked  />
-              <span class="mdl-switch__label"></span>
-            </label>
-          </div>
+            <div class="mdl-cell mdl-cell--5-col label">
+                <label title="Double-click on screenshot image shows overlay">Show Text Overlay</label>
+            </div>
+            <div class="mdl-cell mdl-cell--7-col">
+                <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect text-overlay" for="switch-text-overlay">
+                    <input type="checkbox" id="switch-text-overlay" class="mdl-switch__input" checked/>
+                    <span class="mdl-switch__label"></span>
+                </label>
+            </div>
         </div>
         <div class="mdl-grid options-container translate-options">
-          <div class="mdl-cell mdl-cell--5-col label">
-            <label title="Automatically translate text after OCR processing">Translate after OCR</label>
-          </div>
-          <div class="mdl-cell mdl-cell--7-col">
-            <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect auto-translate" for="switch-auto-translate">
-              <input type="checkbox" id="switch-auto-translate" class="mdl-switch__input" checked  />
-              <span class="mdl-switch__label"></span>
-            </label>
-          </div>
+            <div class="mdl-cell mdl-cell--5-col label">
+                <label title="Automatically translate text after OCR processing">Translate after OCR</label>
+            </div>
+            <div class="mdl-cell mdl-cell--7-col">
+                <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect auto-translate" for="switch-auto-translate">
+                    <input type="checkbox" id="switch-auto-translate" class="mdl-switch__input" checked/>
+                    <span class="mdl-switch__label"></span>
+                </label>
+            </div>
         </div>
         <div class="mdl-grid options-container font-size-options">
-          <div class="mdl-cell mdl-cell--5-col label">
-            <label>Text Box Font Size</label>
-          </div>
-          <div class="mdl-cell mdl-cell--7-col">
-            <select id="ocr-fontsize" name="outputlang">
-              <option value="48px">48 px</option>
-              <option value="42px">42 px</option>
-              <option value="36px">36 px</option>
-              <option value="32px">32 px</option>
-              <option value="28px">28 px</option>
-              <option value="24px">24 px</option>
-              <option value="20px">20 px</option>
-              <option value="18px">18 px</option>
-              <option value="16px" selected>16 px</option>
-              <option value="14px">14 px</option>
-              <option value="12px">12 px</option>
-            </select>
-          </div>
+            <div class="mdl-cell mdl-cell--5-col label">
+                <label>Text Box Font Size</label>
+            </div>
+            <div class="mdl-cell mdl-cell--7-col">
+                <select id="ocr-fontsize" name="outputlang">
+                    <option value="48px">48 px</option>
+                    <option value="42px">42 px</option>
+                    <option value="36px">36 px</option>
+                    <option value="32px">32 px</option>
+                    <option value="28px">28 px</option>
+                    <option value="24px">24 px</option>
+                    <option value="20px">20 px</option>
+                    <option value="18px">18 px</option>
+                    <option value="16px" selected>16 px</option>
+                    <option value="14px">14 px</option>
+                    <option value="12px">12 px</option>
+                </select>
+            </div>
         </div>
         <div class="mdl-grid options-container translate-options">
-          <div class="mdl-cell mdl-cell--5-col label">
-            <label title="Support popup dictionaries">Support popup dictionaries <br/>
-              <a href="http://blog.a9t9.com/p/copyfish-translate.html" class="tip">Tip: How to use Copyfish with translator extensions</a>
-            </label>
-          </div>
-          <div class="mdl-cell mdl-cell--7-col">
-            <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect popup-dicts" for="switch-popup-dicts">
-              <input type="checkbox" id="switch-popup-dicts" class="mdl-switch__input" checked  />
-              <span class="mdl-switch__label"></span>
-            </label>
-          </div>
+            <div class="mdl-cell mdl-cell--5-col label">
+                <label title="Support popup dictionaries">Support popup dictionaries <br/>
+                    <a href="http://blog.a9t9.com/p/copyfish-translate.html" class="tip">Tip: How to use Copyfish with
+                        translator extensions</a>
+                </label>
+            </div>
+            <div class="mdl-cell mdl-cell--7-col">
+                <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect popup-dicts" for="switch-popup-dicts">
+                    <input type="checkbox" id="switch-popup-dicts" class="mdl-switch__input" checked/>
+                    <span class="mdl-switch__label"></span>
+                </label>
+            </div>
         </div>
+        <div class="mdl-grid subtitle">
+            <h2>Shortcuts</h2>
+        </div>
+        <div class="mdl-grid options-container hotkey-options">
+            <div class="mdl-cell mdl-cell--5-col label">
+                <label title="Open grabbing screen hotkey">Open grabbing screen</label>
+            </div>
+            <div class="mdl-cell mdl-cell--7-col">
+                CTRL + SHIFT +
+                <select id="openHotkey" class="hotkeySelector">
+                    <option value="48">0</option>
+                    <option value="49">1</option>
+                    <option value="50">2</option>
+                    <option value="51">3</option>
+                    <option value="52">4</option>
+                    <option value="53">5</option>
+                    <option value="54">6</option>
+                    <option value="55">7</option>
+                    <option value="56">8</option>
+                    <option value="57">9</option>
+                    <option value="65">a</option>
+                    <option value="66">b</option>
+                    <option value="67">c</option>
+                    <option value="68">d</option>
+                    <option value="69">e</option>
+                    <option value="70">f</option>
+                    <option value="71">g</option>
+                    <option value="72">h</option>
+                    <option value="73">i</option>
+                    <option value="74">j</option>
+                    <option value="75">k</option>
+                    <option value="76">l</option>
+                    <option value="77">m</option>
+                    <option value="78">n</option>
+                    <option value="79">o</option>
+                    <option value="80">p</option>
+                    <option value="81">q</option>
+                    <option value="82">r</option>
+                    <option value="83">s</option>
+                    <option value="84">t</option>
+                    <option value="85">u</option>
+                    <option value="86">v</option>
+                    <option value="87">w</option>
+                    <option value="88">x</option>
+                    <option value="89">y</option>
+                    <option value="90">z</option>
+                </select>
+            </div>
+        </div>
+        <div class="mdl-grid options-container hotkey-options">
+            <div class="mdl-cell mdl-cell--5-col label">
+                <label title="Close panel hotkey">Close panel</label>
+            </div>
+            <div class="mdl-cell mdl-cell--7-col">
+                CTRL + SHIFT +
+                <select id="closeHotkey" class="hotkeySelector">
+                    <option value="48">0</option>
+                    <option value="49">1</option>
+                    <option value="50">2</option>
+                    <option value="51">3</option>
+                    <option value="52">4</option>
+                    <option value="53">5</option>
+                    <option value="54">6</option>
+                    <option value="55">7</option>
+                    <option value="56">8</option>
+                    <option value="57">9</option>
+                    <option value="65">a</option>
+                    <option value="66">b</option>
+                    <option value="67">c</option>
+                    <option value="68">d</option>
+                    <option value="69">e</option>
+                    <option value="70">f</option>
+                    <option value="71">g</option>
+                    <option value="72">h</option>
+                    <option value="73">i</option>
+                    <option value="74">j</option>
+                    <option value="75">k</option>
+                    <option value="76">l</option>
+                    <option value="77">m</option>
+                    <option value="78">n</option>
+                    <option value="79">o</option>
+                    <option value="80">p</option>
+                    <option value="81">q</option>
+                    <option value="82">r</option>
+                    <option value="83">s</option>
+                    <option value="84">t</option>
+                    <option value="85">u</option>
+                    <option value="86">v</option>
+                    <option value="87">w</option>
+                    <option value="88">x</option>
+                    <option value="89">y</option>
+                    <option value="90">z</option>
+                </select>
+            </div>
+        </div>
+        <div class="mdl-grid options-container shortcut-options">
+            <div class="mdl-cell mdl-cell--5-col label">
+                <label title="Copy text hotkey">Copy text</label>
+            </div>
+            <div class="mdl-cell mdl-cell--7-col">
+                CTRL + SHIFT +
+                <select id="copyHotkey" class="hotkeySelector">
+                    <option value="48">0</option>
+                    <option value="49">1</option>
+                    <option value="50">2</option>
+                    <option value="51">3</option>
+                    <option value="52">4</option>
+                    <option value="53">5</option>
+                    <option value="54">6</option>
+                    <option value="55">7</option>
+                    <option value="56">8</option>
+                    <option value="57">9</option>
+                    <option value="65">a</option>
+                    <option value="66">b</option>
+                    <option value="67">c</option>
+                    <option value="68">d</option>
+                    <option value="69">e</option>
+                    <option value="70">f</option>
+                    <option value="71">g</option>
+                    <option value="72">h</option>
+                    <option value="73">i</option>
+                    <option value="74">j</option>
+                    <option value="75">k</option>
+                    <option value="76">l</option>
+                    <option value="77">m</option>
+                    <option value="78">n</option>
+                    <option value="79">o</option>
+                    <option value="80">p</option>
+                    <option value="81">q</option>
+                    <option value="82">r</option>
+                    <option value="83">s</option>
+                    <option value="84">t</option>
+                    <option value="85">u</option>
+                    <option value="86">v</option>
+                    <option value="87">w</option>
+                    <option value="88">x</option>
+                    <option value="89">y</option>
+                    <option value="90">z</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="mdl-grid">
+            <div class="mdl-cell mdl-cell--12-col">                    
+                <div class="subscription">
+                    <div class="text">🐟 Copyfish Newsletter</div>
+                    <div class="text">We'll send you updates on new Copyfish releases that we're working on. We will not spam you. Scout's honor!</div>
+                    <form action="https://a9t9.us11.list-manage.com/subscribe/post?u=ce17e59f5b68a2fd3542801fd&amp;id=b80e206910" method="post" name="mc-embedded-subscribe-form" target="_blank">
+                        <label for="mce-EMAIL">Email address</label>
+                        <input type="email" value="" name="EMAIL" id="mce-EMAIL" required="">
+                        <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+                        <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_ce17e59f5b68a2fd3542801fd_62c9708e75" tabindex="-1" value=""></div>
+                        <input id="mc-embedded-subscribe" type="submit" value="Subscribe to list" name="subscribe">                        
+                    </form>
+                </div>
+            </div>
+        </div>
+
         <div class="mdl-grid options-container buttons">
-          <div class="mdl-cell mdl-cell--3-col label"></div>
-          <div class="mdl-cell mdl-cell--5-col button-cell">
+            <!--   <div class="mdl-cell mdl-cell--3-col label"></div>
+            <!--<div class="mdl-cell mdl-cell--5-col button-cell">
             <!-- <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent btn btn-reset" title="Reset">Reset</button> -->
             <!-- <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent btn btn-save" title="Save">Save</button> -->
-          </div>
-          <div class="mdl-cell mdl-cell--3-col label">
-            <a class="extension-link" href="http://blog.a9t9.com/p/copyfish.html" target="_blank">Copyfish Website</a>
-          </div>
+            <!--</div>-->
+            <div class="mdl-cell mdl-cell--5-col label">
+                Questions? Ideas? Email us at: <a class="extension-link" href="mailto:copyfish@a9t9.com">copyfish@a9t9.com</a>
+            </div>
         </div>
-      </div>
     </div>
+
     <script src="scripts/jquery.min.js"></script>
     <script src="scripts/material.min.js"></script>
     <script src="scripts/options.js"></script>
-  </body>
+</body>
 </html>

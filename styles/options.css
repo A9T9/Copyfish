@@ -1,91 +1,169 @@
 /*right*/
+
 .ocrext-preserve-whitespace {
-  white-space: pre;
+	white-space: pre;
 }
+
 body {
-  font-size: 16px;
-  color: #757575;
-  padding: 0;
-  margin: 0;
+	font-size: 16px;
+	color: #757575;
+	padding: 0;
+	margin: 0;
 }
+
 .container {
-  width: 960px;
-  margin: 0 auto;
-  padding: 10px 20px 20px 20px;
-  box-sizing: border-box;
+	width: 960px;
+	margin: 0 auto;
+	padding: 10px 20px 20px 20px;
+	box-sizing: border-box;
 }
+
 .container h1 {
-  text-align: center;
-  margin: 10px 0 10px 0;
-  padding-bottom: 20px;
-  border-bottom: 4px solid #2196f3;
+	text-align: center;
+	margin: 10px 0 10px 0;
+	padding-bottom: 20px;
+	border-bottom: 4px solid #2196f3;
 }
+
 .container .inner-wrapper {
-  margin: 25px 0 0 0;
+	margin: 25px 0 0 0;
 }
+
 .container .inner-wrapper .status-text {
-  color: #2196f3;
-  width: 100%;
-  text-align: center;
-  transition: opacity 0.6s;
-  opacity: 0;
-  padding-left: 45px;
-  margin-top: 0;
-  font-size: 18px;
+	color: #2196f3;
+	width: 100%;
+	text-align: center;
+	transition: opacity 0.6s;
+	opacity: 0;
+	padding-left: 45px;
+	margin-top: 0;
+	font-size: 18px;
 }
+
 .container .inner-wrapper .status-text.visible {
-  opacity: 1;
+	opacity: 1;
 }
+
+.container .inner-wrapper .subtitle h2 {
+	margin: 0 auto;
+	color: #000000;
+}
+
 .container .inner-wrapper .options-container {
-  margin-top: 15px;
+	margin-top: 15px;
 }
+
 .container .inner-wrapper .options-container:nth-child(1) {
-  margin-top: 0px;
+	margin-top: 0px;
 }
+
 .container .inner-wrapper .label {
-  padding: 8px 20px 0 0;
-  text-align: right;
+	padding: 8px 20px 0 0;
+	text-align: right;
 }
+
 .container .inner-wrapper .label label a.tip {
-  font-size: 14px;
-  color: #2196f3;
-  display: inline-block;
-  width: 170px;
+	font-size: 14px;
+	color: #2196f3;
+	display: inline-block;
+	width: 170px;
 }
+
 .container .inner-wrapper select {
-  width: 400px;
-  padding: 8px 4px;
-  font-size: 16px;
+	width: 400px;
+	padding: 8px 4px;
+	font-size: 16px;
 }
+
+.container .inner-wrapper select.hotkeySelector {
+	display: inline-block;
+	width: 80px;
+	font-size: 16px;
+}
+
 .container .inner-wrapper select.lang-quickselect {
-  width: 120px;
+	width: 120px;
 }
+
 .container .inner-wrapper label.auto-process,
 .container .inner-wrapper label.auto-translate,
 .container .inner-wrapper label.popup-dicts {
-  margin-top: 8px;
+	margin-top: 8px;
 }
+
+.container .inner-wrapper .subscription {
+	max-width: 500px;
+	border: 2px #F5CE62 solid;
+	margin: 0 auto;
+	padding: 15px 20px;
+}
+
+.container .inner-wrapper .subscription .text {
+	font-size: 20px;
+	color: #7B77F7;
+	text-align: center;
+	margin: 10px auto;
+}
+
+.container .inner-wrapper .subscription label {
+	display: block;
+	color: #000000;
+	margin-bottom: 10px;
+}
+
+.container .inner-wrapper .subscription input[type='email'] {
+	display: block;
+	width: 100%;
+	margin-bottom: 20px;
+}
+
+.container .inner-wrapper .subscription input[type='submit'] {
+	font-size: 13px;
+	border: none;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+	letter-spacing: .03em;
+	color: #fff;
+	background-color: #aaa;
+	box-sizing: border-box;
+	height: 32px;
+	line-height: 32px;
+	padding: 0 18px;
+	display: block;
+	margin: 0;
+	transition: all 0.23s ease-in-out 0s;
+}
+
+.container .inner-wrapper .subscription input[type='submit']:hover {
+	background-color: #777;
+	cursor: pointer;
+}
+
 .container .inner-wrapper .btn {
-  padding: 0 20px;
+	padding: 0 20px;
 }
+
 .container .inner-wrapper .btn:nth-child(2) {
-  margin-left: 15px;
+	margin-left: 15px;
 }
+
 .container .inner-wrapper .extension-link {
-  color: #2196f3;
-  font-size: 18px;
+	color: #2196f3;
+	font-size: 16px;
 }
+
 .container .inner-wrapper .buttons .button-cell {
-  text-align: center;
+	text-align: center;
 }
+
 @media screen and (max-width: 959px) {
-  .container {
-    width: 100%;
-  }
-  .container .inner-wrapper .label {
-    text-align: left;
-  }
-  .container .inner-wrapper select {
-    width: 90%;
-  }
+	.container {
+		width: 100%;
+	}
+	.container .inner-wrapper .label {
+		text-align: left;
+	}
+	.container .inner-wrapper select {
+		width: 90%;
+	}
 }

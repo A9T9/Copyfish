@@ -1,64 +1,30 @@
 {
-    "name": "__MSG_appName__",
-   "short_name": "__MSG_appShortName__",
-  "version": "0.8.8.8",
-  "manifest_version": 2,
-  "description": "__MSG_appDescription__",
-  "icons": {
-    "16": "images/icon-16.png",
-    "19": "images/icon-19.png",
-    "38": "images/icon-38.png",
-    "128": "images/icon-128.png"
-  },
-  "default_locale": "en",
-  "background": {
-    "scripts": [
-      "scripts/jquery.min.js",
-      "scripts/chromereload.js",
-      "scripts/background.js"
-    ]
-  },
-  "options_page": "options.html",
-  "web_accessible_resources": [
-    "dialog.html",
-    "config/config.json",
-    "images/gear.png",
-    "images/close.png"
-  ],
-  "content_scripts": [
-    {
-      "matches": [
-        "<all_urls>"
-      ],
-      "css": [
-        "styles/material.min.css",
-        "styles/cs.css"
-      ],
-      "js": [
-        "scripts/jquery.min.js",
-        "scripts/material.min.js",
-        "scripts/overlay.js",
-        "scripts/cs.js"
-      ]
-    }
-  ],
-  "browser_action": {
-    "default_icon": {
-      "19": "images/icon-19.png",
-      "38": "images/icon-38.png"
-    },
-    "default_title": "__MSG_appName__"
-  },
-  "permissions": [
-    "contextMenus",
-    "tabs",
-    "activeTab",
-    "storage",
-    "http://*/*",
-    "https://*/*",
-    "clipboardWrite"
-  ],
-  "optional_permissions": [
-    "desktopCapture"
-  ]
+	"background": {
+		"scripts": ["scripts/jquery.min.js", "scripts/chromereload.js", "scripts/background.js"]
+	},
+	"browser_action": {
+		"default_icon": {
+			"19": "images/icon-19.png",
+			"38": "images/icon-38.png"
+		},
+		"default_title": "__MSG_appName__"
+	},
+	"default_locale": "en",
+	"description": "__MSG_appDescription__",
+	"icons": {
+		"128": "images/icon-128.png",
+		"16": "images/icon-16.png",
+		"19": "images/icon-19.png",
+		"38": "images/icon-38.png"
+	},
+	"key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAi0HbNToHIsaFwQDEe/kC9hMNpwjY4iiocSAG0tRHqvm2dTenLPhVwLObwLdBrJTz1lo3Ih1Q/lWfN3ppJdc47aXWpqOR8fanL3qDMGCRcFAzo6E1rS7iomJi0Fjbjfn+T1R6ch/APyvHeMFAHQGEsR+kzxp/ewLzv9HS6pC7AjAQM/gF5CJQQUITfcPHkGL3OHq7V7Vbq0a64WCZnagYVRoYRJdS2PxJqohKpGFOxl4GNOxGSd64o4vDlnqQ6qEgFSJVVOyAw/H275mCb6oISf3hLSu6RhHZ/x6efcrJJSE9Ysxw62STDzZyKha3qA0J88+REzwE8LnpcH2W1ZJ0JwIDAQAB",
+	"manifest_version": 2,
+	"name": "__MSG_appName__",
+	"optional_permissions": ["desktopCapture"],
+	"options_page": "options.html",
+	"permissions": ["contextMenus", "tabs", "activeTab", "storage", "<all_urls>", "clipboardWrite"],
+	"short_name": "__MSG_appShortName__",
+	"update_url": "https://clients2.google.com/service/update2/crx",
+	"version": "2.9.3",
+	"web_accessible_resources": ["dialog.html", "config/config.json", "images/gear.png", "images/close.png"]
 }

@@ -6,22 +6,29 @@
         "visualCopyOCRFontSize": "16px",
         "visualCopySupportDicts": false,
         "visualCopyQuickSelectLangs": [],
-        "visualCopyTextOverlay": true
+        "visualCopyTextOverlay": true,
+        "openGrabbingScreenHotkey": 79,
+        "closePanelHotkey": 88,
+        "copyTextHotkey": 67
     },
-    "yandex_api_key": "trnsl.1.1.20150620T072324Z.a834e7d6392b1be7.bd45ef6d33866baf8a48a67dcf2c6b1174b315d8",
     "yandex_api_url": "https://translate.yandex.net/api/v1.5/tr.json/translate",
-    "ocr_api_list": [{
-        "id": "1",
-        "ocr_api_key": "Copyfish",
-        "ocr_api_url": "https://ocrapi.a9t9.com/api/Parse/Image"
-    }, {
-        "id": "2",
-        "ocr_api_key": "copyfishonly",
-        "ocr_api_url": "https://apipro2.ocr.space/parse/image"
-    }],
+  "ocr_api_list": [
+    {
+      "id": "1",
+      "ocr_api_url": "https://apipro1a.ocr.space/parse/image"
+    },
+    {
+      "id": "2",
+      "ocr_api_url": "https://apipro2.ocr.space/parse/image"
+    },
+    {
+        "id":"3",
+        "ocr_api_url": "https://apipro3.ocr.space/parse/image"
+    }
+  ],
     "ocr_server_reset_time": 86400,
-    "ocr_timeout": 60000,
-    "yandex_timeout": 60000,
+    "ocr_timeout": 15000,
+    "yandex_timeout": 30000,
     "yandex_err_msgs": {
         "401": "ERR_KEY_INVALID",
         "402": "ERR_KEY_BLOCKED",
@@ -31,91 +38,121 @@
         "422": "ERR_UNPROCESSABLE_TEXT",
         "501": "ERR_LANG_NOT_SUPPORTED"
     },
-    "ocr_languages": [{
+  "ocr_languages": [
+    {
+        "lang": "ara",
+        "name": "Arabic",
+        "short": "AR"        
+    },
+    {
+      "lang": "chs",
+      "name": "ChineseSimplified",
+      "short": "简"
+    },
+    {
+      "lang": "cht",
+      "name": "ChineseTraditional",
+      "short": "繁"
+    },
+    
+    {
         "lang": "ce",
         "name": "Czech",
         "short": "CS"
-    }, {
-        "lang": "chs",
-        "name": "ChineseSimplified",
-        "short": "繁"
-    }, {
-        "lang": "cht",
-        "name": "ChineseTraditional",
-        "short": "简"
-    }, {
-        "lang": "dan",
-        "name": "Danish",
-        "short": "DA"
-    }, {
-        "lang": "dut",
-        "name": "Dutch",
-        "short": "NL"
-    }, {
-        "lang": "eng",
-        "name": "English",
-        "short": "EN"
-    }, {
-        "lang": "fin",
-        "name": "Finnish",
-        "short": "FI"
-    }, {
-        "lang": "fre",
-        "name": "French",
-        "short": "FR"
-    }, {
-        "lang": "ger",
-        "name": "German",
-        "short": "DE"
-    }, {
-        "lang": "gre",
-        "name": "Greek",
-        "short": "EL"
-    }, {
-        "lang": "hun",
-        "name": "Hungarian",
-        "short": "HU"
-    }, {
-        "lang": "ita",
-        "name": "Italian",
-        "short": "IT"
-    }, {
-        "lang": "jpn",
-        "name": "Japanese",
-        "short": "JP"
-    }, {
-        "lang": "kor",
-        "name": "Korean",
-        "short": "KO"
-    }, {
-        "lang": "nor",
-        "name": "Norwegian",
-        "short": "NN"
-    }, {
-        "lang": "pol",
-        "name": "Polish",
-        "short": "PL"
-    }, {
-        "lang": "por",
-        "name": "Portuguese",
-        "short": "PT"
-    }, {
-        "lang": "rus",
-        "name": "Russian",
-        "short": "RU"
-    }, {
-        "lang": "spa",
-        "name": "Spanish",
-        "short": "ES"
-    }, {
-        "lang": "swe",
-        "name": "Swedish",
-        "short": "SV"
-    }, {
-        "lang": "tur",
-        "name": "Turkish",
-        "short": "TR"
-    }],
+    },
+    
+    
+    {
+      "lang": "dan",
+      "name": "Danish",
+      "short": "DA"
+    },
+    {
+      "lang": "dut",
+      "name": "Dutch",
+      "short": "NL"
+    },
+    {
+      "lang": "eng",
+      "name": "English",
+      "short": "EN"
+    },
+    {
+      "lang": "fin",
+      "name": "Finnish",
+      "short": "FI"
+    },
+    {
+      "lang": "fre",
+      "name": "French",
+      "short": "FR"
+    },
+    {
+      "lang": "ger",
+      "name": "German",
+      "short": "DE"
+    },
+    {
+      "lang": "gre",
+      "name": "Greek",
+      "short": "EL"
+    },
+    {
+      "lang": "hun",
+      "name": "Hungarian",
+      "short": "HU"
+    },
+    {
+      "lang": "ita",
+      "name": "Italian",
+      "short": "IT"
+    },
+    {
+      "lang": "jpn",
+      "name": "Japanese",
+      "short": "JP"
+    },
+    {
+      "lang": "kor",
+      "name": "Korean",
+      "short": "KO"
+    },
+    {
+      "lang": "nor",
+      "name": "Norwegian",
+      "short": "NN"
+    },
+    {
+      "lang": "pol",
+      "name": "Polish",
+      "short": "PL"
+    },
+    {
+      "lang": "por",
+      "name": "Portuguese",
+      "short": "PT"
+    },
+    {
+      "lang": "rus",
+      "name": "Russian",
+      "short": "RU"
+    },
+    {
+      "lang": "spa",
+      "name": "Spanish",
+      "short": "ES"
+    },
+    {
+      "lang": "swe",
+      "name": "Swedish",
+      "short": "SV"
+    },
+    {
+      "lang": "tur",
+      "name": "Turkish",
+      "short": "TR"
+    }
+  ],
     "yandex_languages": [{
         "af": "Afrikaans"
     }, {
