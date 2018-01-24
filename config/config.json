@@ -11,18 +11,22 @@
         "closePanelHotkey": 88,
         "copyTextHotkey": 67
     },
+    "yandex_api_key": "PleaseGetYourOwnKey-ItIsFree-cd59209eaf8.513c1afcbd4eaa561318196f5d48450fcfa42215",
     "yandex_api_url": "https://translate.yandex.net/api/v1.5/tr.json/translate",
   "ocr_api_list": [
     {
       "id": "1",
+      "ocr_api_key": "PleaseGetYourOwnKey-OCR.space-Has-Great-Free-Plan",
       "ocr_api_url": "https://apipro1a.ocr.space/parse/image"
     },
     {
       "id": "2",
+      "ocr_api_key": "PleaseGetYourOwnKey-OCR.space-Has-Great-Free-Plan",
       "ocr_api_url": "https://apipro2.ocr.space/parse/image"
     },
     {
         "id":"3",
+        "ocr_api_key": "PleaseGetYourOwnKey-OCR.space-Has-Great-Free-Plan",
         "ocr_api_url": "https://apipro3.ocr.space/parse/image"
     }
   ],
