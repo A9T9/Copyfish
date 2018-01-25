@@ -346,7 +346,8 @@
 			)
 			.done(function (config, htmlStr) {
 				HTMLSTRCOPY = htmlStr[0];
-				OCRTranslator.APPCONFIG = APPCONFIG = JSON.parse(config[0]);
+				// Note: it seems like with jQuery 3+,  $.get (ajax) directly returns a json object if you're loading a json file
+				OCRTranslator.APPCONFIG = APPCONFIG = typeof config[0] === 'string' ? JSON.parse(config[0]) : config[0];
 				$dfd.resolve(APPCONFIG, HTMLSTRCOPY);
 			})
 			.fail(function (err) {
