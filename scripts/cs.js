@@ -1,9 +1,12 @@
 /* globals jQuery, unescape, componentHandler */
+
 (function ($) {
+
 	'use strict';
 	// pseudo-private members
 	// var $ = jQuery;
-	var appName = 'Copyfish'; //chrome.i18n.getMessage('appShortName');
+
+	var appName = 'Copyfish'; //browser.i18n.getMessage('appShortName');
 	var appShortName = 'Copyfish';
 	var $ready;
 	var HTMLSTRCOPY;
@@ -13,9 +16,12 @@
 	var IS_CAPTURED = false;
 	var $SELECTOR;
 	var OPTIONS;
+	let isImageParse = false;
+	let imageParseData = null;
 	var MAX_ZINDEX = 2147483646;
 	var WIDGETBOTTOM = -8;
 	var SELECTOR_BORDER = 2;
+
 	var OCR_LIMIT = {
 		min: {
 			width: 40,
@@ -27,15 +33,19 @@
 		}
 	};
 	var ISPOSITIONED = false;
-	var OCR_DIMENSION_ERROR = chrome.i18n.getMessage('ocrDimensionError');
+	var OCR_DIMENSION_ERROR = browser.i18n.getMessage('ocrDimensionError');
 	var TextOverlay = window.__TextOverlay__;
+	var OcrEngine = null;
+	var transitionEngine = null;
 
-	/* 
+	/*
 	 *  Set to true to use a JPEG image. Default is PNG
 	 *  JPEG_QUALITY ranges from 0.1 to 1 and is valid only if USE_JPEG is true
 	 */
 	var USE_JPEG = false;
 	var JPEG_QUALITY = 0.6;
+
+
 
 
 	/*Utility functions*/
@@ -45,16 +55,32 @@
 		//console.error('Extension ' + appShortName + ': ' + msg, err);
 	};
 
+
+
 	var _searchOCRLanguageList = function (lang) {
 		var result = '';
-		$.each(APPCONFIG.ocr_languages, function (i, v) {
-			if (v.lang === lang) {
-				result = v;
-				return false;
-			}
-		});
+		if (OPTIONS.ocrEngine == "OcrGoogle") {
+			$.each(APPCONFIG.ocr_google_languages, function (i, v) {
+
+				if (v.lang === lang) {
+					result = v;
+					return false;
+				}
+			});
+		} else if (OPTIONS.ocrEngine === "OcrSpace") {
+			$.each(APPCONFIG.ocr_languages, function (i, v) {
+				if (v.lang === lang) {
+					result = v;
+					return false;
+				}
+			});
+		} else if (OPTIONS.ocrEngine === "OcrSpaceSecond") {
+			return true
+		}
+
 		return result;
 	};
+
 
 	var _getLanguage = function (type, lang) {
 		// var langList = APPCONFIG[type === 'OCR' ? 'ocr_languages' : 'yandex_languages'];
@@ -65,7 +91,7 @@
 		} else {
 			$.each(APPCONFIG.yandex_languages, function (k, v) {
 				if (lang in v) {
-					res = v[lang];
+					res = v[ lang ];
 					return false;
 				}
 			});
@@ -73,8 +99,11 @@
 		return res;
 	};
 
+
 	var _setLanguageOnUI = function () {
-		var ocrLang = _getLanguage('OCR', OPTIONS.visualCopyOCRLang);
+
+
+		var ocrLang = OPTIONS.ocrEngine === "OcrSpaceSecond" ? "Auto-Detect" : _getLanguage('OCR', OPTIONS.visualCopyOCRLang);
 		var translateLang = _getLanguage('translate', OPTIONS.visualCopyTranslateLang);
 		$('.ocrext-label.ocrext-message span')
 			.text('(' + ocrLang + ')')
@@ -87,16 +116,25 @@
 				title: translateLang
 			});
 
+		//autodetect for second engine
+		if (OPTIONS.ocrEngine === "OcrSpaceSecond") {
+			$('.ocrext-result').attr('dir', 'ltr');
+			return
+		}
+
 		var ocrLangDir = _getLanguageDirection(ocrLang);
+
 		$('.ocrext-result').attr('dir', ocrLangDir);
 		var translateLangDir = _getLanguageDirection(translateLang);
 		$('.ocrext-ocr-translated').attr('dir', translateLangDir);
 	};
 
+
 	var _getLanguageDirection = function (lang) {
-		var rtlLanguages = ['arabic', 'arabian'];
+		var rtlLanguages = [ 'arabic', 'arabian' ];
 		return rtlLanguages.indexOf(lang.toLowerCase()) === -1 ? "ltr" : "rtl";
 	};
+
 
 	var _setOCRFontSize = function () {
 		$('.ocrext-ocr-message,.ocrext-ocr-translated')
@@ -107,26 +145,44 @@
 			.addClass('ocrext-font-' + OPTIONS.visualCopyOCRFontSize);
 	};
 
+
 	var _setZIndex = function () {
 		/*
 		 * Google Translate - 1201 Perapera - 7777 GDict - 99997 Transover - 2147483647
 		 */
 		if (OPTIONS.visualCopySupportDicts) {
 			$('.ocrext-wrapper').css('zIndex', 1200);
+			let $textarea = $('textarea.ocrext-result');
+
+			if ($('#popup_support_text').length === 0) {
+
+				$textarea.after(`<p id="popup_support_text" class="${$textarea.prop('classList')}">${$textarea.val()}</p>`);
+				$textarea.hide();
+
+			}
+
 		} else {
 			$('.ocrext-wrapper').css('zIndex', MAX_ZINDEX);
 		}
 	};
 
+
+
 	var _isImageParseError = function (data) {
-		return data && data.ParsedResults && data.ParsedResults.length && data.ParsedResults[0].FileParseExitCode === -10;
+		return data && data.ParsedResults && data.ParsedResults.length && data.ParsedResults[ 0 ].FileParseExitCode === -10;
 	};
 
 	var _drawQuickSelectButtons = function () {
+		if (isFirefox) {
+			$('.icon-action-white').addClass('firefox-ocrext');
+		}
+
 		var $btnContainer = $('.ocrext-quickselect-btn-container');
 		var $btn;
 		var ocrLang;
 		$btnContainer.empty();
+		//console.log(OPTIONS)
+		if (OPTIONS.ocrEngine === "OcrSpaceSecond") return
 		$.each(OPTIONS.visualCopyQuickSelectLangs, function (i, language) {
 			if (language === 'none') {
 				return true;
@@ -193,7 +249,7 @@
 				}
 				$MASK.width($(document).width());
 				$MASK.height($(document).width());
-				if (['absolute', 'relative', 'fixed'].indexOf($('body').css('position')) >= 0) {
+				if ([ 'absolute', 'relative', 'fixed' ].indexOf($('body').css('position')) >= 0) {
 					$MASK.css('position', 'fixed');
 				}
 				return this;
@@ -265,29 +321,29 @@
 				tl.css({
 					left: 0,
 					top: 0,
-					width: pos.tr[0],
-					height: pos.tl[1]
+					width: pos.tr[ 0 ],
+					height: pos.tl[ 1 ]
 				});
 
 				tr.css({
-					left: pos.tr[0],
+					left: pos.tr[ 0 ],
 					top: 0,
-					width: (width - pos.tr[0]),
-					height: pos.br[1]
+					width: (width - pos.tr[ 0 ]),
+					height: pos.br[ 1 ]
 				});
 
 				br.css({
-					left: pos.bl[0],
-					top: pos.bl[1],
-					width: (width - pos.bl[0]),
-					height: (height - pos.bl[1])
+					left: pos.bl[ 0 ],
+					top: pos.bl[ 1 ],
+					width: (width - pos.bl[ 0 ]),
+					height: (height - pos.bl[ 1 ])
 				});
 
 				bl.css({
 					left: 0,
-					top: pos.tl[1],
-					width: pos.tl[0],
-					height: (height - pos.tl[1])
+					top: pos.tl[ 1 ],
+					width: pos.tl[ 0 ],
+					height: (height - pos.tl[ 1 ])
 				});
 			}
 		};
@@ -304,19 +360,29 @@
 			// visualCopyAutoProcess: '',
 			visualCopyAutoTranslate: '',
 			visualCopyOCRFontSize: '',
+			copyAfterProcess: '',
+			copyType: '',
 			visualCopySupportDicts: '',
 			visualCopyQuickSelectLangs: [],
 			visualCopyTextOverlay: '',
 			openGrabbingScreenHotkey: 0,
 			closePanelHotkey: 0,
-			copyTextHotkey: 0
+			copyTextHotkey: 0,
+			transitionEngine: '',
+			ocrEngine: '',
+			google_ocr_api_key: '',
+			google_ocr_api_url: '',
+			google_trs_api_key: '',
+			google_trs_api_url: '',
+			deepapi_trs_api_key: '',
+			deepapi_trs_api_url: '',
+			status: null
 		};
-		chrome.storage.sync.get(theseOptions, function (opts) {
+		browser.storage.sync.get(theseOptions, function (opts) {
 			OPTIONS = opts;
 			// set the global options here
 			$optsDfd.resolve();
 		});
-
 		return $optsDfd;
 	}
 
@@ -325,7 +391,7 @@
 	 */
 	function setOptions(opts) {
 		var $optsDfd = $.Deferred();
-		chrome.storage.sync.set(opts, function () {
+		browser.storage.sync.set(opts, function () {
 			$.extend(OPTIONS, opts);
 			// set the global options here
 			$optsDfd.resolve();
@@ -340,14 +406,23 @@
 		var $dfd = $.Deferred();
 
 		$.when(
-				$.get(chrome.extension.getURL('config/config.json')),
-				$.get(chrome.extension.getURL('/dialog.html')),
-				getOptions()
-			)
+			$.get(browser.extension.getURL('config/config.json')),
+			$.get(browser.extension.getURL('/dialog.html')),
+			getOptions()
+		)
 			.done(function (config, htmlStr) {
-				HTMLSTRCOPY = htmlStr[0];
+
+				if (OPTIONS.status !== "PRO+") {
+					$('.translate-text-tab').addClass('disabled');
+				} else {
+					$('.copyfish-text-translate').css('display', 'flex');
+				}
+
+				HTMLSTRCOPY = htmlStr[ 0 ];
+				//works on PC, but not Mac/Linux? OCRTranslator.APPCONFIG = APPCONFIG = JSON.parse(config[0]);
 				// Note: it seems like with jQuery 3+,  $.get (ajax) directly returns a json object if you're loading a json file
-				OCRTranslator.APPCONFIG = APPCONFIG = typeof config[0] === 'string' ? JSON.parse(config[0]) : config[0];
+				OCRTranslator.APPCONFIG = APPCONFIG = typeof config[ 0 ] === 'string' ? JSON.parse(config[ 0 ]) : config[ 0 ];
+
 				$dfd.resolve(APPCONFIG, HTMLSTRCOPY);
 			})
 			.fail(function (err) {
@@ -360,27 +435,70 @@
 	/*
 	 * Converts dataURI to a blob instance
 	 */
-	function dataURItoBlob(dataURI) {
+
+	//zoom 0.5 mode prototype
+	// async  function  resizeImage(url, width, height) {
+	//
+	// 	return new Promise((resolve, reject) => {
+	// 		var sourceImage = new Image();
+	//
+	// 		sourceImage.onload = function() {
+	// 			// Create a canvas with the desired dimensions
+	// 			var canvas = document.createElement("canvas");
+	// 			canvas.width = width;
+	// 			canvas.height = height;
+	//
+	// 			// Scale and draw the source image to the canvas
+	// 			canvas.getContext("2d").drawImage(sourceImage, 0, 0, width, height);
+	//
+	// 			// Convert the canvas to a data URL in PNG format
+	// 			resolve(canvas.toDataURL());
+	// 		}
+	//
+	//
+	// 		sourceImage.src = url;
+	// 	})
+	//
+	//
+	// }
+
+	async function dataURItoBlob(dataURI) {
+
+		//Todo zoom 0.5 mode prototype
+
+		// if ($('#zoom-btn') && $('#zoom-btn').data('value') === 0.5){
+		// 	const $ocrRext = $('#ocrext-canOrig');
+		// 	let resize = {
+		// 		width: $ocrRext.width() * 2,
+		// 		height: $ocrRext.height() * 2
+		// 	};
+		// 	dataURI = await resizeImage(dataURI,resize.width, resize.height);
+		// }
+
 		// convert base64/URLEncoded data component to raw binary data held in a string
+
 		var byteString;
-		if (dataURI.split(',')[0].indexOf('base64') >= 0) {
-			byteString = atob(dataURI.split(',')[1]);
+		if (dataURI.split(',')[ 0 ].indexOf('base64') >= 0) {
+			byteString = atob(dataURI.split(',')[ 1 ]);
 		} else {
-			byteString = unescape(dataURI.split(',')[1]);
+			byteString = unescape(dataURI.split(',')[ 1 ]);
 
 		}
 
 		// separate out the mime component
-		var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+		var mimeString = dataURI.split(',')[ 0 ].split(':')[ 1 ].split(';')[ 0 ];
 
 		// write the bytes of the string to a typed array
 		var ia = new Uint8Array(byteString.length);
 		for (var i = 0; i < byteString.length; i++) {
-			ia[i] = byteString.charCodeAt(i);
+			ia[ i ] = byteString.charCodeAt(i);
 		}
 
-		return new Blob([ia], {
-			type: mimeString
+
+		return new Promise((resolve, reject) => {
+			resolve(
+				new Blob([ ia ], { type: mimeString })
+			)
 		});
 	}
 
@@ -388,69 +506,100 @@
 	 * will not work if layout changes in between calls, but there is no way to detect this.
 	 * is asynchronous, returns a promise
 	 */
-	function _captureImageOntoCanvas() {
+
+	function _captureImageOntoCanvas(image_parse_mode = false, imageUrl) {
+
 		var $canOrig = $('#ocrext-canOrig'),
 			$can = $('#ocrext-can'),
 			$dialog = $('body').find('.ocrext-wrapper');
 		var $captureComplete = $.Deferred();
-		// capture the current tab using the background page. On success it returns 
+		IS_CAPTURED = true;
+		// capture the current tab using the background page. On success it returns
 		// dataURL and zoom of the captured image
 		getOptions().done(function () {
 			_setLanguageOnUI();
 			_setOCRFontSize();
 			_drawQuickSelectButtons();
 			setTimeout(function () {
-				chrome.runtime.sendMessage({
-					evt: 'capture-screen'
-				}, function (response) {
-					var $imageLoadDfd = $.Deferred();
-					var img = new Image();
+				if (isFirefox) {
+					browser.runtime.sendMessage({
+						evt: 'capture-screen'
+					}).then(function (response) {
+						getOptionsCallback(response, $canOrig, $can, $dialog, image_parse_mode, imageUrl, $captureComplete)
+					});
+				} else {
 
-					img.onload = function () {
-						$imageLoadDfd.resolve();
-					};
-
-					img.src = response.dataURL;
-					$imageLoadDfd
-						.done(function () {
-							// the screencapture is messed up when pixel density changes; compare the window width
-							// and image width to determine if it needs to be fixed
-							// also, this fix problem with page zoom
-							var dpf = window.innerWidth / img.width;
-							var scaleFactor = 1 / dpf,
-								sx = Math.min(startCx, endCx) * scaleFactor,
-								sy = Math.min(startCy, endCy) * scaleFactor,
-								width = Math.abs(endCx - startCx),
-								height = Math.abs(endCy - startCy),
-								scaledWidth = width * scaleFactor,
-								scaledHeight = height * scaleFactor;
-
-							$canOrig.attr({
-								width: scaledWidth,
-								height: scaledHeight
-							});
-
-							$can.attr({
-								width: width,
-								height: height
-							});
-
-							var ctxOrig = $canOrig.get(0).getContext('2d');
-							ctxOrig.drawImage(img, sx, sy, scaledWidth, scaledHeight, 0, 0, scaledWidth, scaledHeight);
-
-							var ctx = $can.get(0).getContext('2d');
-							ctx.drawImage(img, sx, sy, scaledWidth, scaledHeight, 0, 0, width, height); // Or at whatever offset you like
-							$dialog.css({
-								opacity: 1,
-								bottom: WIDGETBOTTOM
-							});
-							$captureComplete.resolve();
-						});
-				});
+					browser.runtime.sendMessage({
+						evt: 'capture-screen'
+					}, function (response) {
+						getOptionsCallback(response, $canOrig, $can, $dialog, image_parse_mode, imageUrl, $captureComplete)
+					});
+				}
 			}, 150);
 		});
 
 		return $captureComplete;
+	}
+
+	const getOptionsCallback = (response, $canOrig, $can, $dialog, image_parse_mode, imageUrl, $captureComplete) => {
+		var $imageLoadDfd = $.Deferred();
+		var img = new Image();
+
+		img.onload = function () {
+			$imageLoadDfd.resolve();
+		};
+
+		img.crossOrigin = "anonymous";
+		img.src = image_parse_mode ? imageUrl : response.dataURL;
+
+		$imageLoadDfd
+			.done(function () {
+				// the screencapture is messed up when pixel density changes; compare the window width
+				// and image width to determine if it needs to be fixed
+				// also, this fix problem with page zoom
+				var dpf = window.innerWidth / img.width;
+
+				var scaleFactor = 1 / dpf,
+					sx = image_parse_mode ? img.width : Math.min(startCx, endCx) * scaleFactor,
+					sy = image_parse_mode ? img.height : Math.min(startCy, endCy) * scaleFactor,
+					width = image_parse_mode ? img.width : Math.abs(endCx - startCx),
+					height = image_parse_mode ? img.height : Math.abs(endCy - startCy),
+					scaledWidth = image_parse_mode ? width : width * scaleFactor,
+					scaledHeight = image_parse_mode ? height : height * scaleFactor;
+
+
+				$canOrig.attr({
+					width: scaledWidth,
+					height: scaledHeight
+				});
+
+
+				$can.attr({
+					width: width,
+					height: height
+				});
+
+				var ctxOrig = $canOrig.get(0).getContext('2d');
+				var ctx = $can.get(0).getContext('2d');
+
+				console.log($can.length, $can, $canOrig, $can.height(), $canOrig.height(), scaledWidth, scaledHeight)
+
+
+				if (image_parse_mode) {
+					ctxOrig.drawImage(img, 0, 0, scaledWidth, scaledHeight, 0, 0, scaledWidth, scaledHeight)
+					ctx.drawImage(img, 0, 0, scaledWidth, scaledHeight, 0, 0, scaledWidth, scaledHeight); // Or at whatever offset you like
+				} else {
+					ctxOrig.drawImage(img, sx, sy, scaledWidth, scaledHeight, 0, 0, scaledWidth, scaledHeight)
+					ctx.drawImage(img, sx, sy, scaledWidth, scaledHeight, 0, 0, width, height); // Or at whatever offset you like
+				}
+
+
+				$dialog.css({
+					opacity: 1,
+					bottom: WIDGETBOTTOM
+				});
+				$captureComplete.resolve();
+			});
 	}
 
 	/*
@@ -458,11 +607,19 @@
 	 */
 	function _getOCRServer() {
 		var $dfd = $.Deferred();
-		chrome.runtime.sendMessage({
-			evt: 'get-best-server'
-		}, function (response) {
-			$dfd.resolve(response.server.id);
-		});
+		if (isFirefox) {
+			browser.runtime.sendMessage({
+				evt: 'get-best-server'
+			}).then(function (response) {
+				$dfd.resolve(response.server.id);
+			});
+		} else {
+			browser.runtime.sendMessage({
+				evt: 'get-best-server'
+			}, function (response) {
+				$dfd.resolve(response.server.id);
+			});
+		}
 		return $dfd;
 	}
 
@@ -470,20 +627,159 @@
 	 * Handles the AJAX POST calls to OCR API.
 	 * Failover logic happens here!
 	 */
-	function _postToOCR($ocrPromise, postData, attempt) {
+	const googleOcrCallback = (response, imageUri, $ocrPromise, startTime) => {
+		const { success, data } = response;
+
+		if (!success) {
+			$ocrPromise.reject({
+				type: 'OCR',
+				stat: 'OCR conversion failed',
+				message: 'Rate limit, try again in one minute',
+				details: "limit reached",
+				code: 429
+			});
+		}
+		let responseData = response.data.responses[ 0 ];
+
+		responseData = responseData || {};
+		// retry if any error condition is met and if any servers are still available
+		if (Object.keys(responseData).length === 0 && responseData.constructor === Object) {
+			$ocrPromise.reject({
+				type: 'OCR',
+				stat: 'OCR conversion failed',
+				message: 'error',
+				details: responseData,
+				code: responseData
+			});
+		} else if (responseData === null) {
+			$ocrPromise.reject({
+				type: 'OCR',
+				stat: 'OCR conversion failed',
+				message: responseData.ErrorMessage,
+				details: responseData.ErrorDetails,
+				code: responseData.OCRExitCode
+			});
+		} else if (responseData.fullTextAnnotation != null) {
+
+			browser.runtime.sendMessage({
+				evt: 'set-server-responsetime',
+				serverResponseTime: (Date.now() - startTime) / 1000
+			});
+			let textOverlayData = {
+				"Lines": [],
+				"HasOverlay": true
+			}
+			responseData.textAnnotations.forEach(function (item, i, arr) {
+
+				let dataToPush =
+				{
+					"Words": [ {
+						"WordText": item.description,
+						"Left": item.boundingPoly.vertices[ 0 ].x,
+						"Top": item.boundingPoly.vertices[ 2 ].y,
+						"Height": item.boundingPoly.vertices[ 2 ].y - item.boundingPoly.vertices[ 0 ].y,
+						"Width": item.boundingPoly.vertices[ 2 ].x - item.boundingPoly.vertices[ 0 ].x
+					} ],
+					"MaxHeight": (item.boundingPoly.vertices[ 2 ].y - item.boundingPoly.vertices[ 0 ].y + 5) * 0.9,
+					"MinTop": item.boundingPoly.vertices[ 0 ].y
+				};
+				if (i != 0) {
+					textOverlayData.Lines.push(dataToPush)
+				}
+			});
+
+
+			$ocrPromise.resolve(responseData.fullTextAnnotation.text, textOverlayData);
+
+		}
+	}
+
+	function _GoogleOcr(imageUri, $ocrPromise, postData) {
 		var formData = new FormData();
-		formData.append('language', postData.language);
+		//console.log(OPTIONS);
+		if (OPTIONS.visualCopyTextOverlay) {
+			formData.append('isOverlayRequired', true);
+		}
+		_getOCRServer().done(function (serverId) {
+			var startTime;
+
+			formData.append('apikey', OPTIONS.google_ocr_api_key);
+			startTime = Date.now();
+
+			let request = {
+				"requests": [
+					{
+						"image": { "content": imageUri },
+						"imageContext": {
+							"languageHints": [
+								postData.language
+							]
+						},
+						"features": [
+							{
+								// if you want to detect more faces, or detect something else, change this
+								"type": "DOCUMENT_TEXT_DETECTION",
+								"maxResults": 1
+							}
+						]
+					}
+				]
+			};
+			if (isFirefox) {
+				browser.runtime.sendMessage({
+					evt: 'google-ocr',
+					options: OPTIONS,
+					request: request
+
+				}).then(function (response) {
+
+					googleOcrCallback(response, imageUri, $ocrPromise, startTime)
+				});
+			} else {
+				browser.runtime.sendMessage({
+					evt: 'google-ocr',
+					options: OPTIONS,
+					request: request
+
+				}, function (response) {
+
+					googleOcrCallback(response, imageUri, $ocrPromise, startTime)
+				});
+
+			}
+
+
+		});
+	}
+
+
+
+
+
+
+
+	function _postToOCR($ocrPromise, postData, attempt, second_engine = false) {
+
+		var formData = new FormData();
+
+		//console.log(attempt, second_engine, postData.language, 12423546)
+
+		if (!second_engine) formData.append('language', postData.language);
+
 		formData.append('file', postData.blob, postData.fileName);
 		if (OPTIONS.visualCopyTextOverlay) {
 			formData.append('isOverlayRequired', true);
 		}
+
+		formData.append('OCREngine', second_engine ? "2" : "1");
+
 		_getOCRServer().done(function (serverId) {
 			var startTime;
 			var serverList = APPCONFIG.ocr_api_list;
 			var maxAttempts = serverList.length;
 			var ocrAPIInfo = $.grep(serverList, function (el) {
 				return el.id === serverId;
-			})[0];
+			})[ 0 ];
 			formData.append('apikey', ocrAPIInfo.ocr_api_key);
 			attempt += 1;
 			startTime = Date.now();
@@ -501,21 +797,35 @@
 					data = data || {};
 					// retry if any error condition is met and if any servers are still available
 					if ((typeof data === 'string' ||
-							// OCRExitCode = -10 corresponds to a parse error due to malformed/blurry image. Not the server's fault
-							data.IsErroredOnProcessing ||
-							data.OCRExitCode !== 1) && !_isImageParseError(data) &&
+						// OCRExitCode = -10 corresponds to a parse error due to malformed/blurry image. Not the server's fault
+						data.IsErroredOnProcessing ||
+						data.OCRExitCode !== 1) && !_isImageParseError(data) &&
 						attempt < maxAttempts) {
 						// sometimes an error string is returned
-						chrome.runtime.sendMessage({
-							evt: 'set-server-responsetime',
-							serverId: ocrAPIInfo.id,
-							serverResponseTime: -1
-						}, function () {
-							OCRTranslator.setStatus('progress',
-								chrome.i18n.getMessage('ocrProgressStatusStillWorking'), true);
-							formData = null;
-							_postToOCR($ocrPromise, postData, attempt);
-						});
+						if (isFirefox) {
+							browser.runtime.sendMessage({
+								evt: 'set-server-responsetime',
+								serverId: ocrAPIInfo.id,
+								serverResponseTime: -1
+							}).then(function () {
+								OCRTranslator.setStatus('progress',
+									browser.i18n.getMessage('ocrProgressStatusStillWorking'), true);
+								formData = null;
+								_postToOCR($ocrPromise, postData, attempt);
+							});
+						} else {
+							browser.runtime.sendMessage({
+								evt: 'set-server-responsetime',
+								serverId: ocrAPIInfo.id,
+								serverResponseTime: -1
+							}, function () {
+								OCRTranslator.setStatus('progress',
+									browser.i18n.getMessage('ocrProgressStatusStillWorking'), true);
+								formData = null;
+								_postToOCR($ocrPromise, postData, attempt);
+							});
+						}
+
 						return false;
 					}
 					if (typeof data === 'string') {
@@ -536,15 +846,15 @@
 						});
 					} else if (data.OCRExitCode === 1) {
 
-						chrome.runtime.sendMessage({
+						browser.runtime.sendMessage({
 							evt: 'set-server-responsetime',
 							serverId: ocrAPIInfo.id,
 							serverResponseTime: (Date.now() - startTime) / 1000
-						}, function () {});
-						$ocrPromise.resolve(data.ParsedResults[0].ParsedText, data.ParsedResults[0].TextOverlay);
+						});
+						$ocrPromise.resolve(data.ParsedResults[ 0 ].ParsedText, data.ParsedResults[ 0 ].TextOverlay);
 
 					} else {
-						result = data.ParsedResults[0];
+						result = data.ParsedResults[ 0 ];
 						$ocrPromise.reject({
 							type: 'OCR',
 							stat: 'OCR conversion failed',
@@ -558,16 +868,30 @@
 					var errData;
 					var stat;
 					if (attempt < maxAttempts) {
-						chrome.runtime.sendMessage({
-							evt: 'set-server-responsetime',
-							serverId: ocrAPIInfo.id,
-							serverResponseTime: -1
-						}, function () {
-							OCRTranslator.setStatus('progress',
-								chrome.i18n.getMessage('ocrProgressStatusStillWorking'), true);
-							formData = null;
-							_postToOCR($ocrPromise, postData, attempt);
-						});
+
+						if (isFirefox) {
+							browser.runtime.sendMessage({
+								evt: 'set-server-responsetime',
+								serverId: ocrAPIInfo.id,
+								serverResponseTime: -1
+							}).then(function () {
+								OCRTranslator.setStatus('progress',
+									browser.i18n.getMessage('ocrProgressStatusStillWorking'), true);
+								formData = null;
+								_postToOCR($ocrPromise, postData, attempt);
+							});
+						} else {
+							browser.runtime.sendMessage({
+								evt: 'set-server-responsetime',
+								serverId: ocrAPIInfo.id,
+								serverResponseTime: -1
+							}, function () {
+								OCRTranslator.setStatus('progress',
+									browser.i18n.getMessage('ocrProgressStatusStillWorking'), true);
+								formData = null;
+								_postToOCR($ocrPromise, postData, attempt);
+							});
+						}
 						return false;
 					}
 					try {
@@ -602,14 +926,18 @@
 	 * 3. Handle response from OCR API and POST to Yandex translate
 	 * 4. AJAX error handling anywhere in the pipeline
 	 *
+	 *
 	 */
-	function _processOCRTranslate() {
+
+	const _processOCRTranslate = () => {
 		// var data = new FormData();
 		var dataURI;
 		var ocrPostData;
 		var $ocr = $.Deferred();
 		var $process = $.Deferred();
 		var $canOrig = $('#ocrext-canOrig');
+		let $capturedImage = $('.copyfish-image-view');
+
 		var dims = {
 			width: $canOrig.width(),
 			height: $canOrig.height()
@@ -619,6 +947,12 @@
 		// in settings are transferred to existing sessions as well
 		getOptions().done(function () {
 			_setOCRFontSize();
+			if (OPTIONS.ocrEngine != null) {
+				//select Ocr Engine
+				OcrEngine = OPTIONS.ocrEngine;
+				//select translation engine
+				transitionEngine = OPTIONS.transitionEngine;
+			}
 			OCRTranslator.resetOverlayInformation();
 			$process
 				.done(function (txt, fromOCR) {
@@ -638,7 +972,7 @@
 
 					$('.ocrext-btn').removeClass('disabled');
 					OCRTranslator.setStatus('success',
-						fromOCR ? chrome.i18n.getMessage('ocrSuccessStatus') : chrome.i18n.getMessage('translationSuccessStatus'));
+						fromOCR ? browser.i18n.getMessage('ocrSuccessStatus') : browser.i18n.getMessage('translationSuccessStatus'));
 					OCRTranslator.enableContent();
 				})
 				.fail(function (err) {
@@ -662,13 +996,15 @@
 					ocrPostData = null;
 					$canOrig = null;
 					$ocr = null;
+
+					onOCRCopy(true)
 				});
 
 			$ocr
 				.done(function (text, overlayInfo) {
 					$('.ocrext-ocr-message')
 						.val(text);
-
+					$('#popup_support_text').text(text);
 					// dataURI should be visible as it is encapsulated within _processOCRTranslate
 					// the mad-world of async programming
 					// OCRTranslator.textOverlay.setOverlayInformation(overlayInfo, dataURI);
@@ -683,37 +1019,128 @@
 						return true;
 					}
 					OCRTranslator.setStatus('progress',
-						chrome.i18n.getMessage('translationProgressStatus'), true);
-					$.ajax({
-						url: APPCONFIG.yandex_api_url,
-						data: {
-							key: APPCONFIG.yandex_api_key,
-							lang: OPTIONS.visualCopyTranslateLang,
-							text: text
-						},
-						timeout: APPCONFIG.yandex_timeout,
-						type: 'GET',
-						success: function (data) {
-							if (data.code === 200) {
-								$process.resolve(data.text);
-							}
-						},
-						error: function (x, t) {
-							var errData;
-							try {
-								errData = JSON.parse(x.responseText);
-							} catch (e) {
-								errData = {};
-							}
-							$process.reject({
-								type: 'translate',
-								stat: t === 'timeout' ? 'Translation request timed out' : 'An error occurred during translation',
-								message: errData.message,
-								details: null,
-								code: errData.code
+						browser.i18n.getMessage('translationProgressStatus'), true);
+					//detect active translate language
+					if (OPTIONS.transitionEngine == "GoogleTranslator") {
+						if (isFirefox) {
+							browser.runtime.sendMessage({
+								evt: 'google-translate',
+								options: OPTIONS,
+								text: text
+							}).then(function (response) {
+
+								if (response.success === true) {
+									$process.resolve(response.data)
+									onOCRCopy(true)
+								} else if (response.success === false) {
+									$process.reject({
+										type: 'translate',
+										stat: response.time === 'timeout' ? 'Translation request timed out' : 'An error occurred during translation',
+										message: response.data.message,
+										details: null,
+										code: response.data.code
+									});
+								}
+							});
+						} else {
+							browser.runtime.sendMessage({
+								evt: 'google-translate',
+								options: OPTIONS,
+								text: text
+							}, function (response) {
+
+								if (response.success === true) {
+									$process.resolve(response.data)
+									onOCRCopy(true)
+								} else if (response.success === false) {
+									$process.reject({
+										type: 'translate',
+										stat: response.time === 'timeout' ? 'Translation request timed out' : 'An error occurred during translation',
+										message: response.data.message,
+										details: null,
+										code: response.data.code
+									});
+								}
 							});
 						}
-					});
+
+
+					} else if (OPTIONS.transitionEngine === "YandexTranslator") {
+						$.ajax({
+							url: APPCONFIG.yandex_api_url,
+							data: {
+								key: APPCONFIG.yandex_api_key,
+								lang: OPTIONS.visualCopyTranslateLang,
+								text: text
+							},
+							timeout: APPCONFIG.yandex_timeout,
+							type: 'GET',
+							success: function (data) {
+								if (data.code === 200) {
+									$process.resolve(data.text);
+									onOCRCopy(true)
+								}
+							},
+							error: function (x, t) {
+								var errData;
+								try {
+									errData = JSON.parse(x.responseText);
+								} catch (e) {
+									errData = {};
+								}
+								$process.reject({
+									type: 'translate',
+									stat: t === 'timeout' ? 'Translation request timed out' : 'An error occurred during translation',
+									message: errData.message,
+									details: null,
+									code: errData.code
+								});
+							}
+						});
+					} else if (OPTIONS.transitionEngine === "DeepTranslator") {
+						if (isFirefox) {
+							browser.runtime.sendMessage({
+								evt: 'deepapi-translate',
+								options: OPTIONS,
+								text: text
+							}).then(function (response) {
+								if (response.success === true) {
+									$process.resolve(response.data)
+									onOCRCopy(true)
+								} else if (response.success === false) {
+									$process.reject({
+										type: 'translate',
+										stat: response.time === 'timeout' ? 'Translation request timed out' : 'An error occurred during translation',
+										message: response.data.message,
+										details: null,
+										code: response.data.code
+									});
+								}
+							});
+						} else {
+							browser.runtime.sendMessage({
+								evt: 'deepapi-translate',
+								options: OPTIONS,
+								text: text
+							}, function (response) {
+								console.log('xxxxxxxxxxxxxxxxxxxxxxxxx'); console.log(response);
+								if (response.success === true) {
+									$process.resolve(response.data)
+									onOCRCopy(true)
+								} else if (response.success === false) {
+									$process.reject({
+										type: 'translate',
+										stat: response.time === 'timeout' ? 'Translation request timed out' : 'An error occurred during translation',
+										message: response.data.message,
+										details: null,
+										code: response.data.code
+									});
+								}
+							});
+						}
+					}
+
+
 				})
 				.fail(function (err) {
 					//  receive error and relay it to $process
@@ -736,22 +1163,52 @@
 
 			// Disable widget, show spinner
 			OCRTranslator.disableContent();
+			OCRTranslator.checkDesktopCaptureModule();
 			OCRTranslator.setStatus('progress',
-				chrome.i18n.getMessage('ocrProgressStatus'), true);
+				browser.i18n.getMessage('ocrProgressStatus'), true);
 
 			// POST to OCR.
 			ocrPostData = {};
 			ocrPostData.language = OPTIONS.visualCopyOCRLang;
 			if (USE_JPEG) {
 				dataURI = $canOrig.get(0).toDataURL('image/jpeg', JPEG_QUALITY);
-				ocrPostData.blob = dataURItoBlob(dataURI);
 				ocrPostData.fileName = 'ocr-file.jpg';
+				dataURItoBlob(dataURI).then(function (url) {
+					ocrPostData.blob = url;
+					//check Ocr Engine
+					if (OcrEngine === "OcrSpace") {
+						_postToOCR($ocr, ocrPostData, 0);
+					} else if (OcrEngine === "OcrSpaceSecond") {
+						_postToOCR($ocr, ocrPostData, 0, true);
+					} else if (OcrEngine === "OcrGoogle") {
+						let imageUrl = dataURI.replace('data:image/png;base64,', '');
+						_GoogleOcr(imageUrl, $ocr, ocrPostData)
+					}
+				});
+
 			} else {
+
 				dataURI = $canOrig.get(0).toDataURL();
-				ocrPostData.blob = dataURItoBlob(dataURI);
 				ocrPostData.fileName = 'ocr-file.png';
+				dataURItoBlob(dataURI).then(function (url) {
+					ocrPostData.blob = url;
+					//check Ocr Engine
+					if (OcrEngine === "OcrSpace") {
+						_postToOCR($ocr, ocrPostData, 0);
+					} else if (OcrEngine === "OcrSpaceSecond") {
+						_postToOCR($ocr, ocrPostData, 0, true);
+					} else if (OcrEngine === "OcrGoogle") {
+						let imageUrl = dataURI.replace('data:image/png;base64,', '');
+						_GoogleOcr(imageUrl, $ocr, ocrPostData)
+					}
+				});
+
+				//	console.log('else',dataURI);
 			}
-			_postToOCR($ocr, ocrPostData, 0);
+			//console.log('options',OPTIONS);
+
+
+
 
 			/*
 			 * $process::done can be called only if OCR and translation succeed
@@ -770,9 +1227,15 @@
 	 */
 	function onOCRMouseMove(e) {
 		var l, t, w, h;
+		var scrollTop = $('body').scrollTop();
+		if (!scrollTop) {
+			// some modern browser hack
+			// Fix issue: https://github.com/teamdocs/copyfish2020/issues/4
+			scrollTop = Math.max($("html").scrollTop(), $('body').scrollTop());
+		}
 		if (ISPOSITIONED) {
 			endX = e.pageX - $('body').scrollLeft();
-			endY = e.pageY - $('body').scrollTop();
+			endY = e.pageY - scrollTop;
 			$SELECTOR.css({
 				'position': 'fixed'
 			});
@@ -797,17 +1260,17 @@
 		});
 
 		Mask.reposition({
-			tl: [l + SELECTOR_BORDER, t + SELECTOR_BORDER],
-			tr: [l + w + SELECTOR_BORDER, t + SELECTOR_BORDER],
-			bl: [l + SELECTOR_BORDER, t + h + SELECTOR_BORDER],
-			br: [l + w + SELECTOR_BORDER, t + h + SELECTOR_BORDER]
+			tl: [ l + SELECTOR_BORDER, t + SELECTOR_BORDER ],
+			tr: [ l + w + SELECTOR_BORDER, t + SELECTOR_BORDER ],
+			bl: [ l + SELECTOR_BORDER, t + h + SELECTOR_BORDER ],
+			br: [ l + w + SELECTOR_BORDER, t + h + SELECTOR_BORDER ]
 		});
 	}
 
 	/*
 	 * mousedown event handler
 	 * once mousedown occurs, selection starts. Captures the initial coords and adds the selector
-	 * rectangle onto the page. 
+	 * rectangle onto the page.
 	 * Adds the mousemove and mouseup events
 	 */
 	function onOCRMouseDown(e) {
@@ -820,9 +1283,15 @@
 		$('.ocrext-mask p.ocrext-element').css('transform', 'scale(0,0)');
 		$SELECTOR = $('<div class="ocrext-selector"></div>');
 		$SELECTOR.appendTo($body);
+		var scrollTop = $body.scrollTop();
+		if (!scrollTop) {
+			// some modern browser hack
+			// Fix issue: https://github.com/teamdocs/copyfish2020/issues/4
+			scrollTop = Math.max($("html").scrollTop(), $body.scrollTop());
+		}
 		if (ISPOSITIONED) {
 			startX = e.pageX - $body.scrollLeft();
-			startY = e.pageY - $body.scrollTop();
+			startY = e.pageY - scrollTop;
 			$SELECTOR.css({
 				'position': 'fixed'
 			});
@@ -850,6 +1319,8 @@
 		// we need the closure here. `.one` would automagically remove the listener when done
 		$body.one('mouseup', function (evt) {
 			var $dialog;
+			isImageParse = false;
+			imageParseData = null;
 			endCx = evt.clientX;
 			endCy = evt.clientY;
 
@@ -871,7 +1342,7 @@
 				})
 				.show();
 
-			// initiate image capture 
+			// initiate image capture
 			_captureImageOntoCanvas().done(function () {
 				_processOCRTranslate();
 			});
@@ -888,12 +1359,16 @@
 		OCRTranslator.reset();
 		// timeout to ensure that a render is done before initiating next capture cycle
 		setTimeout(function () {
-			_captureImageOntoCanvas().done(function () {
+			_captureImageOntoCanvas(isImageParse, imageParseData).done(function () {
 				_processOCRTranslate();
 				_setZIndex();
 			});
 		}, 20);
 	}
+
+	const onOcrDesktopRecapture = () => {
+		browser.runtime.sendMessage({ evt: 'captureScreen' });
+	};
 
 	/*
 	 * Recapture button click handler
@@ -931,7 +1406,7 @@
 				}
 
 				$('.ocrext-btn').removeClass('disabled');
-				OCRTranslator.setStatus('success', chrome.i18n.getMessage('translationSuccessStatus'));
+				OCRTranslator.setStatus('success', browser.i18n.getMessage('translationSuccessStatus'));
 				OCRTranslator.enableContent();
 			})
 			.fail(function (err) {
@@ -945,28 +1420,153 @@
 			});
 
 		var text = $(".ocrext-ocr-message").val();
+		//detect active translate language
+		if (OPTIONS.transitionEngine == "GoogleTranslator") {
+			$.ajax({
+				url: OPTIONS.google_trs_api_url,
+				data: {
+					key: OPTIONS.google_trs_api_key,
+					target: OPTIONS.visualCopyTranslateLang,
+					q: text
+				},
+				timeout: APPCONFIG.yandex_timeout,
+				type: 'GET',
+				success: function (data) {
+					if (data.data.translations[ 0 ].translatedText != null) {
+
+						$display.resolve(data.data.translations[ 0 ].translatedText);
+					}
+				},
+				error: function (x, t) {
+					var errData;
+					try {
+						errData = JSON.parse(x.responseText);
+					} catch (e) {
+						errData = {};
+					}
+					$display.reject({
+						type: 'translate',
+						stat: t === 'timeout' ? 'Translation request timed out' : 'An error occurred during translation',
+						message: errData.message,
+						details: null,
+						code: errData.code
+					});
+				}
+			});
+		} else if (OPTIONS.transitionEngine === "YandexTranslator") {
+			$.ajax({
+				url: APPCONFIG.yandex_api_url,
+				data: {
+					key: APPCONFIG.yandex_api_key,
+					lang: OPTIONS.visualCopyTranslateLang,
+					text: text
+				},
+				timeout: APPCONFIG.yandex_timeout,
+				type: 'GET',
+				success: function (data) {
+					if (data.code === 200) {
+						$display.resolve(data.text);
+					}
+				},
+				error: function (x, t) {
+					var errData;
+					try {
+						errData = JSON.parse(x.responseText);
+					} catch (e) {
+						errData = {};
+					}
+					$display.reject({
+						type: 'translate',
+						stat: t === 'timeout' ? 'Translation request timed out' : 'An error occurred during translation',
+						message: errData.message,
+						details: null,
+						code: errData.code
+					});
+				}
+			});
+		} else if (OPTIONS.transitionEngine == "DeepTranslator") {
+			$.ajax({
+				url: OPTIONS.deepapi_trs_api_url,
+				data: {
+					auth_key: OPTIONS.deepapi_trs_api_key, // appConfig temp and should be replaced by dynamic value OPTIONS.deep_trs_api_key
+					target_lang: OPTIONS.deepapi_trs_api_url,
+					text: text
+				},
+				timeout: APPCONFIG.yandex_timeout,
+				type: 'GET',
+				success: function (data) {
+					if (data && data.data && data.data.translations[ 0 ].text != null) {
+						$display.resolve(data.data.translations[ 0 ].text);
+					}
+				},
+				error: function (x, t) {
+					var errData;
+					try {
+						errData = JSON.parse(x.responseText);
+					} catch (e) {
+						errData = {};
+					}
+					$display.reject({
+						type: 'translate',
+						stat: t === 'timeout' ? 'Translation request timed out' : 'An error occurred during translation',
+						message: errData.message,
+						details: null,
+						code: errData.code
+					});
+				}
+			});
+		}
+
+	}
+
+	/*
+	 * Close button click handler. Also called on press of ESC
+	 * Close the current session and communicate this to the bg page (main extension)
+	 * Release any global state captured in between
+	 */
+
+	function openGoogleTransatePage() {
+		let $textarea = $('textarea.ocrext-result').val();
+		let translatedText = $textarea.split(' ').join('+');
+		let userLang = OPTIONS.visualCopyTranslateLang || navigator.language || navigator.userLanguage;
+		let $text = `https://translate.google.com/?text=${encodeURI(translatedText)}&hl=${userLang}&langpair=auto|${userLang}&tbb=1`;
+		window.open($text, '_blank');
+	}
+
+	function googleTranslate($process, text) {
+		if (!APPCONFIG.gtranslate.api_key) {
+			$process.reject({
+				type: 'translate',
+				stat: 'Google translate service api key not found. Please add in config',
+				message: 'Google translate service api key not found. Please add in config',
+				details: null,
+				code: ''
+			});
+			return null;
+		}
 		$.ajax({
-			url: APPCONFIG.yandex_api_url,
+			url: APPCONFIG.gtranslate.api_url,
 			data: {
-				key: APPCONFIG.yandex_api_key,
-				lang: OPTIONS.visualCopyTranslateLang,
-				text: text
+				key: APPCONFIG.gtranslate.api_key,
+				target: OPTIONS.visualCopyTranslateLang,
+				q: text
 			},
-			timeout: APPCONFIG.yandex_timeout,
+			timeout: APPCONFIG.gtranslate.timeout,
 			type: 'GET',
 			success: function (data) {
 				if (data.code === 200) {
-					$display.resolve(data.text);
+					$process.resolve(data.text);
 				}
 			},
 			error: function (x, t) {
 				var errData;
 				try {
 					errData = JSON.parse(x.responseText);
+					errData = errData.error || {};
 				} catch (e) {
 					errData = {};
 				}
-				$display.reject({
+				$process.reject({
 					type: 'translate',
 					stat: t === 'timeout' ? 'Translation request timed out' : 'An error occurred during translation',
 					message: errData.message,
@@ -977,11 +1577,50 @@
 		});
 	}
 
-	/*
-	 * Close button click handler. Also called on press of ESC
-	 * Close the current session and communicate this to the bg page (main extension)
-	 * Release any global state captured in between
-	 */
+	function deepApiTranslate($process, text) {
+		if (!APPCONFIG.deep_api_translate.api_key) {
+			$process.reject({
+				type: 'translate',
+				stat: 'Deep api translate api key not found. Please add in config',
+				message: 'Deep api translate api key not found. Please add in config',
+				details: null,
+				code: ''
+			});
+			return null;
+		}
+		$.ajax({
+			url: APPCONFIG.deep_api_translate.api_url,
+			data: {
+				auth_key: APPCONFIG.deep_api_translate.api_key,
+				target_lang: OPTIONS.visualCopyTranslateLang,
+				text: text
+			},
+			timeout: APPCONFIG.deep_api_translate.timeout,
+			type: 'GET',
+			success: function (data) {
+				if (data.code === 200) {
+					$process.resolve(data.text);
+				}
+			},
+			error: function (x, t) {
+				var errData;
+				try {
+					errData = JSON.parse(x.responseText);
+					errData = errData.error || {};
+				} catch (e) {
+					errData = {};
+				}
+				$process.reject({
+					type: 'translate',
+					stat: t === 'timeout' ? 'Translation request timed out' : 'An error occurred during translation',
+					message: errData.message || '',
+					details: null,
+					code: errData.code
+				});
+			}
+		});
+	}
+
 	function onOCRClose(e) {
 		e && e.stopPropagation();
 
@@ -991,11 +1630,70 @@
 		$('header.ocrext-header').removeClass('minimized');
 		$('.ocrext-wrapper').removeClass('ocrext-wrapper-minimized');
 		OCRTranslator.disable();
-		chrome.runtime.sendMessage({
+		browser.runtime.sendMessage({
 			evt: 'capture-done'
-		}, function ( /*resp*/ ) {
-
 		});
+	}
+
+	const onOCRCopy = (translateAuto = false) => {
+		/*Copy button click handler*/
+
+		if (translateAuto && !OPTIONS.copyAfterProcess) {
+			return false;
+		}
+
+
+
+		let messageTextArea = $('.ocrext-ocr-message');
+		var message = messageTextArea.val();
+
+		console.log(message, 123123)
+		let activeTab = $('div[aria-selected="true"]');
+
+		var translation = $('.ocrext-ocr-translated').text();
+		var text = null;
+
+		if (!translateAuto) {
+			text = message + translation;
+		} else {
+			console.log(OPTIONS.copyType, 213112)
+			switch (OPTIONS.copyType) {
+				case 'Text':
+					text = message;
+					break;
+				case 'Translation':
+					text = translation;
+					break;
+				default:
+					text = message + translation;
+			}
+		}
+
+		console.log(OPTIONS, 123123123)
+
+
+		if (activeTab.length === 0) {
+			browser.runtime.sendMessage({
+				evt: 'copy',
+				text: text
+			});
+		} else if (activeTab.hasClass('translate-text-tab')) {
+			browser.runtime.sendMessage({
+				evt: 'copy',
+				text: translation
+			});
+		} else if (activeTab.hasClass('ocr-text-capture-tab')) {
+			browser.runtime.sendMessage({
+				evt: 'copy',
+				text: message
+			});
+		} else {
+			browser.runtime.sendMessage({
+				evt: 'copy',
+				text: text
+			});
+		}
+
 	}
 
 
@@ -1003,15 +1701,17 @@
 	 * @module: OCRTranslator
 	 * The main translator module. Simple module pattern, no fancy constructors or factories
 	 */
+
 	var OCRTranslator = {
 		/*
 		 * Pseudo constructor
-		 * init: load resources and bind runtime listener, once the $ready deferred 
+		 * init: load resources and bind runtime listener, once the $ready deferred
 		 * resolves, render HTML on 'enableselection' event
-		 * Nothing gets rendered until the user presses the browserAction atleast 
+		 * Nothing gets rendered until the user presses the browserAction atleast
 		 * once within a tab. Only listeners get added and these simply bubble up
 		 * (delegated to body)
 		 */
+
 		init: function () {
 			// get config information
 			var self = this;
@@ -1020,10 +1720,13 @@
 			$ready = _bootStrapResources();
 
 			// listen to runtime messages from other pages, mainly the background page
-			chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+			browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
 				if (sender.tab) {
 					return true;
 				}
+
+				console.log(request.evt, 8789)
+
 				if (request.evt === 'isavailable') {
 					if (self._initialized) {
 						sendResponse({
@@ -1048,6 +1751,7 @@
 				}
 				if (request.evt === 'enableselection') {
 					// enable only if resources are loaded and available
+
 					$ready.done(function () {
 						OCRTranslator.enable();
 					});
@@ -1055,6 +1759,56 @@
 					sendResponse({
 						farewell: 'enableselection:OK'
 					});
+				} else if (request.evt === "disableselection") {
+
+					if (OCRTranslator.state === 'disabled') {
+						return true;
+					}
+
+					$ready.done(function () {
+						OCRTranslator.disable();
+					});
+				} else if (request.evt === "translateCapturedImage") {
+					this.textOverlay = TextOverlay();
+					console.log(this.textOverlay)
+					isImageParse = true;
+					imageParseData = request.data;
+
+					if (OCRTranslator.state !== 'enabled') this.bindEvents();
+
+					OCRTranslator.state = 'enabled';
+
+					_captureImageOntoCanvas(true, request.data).done(function () {
+						_processOCRTranslate();
+					});
+
+				} else if (request.evt === 'image_for_parse') {
+					isImageParse = true;
+					imageParseData = request.data;
+					let $body = $('body');
+					var $dialog;
+					// manipulate DOM to remove temporary cruft
+					$body.removeClass('ocrext-ch');
+					// turn off the mousemove event, we no longer need it
+					$body.off('mousemove', onOCRMouseMove);
+
+					Mask.hide();
+					// show the widget
+					_setZIndex();
+					$dialog = $body.find('.ocrext-wrapper');
+					$dialog
+						.css({
+							// zIndex: MAX_ZINDEX,
+							// opacity: 0,
+							bottom: -$dialog.height()
+						})
+						.show();
+
+					// initiate image capture
+					_captureImageOntoCanvas(true, request.data).done(function () {
+						_processOCRTranslate();
+					});
+
 				}
 			});
 			$(document).ready(function () {
@@ -1071,19 +1825,34 @@
 			// kind of like using a lock
 			this._initializing = false;
 			this._initialized = true;
-			ISPOSITIONED = ['absolute', 'relative', 'fixed'].indexOf($('body').css('position')) >= 0;
+			ISPOSITIONED = [ 'absolute', 'relative', 'fixed' ].indexOf($('body').css('position')) >= 0;
 			this.initWidgets();
 			this.bindEvents();
+			this.addIconToTranslateButton();
 
 			// tell the background page that the tab is ready
-			chrome.runtime.sendMessage({
+			browser.runtime.sendMessage({
 				evt: 'ready'
 			});
 		},
 
+
+		addIconToTranslateButton: function () {
+
+			let $translateButtonImg = $('#popup_translate_button img');
+
+			$translateButtonImg.attr('src', browser.runtime.getURL("images/translate.png"));
+		},
+
 		initWidgets: function () {
 			$('body').append(HTMLSTRCOPY);
-			$('.ocrext-title span').text(appName);
+			//	console.log(OPTIONS.status)
+			if (OPTIONS.status.toLowerCase() === 'free plan') {
+				$('.ocrext-title span').text(appName);
+			} else {
+				$('.ocrext-title span').text(appName + " " + OPTIONS.status);
+			}
+
 			if (!OPTIONS.visualCopyAutoTranslate) {
 				$('.ocrext-ocr-message').addClass('ocrext-preserve-whitespace expanded');
 				$('.ocrext-grid-translated').hide();
@@ -1108,7 +1877,11 @@
 		 */
 		bindEvents: function () {
 			var $body = $('body');
+			let $translateButton = $('#popup_translate_button');
 			var self = this;
+
+			$translateButton
+				.on('click', $translateButton, openGoogleTransatePage);
 			$body
 				.on('dblclick', '.ocrext-textoverlay-container', function () {
 					if ($('#ocrext-can').parents('.ocrext-content').hasClass('ocrext-disabled')) {
@@ -1133,17 +1906,9 @@
 				.on('click', '.ocrext-ocr-recapture', onOCRRecapture)
 				.on('click', '.ocrext-ocr-retranslate', onRetranslate)
 				.on('click', '.ocrext-ocr-sendocr', onOCRRedo)
+				.on('click', '.ocrext-ocr-desktop-recapture', onOcrDesktopRecapture)
 				.on('click', '.ocrext-closeToolbar-link', onOCRClose)
-				.on('click', '.ocrext-ocr-copy', function () {
-					/*Copy button click handler*/
-					var message = $('.ocrext-ocr-message').val();
-					var translation = $('.ocrext-ocr-translated').text();
-					var text = message + translation;
-					chrome.runtime.sendMessage({
-						evt: 'copy',
-						text: text
-					});
-				})
+				.on('click', '.ocrext-ocr-copy', onOCRCopy)
 				.on('click', '.ocrext-ocr-quickselect', function () {
 					var $el = $(this);
 					/*if($el.hasClass('selected')){
@@ -1151,6 +1916,7 @@
 					 }*/
 					$el.siblings().removeClass('selected');
 					$el.addClass('selected');
+
 					setOptions({
 						visualCopyOCRLang: $(this).attr('data-lang')
 					}).done(function () {
@@ -1169,13 +1935,23 @@
 						$this.addClass('minimized');
 					}
 				})
-				.on('click', 'a.ocrext-settings-link', function (e) {
+				.on('click', '.ocrext-settings-link', function (e) {
 					/*Settings  (gear icon) click handler*/
 					e.stopPropagation();
-					chrome.runtime.sendMessage({
+					browser.runtime.sendMessage({
 						evt: 'open-settings'
 					});
+				}).on('click', 'a.ocrext-open-tab-link', function (e) {
+					/*Settings  (gear icon) click handler*/
+					e.stopPropagation();
+					console.log($('#ocrext-canOrig'), 123123)
+					browser.runtime.sendMessage({
+						evt: 'imageOcrInTab',
+						data: $('#ocrext-can').get(0).toDataURL()
+					});
 				});
+
+
 
 			/*ESC handler. */
 			$(document).on('keyup', function (e) {
@@ -1201,7 +1977,11 @@
 			$body.addClass('ocrext-overlay ocrext-ch')
 				.find('.ocrext-wrapper')
 				.hide();
-			$('.ocrext-title span').text(appName);
+			if (OPTIONS.status.toLowerCase() === 'free plan') {
+				$('.ocrext-title span').text(appName);
+			} else {
+				$('.ocrext-title span').text(appName + " " + OPTIONS.status);
+			}
 			OCRTranslator.reset();
 			// show mask
 			Mask.addToBody().show();
@@ -1213,19 +1993,24 @@
 		},
 
 		/*
-		 * Hide the widget. Does not destroy/recreate, the widget size isn't big enough 
+		 * Hide the widget. Does not destroy/recreate, the widget size isn't big enough
 		 * to adversely impact page weight
 		 */
 		disable: function () {
 			var $body = $('body');
-			$body.removeClass('ocrext-overlay ocrext-ch')
-				.find('.ocrext-wrapper')
-				.hide();
-			$body.off('mousedown', onOCRMouseDown);
-			OCRTranslator.state = 'disabled';
-			Mask.remove();
-			OCRTranslator.reset();
-			IS_CAPTURED = false;
+			try {
+				$body.removeClass('ocrext-overlay ocrext-ch')
+					.find('.ocrext-wrapper')
+					.hide();
+				$body.off('mousedown', onOCRMouseDown);
+				OCRTranslator.state = 'disabled';
+				Mask.remove();
+				OCRTranslator.reset();
+				IS_CAPTURED = false;
+			} catch (e) {
+				console.log(e)
+			}
+
 			return this;
 		},
 
@@ -1247,7 +2032,7 @@
 		enableContent: function () {
 			$('.ocrext-spinner').removeClass('is-active');
 			$('.ocrext-content').removeClass('ocrext-disabled');
-			$('.ocrext-btn-container .ocrext-btn').removeClass('disabled').removeAttr('disabled');
+			$('.ocrext-btn-container .ocrext-btn:not(".ocrext-ocr-desktop-recapture")').removeClass('disabled').removeAttr('disabled');
 			$('.ocrext-quickselect-btn-container .ocrext-btn').removeClass('disabled').removeAttr('disabled');
 			return this;
 		},
@@ -1261,6 +2046,19 @@
 			return this;
 		},
 
+		checkDesktopCaptureModule: () => {
+			if (isFirefox) {
+				browser.runtime.sendMessage({ evt: "checkDesktopCaptureSoftware" }).then(function (response) {
+					if (response) $('.ocrext-ocr-desktop-recapture').removeClass('disabled').removeAttr('disabled');
+				});
+			} else {
+				browser.runtime.sendMessage({ evt: "checkDesktopCaptureSoftware" }, function (response) {
+					if (response) $('.ocrext-ocr-desktop-recapture').removeClass('disabled').removeAttr('disabled');
+				});
+			}
+
+		},
+
 		// Utility to set the status - progress, error and success are supported
 		// pass noAutoClose as true if the status message must be persisted beyond 10s
 		setStatus: function (status, txt, noAutoClose) {
@@ -1269,6 +2067,8 @@
 			} else {
 				$('.ocrext-content').removeClass('ocrext-error');
 			}
+
+			console.log($('.ocrext-status'))
 			$('.ocrext-status')
 				.removeClass('ocrext-success ocrext-error ocrext-progress')
 				.addClass(status === 'error' ? 'ocrext-error' :
@@ -1305,6 +2105,7 @@
 		showOverlay: function () {
 			var $canvas = $('#ocrext-can');
 			var $canvasOrig = $('#ocrext-canOrig');
+
 			this.textOverlay
 				.setOverlayInformation(this._overlay, $canvas.width(), $canvas.height(), null, $canvas.width() / $canvasOrig.width())
 				.show();
@@ -1312,17 +2113,21 @@
 
 		showOverlayTab: function () {
 			var $canvas = $('#ocrext-can');
-			var $canvasOrig = $('#ocrext-canOrig');
-			chrome.runtime.sendMessage({
-				evt: 'show-overlay-tab',
-				overlayInfo: this._overlay,
-				imgDataURI: $canvas.get(0).toDataURL(),
-				canWidth: $canvas.width(),
-				canHeight: $canvas.height(),
-				zoom: $canvas.width() / $canvasOrig.width()
-			}, function () {
-				/* done */
+			browser.runtime.sendMessage({
+				evt: 'imageOcrInTab',
+				data: $canvas.get(0).toDataURL()
 			});
+			//old overlay tab code
+			// browser.runtime.sendMessage({
+			// 	evt: 'show-overlay-tab',
+			// 	overlayInfo: this._overlay,
+			// 	imgDataURI: $canvas.get(0).toDataURL(),
+			// 	canWidth: $canvas.width(),
+			// 	canHeight: $canvas.height(),
+			// 	zoom: $canvas.width() / $canvasOrig.width()
+			// }, function () {
+			// 	/*	 done */
+			// });
 		},
 
 		hideOverlay: function () {
@@ -1335,10 +2140,11 @@
 	};
 
 	getOptions().done(function () {
-		$(document.body).on("keydown", function (e) {
+		$('body').on("keydown", function (e) {
+
 			if (e.ctrlKey && e.shiftKey) {
 				if (e.keyCode === OPTIONS.openGrabbingScreenHotkey) {
-					chrome.runtime.sendMessage({
+					browser.runtime.sendMessage({
 						evt: 'activate'
 					});
 					e.stopPropagation();

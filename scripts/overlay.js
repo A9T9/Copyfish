@@ -1,3 +1,12 @@
+window.browser = (function () {
+	return window.msBrowser ||
+		window.browser ||
+		window.chrome;
+})();
+
+const isFirefox = typeof InstallTrigger !== 'undefined';
+
+
 (function () {
 	'use strict';
 	var TextOverlay = function () {
@@ -15,10 +24,11 @@
 			return !!_overlay && _overlay.HasOverlay;
 		};
 		$container = $('.ocrext-textoverlay-container');
+
 		htmlString = [
 			'<div class="ocrext-element ocrext-text-overlay">',
 			'<div class="ocrext-element ocrext-text-overlay-word-wrapper">',
-			'<img class="ocrext-element ocrext-text-overlay-img" id="text-overlay-img"/>',
+			'<img class="ocrext-element ocrext-text-overlay-img text-overlay-img" />',
 			'</div>',
 			'</div>'
 		].join('');
@@ -26,10 +36,10 @@
 
 		_init = function (self) {
 			var run;
-			// $('title,.title').text(chrome.i18n.getMessage('appName') + ' - ' + chrome.i18n.getMessage('overlayTab'));
+			// $('title,.title').text(browser.i18n.getMessage('appName') + ' - ' + browser.i18n.getMessage('overlayTab'));
 			// `self` is passed; pythonic!
-			$overlay = $(htmlString);
-			$overlay.appendTo($container);
+			$(htmlString).appendTo($container);
+			$overlay = $('.ocrext-textoverlay-container')
 
 			$container.on('click', '.ocrext-close-link', function () {
 				_overlayInstance.hide();
@@ -42,6 +52,7 @@
 				// if setOverlayInformation is called when _overlay is already set, do nothing!
 				if (!_overlay) {
 					_overlay = overlayInfo;
+
 					this.render(canvasWidth, canHeight, imgDataURI, zoom);
 				}
 				return this;
@@ -56,8 +67,10 @@
 					var $wordWrapper = $overlay.find('.ocrext-text-overlay-word-wrapper');
 					var $word;
 
+					console.log($overlay.length,$wordWrapper.length, 9999)
+
 					if (imgDataURI) {
-						$container.find('#text-overlay-img').attr('src', imgDataURI);
+						$container.find('.text-overlay-img').attr('src', imgDataURI);
 					}
 
 					this.setDimensions(canvasWidth, canvasHeight);
@@ -73,7 +86,7 @@
 									top: minLineTopDist,
 									height: maxLineHeight,
 									width: word.Width * zoom,
-									fontSize: maxLineHeight * 0.8
+									fontSize: maxLineHeight * 0.7
 								})
 								.appendTo($wordWrapper);
 							$word = null;
@@ -85,9 +98,11 @@
 			},
 
 			setDimensions: function (width, height) {
+
 				$.each([$overlay, $overlay.find('.ocrext-text-overlay-word-wrapper')], function () {
 					this.width(width).height(height);
 				});
+
 				return this;
 			},
 
@@ -102,6 +117,7 @@
 					// this.position();
 					$container.addClass('visible');
 					$overlay.addClass('visible');
+					$container.find('.ocrext-text-overlay').addClass('visible');
 
 				} else {
 					// logError('Overlay is unavailable.');
@@ -113,6 +129,7 @@
 			hide: function () {
 				$container.removeClass('visible');
 				$overlay.removeClass('visible');
+				$container.find('.ocrext-text-overlay').remove('visible');
 				return this;
 			},
 
@@ -129,16 +146,21 @@
 			},
 
 			setTitle: function () {
-				$('title,.ocrext-textoverlay-title').text(chrome.i18n.getMessage('overlayTab'));
+				$('title,.ocrext-textoverlay-title').text(browser.i18n.getMessage('overlayTab'));
 				return this;
 			},
 
 			listenToBackgroundEvents: function () {
 				var self = this;
-				chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+				browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+
+					console.log(request.evt, 8789)
+
 					if (sender.tab) {
 						return true;
 					}
+
+
 
 					if (request.evt === 'init-overlay-tab') {
 						self.setOverlayInformation(request.overlayInfo, request.canWidth, request.canHeight, request.imgDataURI, request.zoom);

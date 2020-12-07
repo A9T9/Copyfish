@@ -12,6 +12,9 @@
 	-webkit-user-select: none;
 }
 
+
+
+
 .ocrext-overlay .ocrext-mask {
 	position: absolute;
 	/*background: @black;
@@ -73,6 +76,23 @@
 	font-variant: normal;
 }
 
+.canvas-hidden{
+	display: block !important;
+    position: absolute;
+    top: -800px;
+}
+
+#copyfish-tab-image-container{
+	position: relative;
+	min-width: 430px;
+	max-height: 200px;
+	width: 100%;
+	box-shadow: rgba(0, 0, 0, 0.14) 0px 2px 2px 0px, rgba(0, 0, 0, 0.2) 0px 3px 1px -2px, rgba(0, 0, 0, 0.12) 0px 1px 5px 0px;
+	margin: 5px auto 10px;
+	overflow: auto;
+	transition: height 0.25s ease 0s;
+}
+
 .ocrext-textoverlay-container {
 	cursor: pointer;
 	display: none;
@@ -83,8 +103,43 @@
 	height: 100%;
 }
 
+.tabs-container .ocrext-result{
+	padding-right: 18px !important;
+}
+.text-capture-tab h5,.translate-text-tab h5{
+	font-size: 18px;
+	color: #227fd2;
+}
+
+.text-capture-tab textarea,.translate-text-tab .ocrext-ocr-translated{
+	margin-top: 14px !important;
+	min-height: 120px !important;
+	width: -webkit-fill-available !important;
+	padding: 10px !important;
+	border: 2px solid #393939 !important;
+}
+
+[data-panes] > *{
+	padding: 16px !important;
+}
+
+
+.tabs-container .overlay-tab .ocrext-textoverlay-container{
+	width: auto !important;
+	top: 94px !important;
+}
+
+.tabs-container .ocrext-close-link{
+	display: none !important;
+}
+
 .ocrext-textoverlay-container.visible {
 	display: block;
+	margin: 15px 30px;
+}
+
+.tabs-container .ocrext-textoverlay-container.visible {
+	margin: 0;
 }
 
 .ocrext-textoverlay-container .ocrext-close-link {
@@ -103,6 +158,10 @@
 .ocrext-textoverlay-container .ocrext-text-overlay {
 	display: none;
 	margin: 15px auto;
+}
+
+.ocrext-textoverlay-container .ocrext-text-overlay {
+	margin: 0 !important;
 }
 
 .ocrext-textoverlay-container .ocrext-text-overlay.visible {
@@ -220,6 +279,45 @@
 	background: url('chrome-extension://__MSG_@@extension_id__/images/gear.png');
 }
 
+.tabs-container .ocrext-btn{
+	padding: 10px 20px;
+	margin-right: 16px;
+}
+
+.tabs-container .ocrext-footer{
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+}
+
+.tabs-container .ocrext-btn-container{
+	display: flex;
+	width: auto;
+	margin-right: 60px;
+}
+
+.tabs-container .ocrext-quickselect-btn-container{
+	height: 45px;
+	width: auto;
+	margin-right: 60px;
+
+}
+
+
+.ocrext-wrapper header.ocrext-header .ocrext-title .ocrext-open-tab-link {
+	display: inline-block;
+	float: right;
+	margin: -4px 25px 0 0;
+	padding: 0;
+	height: 24px;
+	width: 24px;
+	background-size: 20px !important;
+	background-repeat: no-repeat !important;
+	background-position: center !important;
+	background: url('chrome-extension://__MSG_@@extension_id__/images/outside.png');
+}
+
+
 .ocrext-wrapper header.ocrext-header .ocrext-title .ocrext-closeToolbar-link {
 	display: inline-block;
 	float: right;
@@ -228,6 +326,18 @@
 	height: 24px;
 	width: 24px;
 	background: url('chrome-extension://__MSG_@@extension_id__/images/close.png');
+}
+
+.ocrext-wrapper header.ocrext-header .ocrext-title .ocrext-closeToolbar-link.firefox-ocrext {
+	background: url('moz-extension://__MSG_@@extension_id__/images/close.png');
+}
+
+.ocrext-wrapper header.ocrext-header .ocrext-title .ocrext-open-tab-link.firefox-ocrext {
+	background: url('moz-extension://__MSG_@@extension_id__/images/outside.png');
+}
+
+.ocrext-wrapper header.ocrext-header .ocrext-title .ocrext-settings-link.firefox-ocrext {
+	background: url('moz-extension://__MSG_@@extension_id__/images/gear.png');
 }
 
 .ocrext-wrapper .ocrext-content {
@@ -253,7 +363,7 @@
 }
 
 .ocrext-wrapper .ocrext-content .ocrext-canvas-container #ocrext-can {
-	margin: 15px auto;
+	margin: 15px 30px;
 	display: block;
 	cursor: pointer;
 }
@@ -425,26 +535,31 @@
 .ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-message.ocrext-font-20px,
 .ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-translated.ocrext-font-20px {
 	font-size: 20px;
+	line-height: 24px;
 }
 
 .ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-message.ocrext-font-18px,
 .ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-translated.ocrext-font-18px {
 	font-size: 18px;
+	line-height: 22px;
 }
 
 .ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-message.ocrext-font-16px,
 .ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-translated.ocrext-font-16px {
 	font-size: 16px;
-}
+	line-height: 20px;
+ }
 
 .ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-message.ocrext-font-14px,
 .ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-translated.ocrext-font-14px {
 	font-size: 14px;
+	line-height: 18px;
 }
 
 .ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-message.ocrext-font-12px,
 .ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-translated.ocrext-font-12px {
 	font-size: 12px;
+	line-height: 16px;
 }
 
 .ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-message.expanded {
@@ -563,3 +678,10 @@ body.ocrext-textoverlay-page .ocrext-textoverlay-container {
 body.ocrext-textoverlay-page .ocrext-textoverlay-container a.ocrext-close-link {
 	display: none;
 }
+
+#popup_translate_button img{
+	height: 40px;
+	width: 42px;
+	cursor: pointer;
+}
+

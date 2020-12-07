@@ -2,6 +2,12 @@
   "background": {
     "scripts": [ "scripts/jquery.min.js", "scripts/chromereload.js", "scripts/background.js" ]
   },
+  "applications": {
+    "gecko": {
+      "id": "copyfish@a9t9.com",
+      "strict_min_version": "42.0"
+    }
+  },
   "version": "5.0.1",
   "browser_action": {
     "default_icon": {
@@ -20,15 +26,19 @@
   },
   "manifest_version": 2,
   "name": "__MSG_appName__",
-  "options_page": "options.html",
   "permissions": [
     "contextMenus",
     "activeTab",
+    "tabs",
+    "<all_urls>",
     "storage",
     "notifications",
     "nativeMessaging"
   ],
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab":true
+  },
   "short_name": "__MSG_appShortName__",
-  "update_url": "https://clients2.google.com/service/update2/crx",
   "web_accessible_resources": [ "dialog.html", "config/config.json", "images/gear.png", "images/outside.png", "images/close.png","images/translate.png"]
 }
