@@ -24,11 +24,10 @@ const isFirefox = typeof InstallTrigger !== 'undefined';
 			return !!_overlay && _overlay.HasOverlay;
 		};
 		$container = $('.ocrext-textoverlay-container');
-
 		htmlString = [
 			'<div class="ocrext-element ocrext-text-overlay">',
 			'<div class="ocrext-element ocrext-text-overlay-word-wrapper">',
-			'<img class="ocrext-element ocrext-text-overlay-img text-overlay-img" />',
+			'<img class="ocrext-element ocrext-text-overlay-img" id="text-overlay-img" />',
 			'</div>',
 			'</div>'
 		].join('');
@@ -98,17 +97,15 @@ const isFirefox = typeof InstallTrigger !== 'undefined';
 			},
 
 			setDimensions: function (width, height) {
-
 				$.each([$overlay, $overlay.find('.ocrext-text-overlay-word-wrapper')], function () {
 					this.width(width).height(height);
 				});
-
 				return this;
 			},
 
 			reset: function () {
 				_overlay = null;
-				$overlay.find('.ocrext-text-overlay-word-wrapper span').remove();
+				$overlay.find('.ocrext-text-overlay').remove();
 				return this;
 			},
 
@@ -159,8 +156,6 @@ const isFirefox = typeof InstallTrigger !== 'undefined';
 					if (sender.tab) {
 						return true;
 					}
-
-
 
 					if (request.evt === 'init-overlay-tab') {
 						self.setOverlayInformation(request.overlayInfo, request.canWidth, request.canHeight, request.imgDataURI, request.zoom);
