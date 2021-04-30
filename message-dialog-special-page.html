@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>CopyFish</title>
+    <link crossorigin="anonymous" media="all" rel="stylesheet" href="/styles/material.min.css" />
+    <style>
+        .popup-box {
+            min-width: 400px;
+            font-size: 13px;
+            box-shadow: 0 0 1rem #ccc;
+            min-height: 130px;
+            margin: 0px;
+        }
+
+        .cp-dialog-open-button {
+            color: #FFF;
+            background: #0066CC;
+            padding: 10px;
+            text-decoration: none;
+            border: 1px solid #0157ad;
+            border-radius: 3px;
+        }
+
+        /* Popup inner div */
+        .cp-dialog-popup-content {
+            /* width: 30%; */
+            margin: 0 auto;
+            box-sizing: border-box;
+            padding: 40px;
+            /* margin-top: 100px; */
+            box-shadow: 0px 2px 6px rgba(0, 0, 0, 1);
+            border-radius: 3px;
+            background: #fff;
+            /* position: relative; */
+        }
+
+        /* Popup close button */
+
+        #cfish-popup-message-dialog {
+            /* z-index: 999; */
+            font-family: Roboto, Helvetica, Arial, sans-serif;
+            color:#757575;
+        }
+
+        #cfish-popup-message-dialog .cp-dialog-popup-content {
+            padding: 0;
+        }
+
+        #cfish-popup-message-dialog .title-con {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            background:#2196f3;
+        }
+
+        #cfish-popup-message-dialog .title-con img {
+            width: 25px;
+            height: 25px;
+            object-fit: cover;
+        }
+
+        #cfish-popup-message-dialog #cp-dialog-title {
+            color: #fff;
+            padding: 0;
+            margin: 0 0 0 10px;
+        }
+
+        #cfish-popup-message-dialog #cp-dialog-description {
+            padding: 10px 15px 20px;
+            font-size: 18px;
+            line-height: 25px;
+        }
+
+        #cfish-popup-message-dialog #cp-dialog-description .button-row {
+            padding-top: 25px;
+        }
+
+        #cfish-popup-message-dialog #cp-dialog-description .button-row.btn-center {
+            text-align: center;
+        }
+
+        #cfish-popup-message-dialog #cp-dialog-description span {
+            display: inline-block;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            margin-top: 12px;
+        }
+
+        #cfish-popup-message-dialog .cp-dialog-close-button {
+            top: 7px;
+            background: none;
+            right: 5px;
+        }
+
+        .cp-dialog-description span {
+            padding-top: 12px;
+        }
+
+        @media screen and (max-width: 720px) {
+            .cp-dialog-popup-content {
+                width: 100%;
+            }
+        }
+    </style>
+    <script src='/scripts/jquery.min.js'></script>
+    <script src='/scripts/message-dialog.js'></script>
+</head>
+
+<body class="popup-box">
+    <div class="cp-dialog-popup" popup-name="popup-1" id="cfish-popup-message-dialog">
+        <div class="cp-dialog-popup-content">
+            <div class="title-con">
+                <img id='cp-dialog-image' src="/images/copyfish-48.png">
+                <h2 id="cp-dialog-title">Copyfish</h2>
+            </div>
+            <p id="cp-dialog-description">
+                Welcome to the <b>Copyfish</b> extension.
+                You can run this on any webpage, except
+                for ones where the browser restricts
+                extensions from running scripts. This
+                includes the Chrome web store, browser
+                settings pages, and other extensions.
+                But you <i>can</i> use <a href='javascript:void(0);' id='readMoreLink' 
+                >Desktop Screenshot</a> instead.
+                This requires the installation of a helper app.
+                <span>
+                    <button id='downloadHelper'
+                        class="cp-show-dialog-button ocrext-btn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                        title="">
+                        Download the helper app
+                    </button>
+                </span>
+                <span>
+                    <button id='downloadReadMore'
+                        class="cp-show-dialog-button ocrext-btn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                        title="">
+                        Read More
+                    </button>
+                </span>
+                <span>
+                    <button id='cancelPopup'
+                        class="cp-show-dialog-button ocrext-btn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
+                        title="">
+                        Close
+                    </button>
+                </span>
+            </p>
+        </div>
+    </div>
+</body>
+
+</html>

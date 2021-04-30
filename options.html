@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <link rel="stylesheet" href="styles/material.min.css" />
   <link href="styles/options.css" rel="stylesheet">
-  <title>Copyfish Options</title>
+  <title>Options</title>
 </head>
 
 <body>
@@ -45,41 +45,13 @@
         </tr>
       </div>
 
-      <span class="EnginesType">Translation Engine</span>
-      <div class="TranslationEngine">
-        <tr>
-          <td>
-            <label class="mdl-radio mdl-js-radio  mdl-js-ripple-effect" for="YandexTranslator">
-              <input type="radio" id="YandexTranslator" name="translator" class="mdl-radio__button"
-                value="YandexTranslator" disabled>
-              <span class="mdl-radio__label">PRO+ Plan: Use Yandex Translator</span>
-            </label>
-          </td>
-
-          <td>
-            <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="GoogleTranslator">
-              <input type="radio" id="GoogleTranslator" name="translator" class="mdl-radio__button"
-                value="GoogleTranslator" disabled>
-              <span class="mdl-radio__label">PRO+ Plan: Instant translations with Google Translate</span>
-            </label>
-          </td>
-
-          <td>
-            <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="DeepTranslator">
-              <input type="radio" id="DeepTranslator" name="translator" class="mdl-radio__button"
-                value="DeepTranslator" disabled>
-              <span class="mdl-radio__label">PRO+ Plan: Instant translations with Deep API</span>
-            </label>
-          </td>
-        </tr>
-      </div>
-
       <div class="mdl-grid options-container copyfishStatus">
         <div class="mdl-cell mdl-cell--5-col label">
           <label title="Double-click on screenshot image shows overlay">CopyFish Status:</label>
         </div>
         <div class="mdl-cell mdl-cell--7-col status-display">
-          <span class="show_status"></span> active
+          <span class="show_status"></span>
+          <!-- active -->
           <a href="https://ocr.space/rd/copyfish?help=pro" target="_blank"><button
               class="upgrade_status mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect"
               type="button" name="button">Upgrade</button></a>
@@ -116,7 +88,8 @@
           </select>
         </div>
       </div>
-      <div class="mdl-grid options-container translate-options">
+
+      <div class="mdl-grid options-container">
         <div class="mdl-cell mdl-cell--5-col label">
           <label>Translate to</label>
         </div>
@@ -134,7 +107,8 @@
             <option value="ca">Catalan</option>
             <option value="hr">Croatian</option>
             <option value="cs">Czech</option>
-            <option value="zh">Chinese</option>
+            <option value="zh-TW">Chinese</option>
+            <option value="zh-CN">Chinese Simplified</option>
             <option value="da">Danish</option>
             <option value="nl">Dutch</option>
             <option value="en">English</option>
@@ -146,7 +120,9 @@
             <option value="de">German</option>
             <option value="el">Greek</option>
             <option value="ht">Haitian (Creole)</option>
-            <option value="he">Hebrew</option>
+            <!-- <option value="he">Hebrew</option> -->
+            <!--- Updated based on the link https://sites.google.com/site/tomihasa/google-language-codes-->
+            <option value="iw">Hebrew</option>
             <option value="hu">Hungarian</option>
             <option value="is">Icelandic</option>
             <option value="id">Indonesian</option>
@@ -167,7 +143,7 @@
             <option value="no">Norwegian</option>
             <option value="fa">Persian</option>
             <option value="pl">Polish</option>
-            <option value="pt">Portuguese</option>
+            <option value="pt-BR">Portuguese</option>
             <option value="ro">Romanian</option>
             <option value="ru">Russian</option>
             <option value="es">Spanish</option>
@@ -188,6 +164,7 @@
           </select>
         </div>
       </div>
+
       <!-- <div class="mdl-grid options-container translate-options">
           <div class="mdl-cell mdl-cell--5-col label">
             <label>Process on Capture</label>
@@ -199,7 +176,7 @@
             </label>
           </div>
         </div> -->
-      <div class="mdl-grid options-container ocr-textoverlay-options">
+      <!-- <div class="mdl-grid options-container ocr-textoverlay-options">
         <div class="mdl-cell mdl-cell--5-col label">
           <label title="Double-click on screenshot image shows overlay">Show Text Overlay</label>
         </div>
@@ -209,7 +186,8 @@
             <span class="mdl-switch__label"></span>
           </label>
         </div>
-      </div>
+      </div> -->
+
       <div class="mdl-grid options-container translate-options">
         <div class="mdl-cell mdl-cell--5-col label">
           <label title="Automatically translate text after OCR processing">Translate after OCR</label>
@@ -221,6 +199,37 @@
           </label>
         </div>
       </div>
+      <div id='translation-block'>
+        <span class="EnginesType mdl-cell mdl-cell--5-col label">Translation Engine</span>
+        <div class="TranslationEngine">
+          <tr>
+            <!-- <td>
+            <label class="mdl-radio mdl-js-radio  mdl-js-ripple-effect" for="YandexTranslator">
+              <input type="radio" id="YandexTranslator" name="translator" class="mdl-radio__button"
+                value="YandexTranslator" disabled>
+              <span class="mdl-radio__label">PRO+ Plan: Use Yandex Translator</span>
+            </label>
+          </td> -->
+
+            <td>
+              <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="GoogleTranslator">
+                <input type="radio" id="GoogleTranslator" name="translator" class="mdl-radio__button"
+                  value="GoogleTranslator" disabled>
+                <span class="mdl-radio__label">PRO+ Plan: Instant translations with Google Translate</span>
+              </label>
+            </td>
+
+            <td>
+              <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="DeepTranslator">
+                <input type="radio" id="DeepTranslator" name="translator" class="mdl-radio__button"
+                  value="DeepTranslator" disabled>
+                <span class="mdl-radio__label">PRO+ Plan: Instant translations with Deepl API</span>
+              </label>
+            </td>
+          </tr>
+        </div>
+      </div>
+
       <div class="mdl-grid options-container font-size-options">
         <div class="mdl-cell mdl-cell--5-col label">
           <label>Text Box Font Size</label>
@@ -251,6 +260,18 @@
         <div class="mdl-cell mdl-cell--7-col">
           <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect popup-dicts" for="switch-popup-dicts">
             <input type="checkbox" id="switch-popup-dicts" class="mdl-switch__input" checked />
+            <span class="mdl-switch__label"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="mdl-grid options-container translate-options">
+        <div class="mdl-cell mdl-cell--5-col label">
+          <label title="Use Table OCR">Use Table OCR</label>
+        </div>
+        <div class="mdl-cell mdl-cell--7-col">
+          <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect table-ocr" for="switch-table-ocr">
+            <input type="checkbox" id="switch-table-ocr" class="mdl-switch__input" />
             <span class="mdl-switch__label"></span>
           </label>
         </div>
@@ -336,6 +357,34 @@
           </p>
         </div>
 
+        <div class="mdl-grid mdl-cell--10-col options-container translate-options">
+          <div class="mdl-cell label mdl-cell mdl-cell--6-col">
+            <label title="Use Table OCR"><strong>Always use Desktop OCR</strong></label>
+          </div>
+          <div class="mdl-cell mdl-cell--5-col">
+            <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect usedesktop-ocr" for="switch-usedesktop-ocr">
+              <input type="checkbox" id="switch-usedesktop-ocr" class="mdl-switch__input" />
+              <span class="mdl-switch__label"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="xmodule-title">
+          <span><b>File Access Status:</b> </span>
+
+          <button id="check-update-fileaccess" type="button" class="ant-btn ant-btn-primary"><span>Test it</span>
+          </button>
+
+        </div>
+
+        <div class="xmodule-status"><label>Status:&nbsp;</label>
+          <div class="status-box fileaccess_module-span"><span style="color: red;">Not Installed</span>
+            <a target="_blank" href="https://ocr.space/rd/copyfish?help=download">Download it</a>
+            &nbsp;
+            <span style="color: red;">Disabled</span>
+          </div>
+        </div>
+
         <div class="xmodule-title">
           <span><b>Desktop Screenshot Status:</b> </span>
 
@@ -347,20 +396,12 @@
         <div class="xmodule-status"><label>Status:&nbsp;</label>
           <div class="status-box xmodule-span"><span style="color: red;">Not Installed</span>
             <a target="_blank" href="https://ocr.space/rd/copyfish?help=download">Download it</a>
+            &nbsp;
+            <span style="color: red;">Disabled</span>
+            <a href="#">Enable</a>
           </div>
-        </div>
-
-        <div class="xmodule-title">
-          <span><b>Desktop Screenshot Xmodule Access Status:</b> </span>
-
-          <button id="check-update-fileaccess" type="button" class="ant-btn ant-btn-primary"><span>Test it</span>
-          </button>
-
-        </div>
-
-        <div class="xmodule-status"><label>Status:&nbsp;</label>
-          <div class="status-box fileaccess_module-span"><span style="color: red;">Not Installed</span>
-            <a target="_blank" href="https://ocr.space/rd/copyfish?help=download">Download it</a>
+          <div id="xmodule-shutter">
+            Error: External Shutter program not found
           </div>
         </div>
 
@@ -566,6 +607,7 @@
 
   <script src="scripts/jquery.min.js"></script>
   <script src="scripts/material.min.js"></script>
+  <script src="scripts/genlib.js"></script>
   <script src="scripts/options.js"></script>
 </body>
 

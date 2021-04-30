@@ -2,9 +2,9 @@
     margin: 0 !important;
 }
 
-#tabpanel-0-1 .ocrext-textoverlay-container{
+/* #tabpanel-0-1 .ocrext-textoverlay-container{
     top: 92px !important;
-}
+} */
 
 .ocrext-element.ocrext-status{
     display: flex;

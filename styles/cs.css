@@ -12,9 +12,6 @@
 	-webkit-user-select: none;
 }
 
-
-
-
 .ocrext-overlay .ocrext-mask {
 	position: absolute;
 	/*background: @black;
@@ -76,13 +73,13 @@
 	font-variant: normal;
 }
 
-.canvas-hidden{
-	display: block !important;
-    position: absolute;
-    top: -800px;
+.canvas-hidden {
+	display: none !important;
+	position: absolute;
+	top: -800px;
 }
 
-#copyfish-tab-image-container{
+#copyfish-tab-image-container {
 	position: relative;
 	min-width: 430px;
 	max-height: 200px;
@@ -103,33 +100,35 @@
 	height: 100%;
 }
 
-.tabs-container .ocrext-result{
+.tabs-container .ocrext-result {
 	padding-right: 18px !important;
 }
-.text-capture-tab h5,.translate-text-tab h5{
+
+.text-capture-tab h5, .translate-text-tab h5 {
 	font-size: 18px;
 	color: #227fd2;
 }
 
-.text-capture-tab textarea,.translate-text-tab .ocrext-ocr-translated{
+.text-capture-tab textarea, .translate-text-tab .ocrext-ocr-translated {
 	margin-top: 14px !important;
 	min-height: 120px !important;
+	width: -moz-available !important;
 	width: -webkit-fill-available !important;
+	width: fill-available !important;
 	padding: 10px !important;
 	border: 2px solid #393939 !important;
 }
 
-[data-panes] > *{
+[data-panes]>* {
 	padding: 16px !important;
 }
 
-
-.tabs-container .overlay-tab .ocrext-textoverlay-container{
+.tabs-container .overlay-tab .ocrext-textoverlay-container {
 	width: auto !important;
 	top: 94px !important;
 }
 
-.tabs-container .ocrext-close-link{
+.tabs-container .ocrext-close-link {
 	display: none !important;
 }
 
@@ -279,30 +278,28 @@
 	background: url('chrome-extension://__MSG_@@extension_id__/images/gear.png');
 }
 
-.tabs-container .ocrext-btn{
+.tabs-container .ocrext-btn {
 	padding: 10px 20px;
 	margin-right: 16px;
 }
 
-.tabs-container .ocrext-footer{
+.tabs-container .ocrext-footer {
 	display: flex;
 	align-items: center;
 	justify-content: flex-end;
 }
 
-.tabs-container .ocrext-btn-container{
+.tabs-container .ocrext-btn-container {
 	display: flex;
 	width: auto;
 	margin-right: 60px;
 }
 
-.tabs-container .ocrext-quickselect-btn-container{
+.tabs-container .ocrext-quickselect-btn-container {
 	height: 45px;
 	width: auto;
 	margin-right: 60px;
-
 }
-
 
 .ocrext-wrapper header.ocrext-header .ocrext-title .ocrext-open-tab-link {
 	display: inline-block;
@@ -316,7 +313,6 @@
 	background-position: center !important;
 	background: url('chrome-extension://__MSG_@@extension_id__/images/outside.png');
 }
-
 
 .ocrext-wrapper header.ocrext-header .ocrext-title .ocrext-closeToolbar-link {
 	display: inline-block;
@@ -496,68 +492,57 @@
 	resize: none;
 }
 
-.ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-message.ocrext-font-48px,
-.ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-translated.ocrext-font-48px {
+.ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-message.ocrext-font-48px, .ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-translated.ocrext-font-48px {
 	font-size: 48px;
 	line-height: 48px;
 }
 
-.ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-message.ocrext-font-42px,
-.ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-translated.ocrext-font-42px {
+.ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-message.ocrext-font-42px, .ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-translated.ocrext-font-42px {
 	font-size: 42px;
 	line-height: 42px;
 }
 
-.ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-message.ocrext-font-36px,
-.ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-translated.ocrext-font-36px {
+.ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-message.ocrext-font-36px, .ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-translated.ocrext-font-36px {
 	font-size: 36px;
 	line-height: 36px;
 }
 
-.ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-message.ocrext-font-32px,
-.ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-translated.ocrext-font-32px {
+.ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-message.ocrext-font-32px, .ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-translated.ocrext-font-32px {
 	font-size: 32px;
 	line-height: 32px;
 }
 
-.ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-message.ocrext-font-28px,
-.ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-translated.ocrext-font-28px {
+.ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-message.ocrext-font-28px, .ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-translated.ocrext-font-28px {
 	font-size: 28px;
 	line-height: 28px;
 }
 
-.ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-message.ocrext-font-24px,
-.ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-translated.ocrext-font-24px {
+.ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-message.ocrext-font-24px, .ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-translated.ocrext-font-24px {
 	font-size: 24px;
 	line-height: 24px;
 }
 
-.ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-message.ocrext-font-20px,
-.ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-translated.ocrext-font-20px {
+.ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-message.ocrext-font-20px, .ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-translated.ocrext-font-20px {
 	font-size: 20px;
 	line-height: 24px;
 }
 
-.ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-message.ocrext-font-18px,
-.ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-translated.ocrext-font-18px {
+.ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-message.ocrext-font-18px, .ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-translated.ocrext-font-18px {
 	font-size: 18px;
 	line-height: 22px;
 }
 
-.ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-message.ocrext-font-16px,
-.ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-translated.ocrext-font-16px {
+.ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-message.ocrext-font-16px, .ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-translated.ocrext-font-16px {
 	font-size: 16px;
 	line-height: 20px;
- }
+}
 
-.ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-message.ocrext-font-14px,
-.ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-translated.ocrext-font-14px {
+.ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-message.ocrext-font-14px, .ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-translated.ocrext-font-14px {
 	font-size: 14px;
 	line-height: 18px;
 }
 
-.ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-message.ocrext-font-12px,
-.ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-translated.ocrext-font-12px {
+.ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-message.ocrext-font-12px, .ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-translated.ocrext-font-12px {
 	font-size: 12px;
 	line-height: 16px;
 }
@@ -609,8 +594,7 @@
 	cursor: default;
 }
 
-.ocrext-wrapper .ocrext-content.ocrext-error .ocrext-ocr-output .ocrext-ocr-message,
-.ocrext-wrapper .ocrext-content.ocrext-error .ocrext-ocr-output .ocrext-message {
+.ocrext-wrapper .ocrext-content.ocrext-error .ocrext-ocr-output .ocrext-ocr-message, .ocrext-wrapper .ocrext-content.ocrext-error .ocrext-ocr-output .ocrext-message {
 	color: #d9534f;
 }
 
@@ -679,9 +663,96 @@ body.ocrext-textoverlay-page .ocrext-textoverlay-container a.ocrext-close-link {
 	display: none;
 }
 
-#popup_translate_button img{
+#popup_translate_button img {
 	height: 40px;
 	width: 42px;
 	cursor: pointer;
 }
 
+#deepl_translate_button img {
+	height: 40px;
+	width: 42px;
+	cursor: pointer;
+}
+
+.translate-button {
+	margin-left: 8px;
+}
+
+/*Custom dialog popup*/
+
+/* Popup Open button */ 
+.cp-dialog-open-button{
+    color:#FFF;
+    background:#0066CC;
+    padding:10px;
+    text-decoration:none;
+    border:1px solid #0157ad;
+    border-radius:3px;
+}
+ 
+.cp-dialog-open-button:hover{
+    background:#01478e;
+}
+ 
+.cp-dialog-popup {
+    position:fixed;
+    top:0px;
+    left:0px;
+    background:rgba(0,0,0,0);
+    width:100%;
+    height:100%;
+    display:none;
+}
+ 
+/* Popup inner div */
+.cp-dialog-popup-content {
+    width: 30%;
+    margin: 0 auto;
+    box-sizing: border-box;
+    padding: 40px;
+    margin-top: 100px;
+    box-shadow: 0px 2px 6px rgba(0,0,0,1);
+    border-radius: 3px;
+    background: #fff;
+    position: relative;
+}
+ 
+/* Popup close button */
+.cp-dialog-close-button {
+    width: 25px;
+    height: 25px;
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    border-radius: 20px;
+    background: rgba(0,0,0,0.8);
+    font-size: 20px;
+    text-align: center;
+    color: #fff;
+    text-decoration:none;
+}
+ 
+.cp-dialog-close-button:hover {
+    background: rgba(0,0,0,1);
+}
+
+#cfish-popup-message-dialog{z-index: 999; font-family: Roboto, Helvetica, Arial, sans-serif;color:#757575}
+#cfish-popup-message-dialog .cp-dialog-popup-content{padding: 0;}
+#cfish-popup-message-dialog .title-con{display: flex; align-items: center; padding: 10px 15px; background:#2196f3;}
+#cfish-popup-message-dialog .title-con img {width: 25px; height: 25px; object-fit: cover;}
+#cfish-popup-message-dialog #cp-dialog-title{color: #fff; padding: 0; margin: 0 0 0 10px;}
+#cfish-popup-message-dialog #cp-dialog-description{padding: 10px 15px 20px; font-size: 18px; line-height: 25px;}
+#cfish-popup-message-dialog #cp-dialog-description .button-row{padding-top: 25px;}
+#cfish-popup-message-dialog #cp-dialog-description .button-row.btn-center{text-align: center;}
+#cfish-popup-message-dialog #cp-dialog-description span{display: inline-block; margin-right: 10px; margin-bottom: 10px;}
+#cfish-popup-message-dialog #cp-dialog-description span:hover{opacity: 0.8;}
+#cfish-popup-message-dialog .cp-dialog-close-button{top: 7px; background: none; right: 5px;}
+#cfish-popup-message-dialog h2{ font-size: 1.5em;
+								font-weight: bolder;
+							}
+@media screen and (max-width: 720px) {
+.cp-dialog-popup-content {
+    width:90%;
+    } 
+}

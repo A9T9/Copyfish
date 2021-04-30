@@ -357,7 +357,15 @@ align-items: center;
 	display: flex;
 	justify-content: flex-start;
 	align-items: center;
+	flex-wrap: wrap;
 }
+
+#xmodule-shutter {
+	width: 100%;
+	display: none;
+	color: red;
+}
+
 .xmodule-title {
 	width: 68%;
 	display: flex;
@@ -399,10 +407,12 @@ align-items: center;
 .xmodule-title {
 	margin-top: 20px;
 }
-
 .options-link{
 	color: #2b9beb;
 	text-decoration: none;
 }
-
-
+.container {
+	font-family: 'Roboto', Helvetica, Arial, serif;
+	font-variant: normal;
+}
+.disabled-trans-block{background-color:#eeebeb;}

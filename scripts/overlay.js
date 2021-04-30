@@ -4,11 +4,67 @@ window.browser = (function () {
 		window.chrome;
 })();
 
-const isFirefox = typeof InstallTrigger !== 'undefined';
-
-
+//let isFirefox = typeof InstallTrigger !== 'undefined';
 (function () {
 	'use strict';
+	const htmlDialog = function () {
+		const allMethod = {
+			init: function () {
+				let self = this;
+				$('body').off('click', '[popup-close]');
+				$('body').off('click', '.cp-dialog-close-button,.cp-dialog-popup');
+				$('body').on('click', '[popup-close]', function () {
+					var popup_name = $(this).attr('popup-close');
+					$('[popup-name="' + popup_name + '"]').fadeOut(300);
+				});
+				// Close Popup When Click Outside
+				$('body').on('click', '.cp-dialog-close-button', function () {
+					var popup_name = $(this).find('[popup-close]').attr('popup-close');
+					$('[popup-name="' + popup_name + '"]').fadeOut(300);
+					$(this).children().click(function () {
+						return false;
+					});
+				});
+				$(document).on('keyup', function (e) {
+					if (e.keyCode === 27) {
+						self.closeDialog();
+					}
+				});
+				$('body').attr('data-ocrext-dialog',1);
+			},
+			closeDialog: function(){
+				$('#cfish-popup-message-dialog').fadeOut(300);
+			},
+			hardClose:function(){
+				$('#cfish-popup-message-dialog').hide();
+			},
+			showDialog: function (header,message, buttons) {
+				let buttonHtml = '';
+				//this.hardClose();
+				buttons && buttons.forEach((single,i) => {
+					let { label = '', cb = () => { } } = single;
+					let buttonId = 'cfish-' + i + (Date.now());
+					let btn = '<span><button id="' + buttonId + '" class="cp-show-dialog-button ocrext-btn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" title="">' + label + '</button></span>';
+					buttonHtml += btn;
+					if ($('#' + buttonId).length) {
+						$('#' + buttonId).remove();
+					}
+					$('body').off('click', '#' + buttonId);
+					$('body').on('click', '#' + buttonId, cb);
+				});
+				$('#cp-dialog-title').html('');
+				$('#cp-dialog-description').html('');
+				$('#cp-dialog-image').attr('src', browser.runtime.getURL("images/copyfish-32.png"));
+				$('#cp-dialog-title').html(header);
+				$('#cp-dialog-description').html(message);
+				buttonHtml && $('#cp-dialog-description').append('<div class="button-row ' + (buttons.length == 1 ? 'btn-center' : '') + '">' + buttonHtml + '</div>');
+				$('[popup-name="popup-1"]').fadeIn(300);
+			},
+		}
+
+		return allMethod;
+	};
+
 	var TextOverlay = function () {
 		var _overlay;
 		var $container;
@@ -38,6 +94,10 @@ const isFirefox = typeof InstallTrigger !== 'undefined';
 			var run;
 			// $('title,.title').text(browser.i18n.getMessage('appName') + ' - ' + browser.i18n.getMessage('overlayTab'));
 			// `self` is passed; pythonic!
+			if($container && $container.length){
+				// reset if already available
+				$container.find('.ocrext-text-overlay').remove();
+			}
 			$(htmlString).appendTo($container);
 			$overlay = $('.ocrext-textoverlay-container')
 
@@ -52,7 +112,6 @@ const isFirefox = typeof InstallTrigger !== 'undefined';
 				// if setOverlayInformation is called when _overlay is already set, do nothing!
 				if (!_overlay) {
 					_overlay = overlayInfo;
-
 					this.render(canvasWidth, canHeight, imgDataURI, zoom);
 				}
 				return this;
@@ -66,9 +125,6 @@ const isFirefox = typeof InstallTrigger !== 'undefined';
 					var lines = _overlay.Lines;
 					var $wordWrapper = $overlay.find('.ocrext-text-overlay-word-wrapper');
 					var $word;
-
-					console.log($overlay.length,$wordWrapper.length, 9999)
-
 					if (imgDataURI) {
 						$container.find('.text-overlay-img').attr('src', imgDataURI);
 					}
@@ -159,9 +215,7 @@ const isFirefox = typeof InstallTrigger !== 'undefined';
 					if (sender.tab) {
 						return true;
 					}
-
-
-
+					
 					if (request.evt === 'init-overlay-tab') {
 						self.setOverlayInformation(request.overlayInfo, request.canWidth, request.canHeight, request.imgDataURI, request.zoom);
 						// self.position();
@@ -187,6 +241,11 @@ const isFirefox = typeof InstallTrigger !== 'undefined';
 		textOverlay.listenToBackgroundEvents();
 		textOverlay.setTitle();
 	}
+	if(!$('body').attr('data-ocrext-dialog')){
+		window.__copyFishHtmlDialog__ = htmlDialog();
+		window.__copyFishHtmlDialog__.init();
+	}
 
 	window.__TextOverlay__ = TextOverlay;
+	
 }());

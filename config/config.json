@@ -11,33 +11,37 @@
         "openGrabbingScreenHotkey": 49,
         "closePanelHotkey": 50,
         "copyTextHotkey": 51,
-        "ocrEngine": "OcrSpace",
+        "ocrEngine": "OcrSpaceSecond",
         "copyType": "Text",
         "transitionEngine": false,
-        "status": "Free Plan"
+        "status": "Free Plan",
+        "useTableOcr": false,
+        "useDefaultDesktopOcr":false
     },
     "yandex_api_key": "trnsl.1.1.k1.86128cd59209eaf8.513c1afcbd4eaa561318196f5d48450fcfa42215",
     "yandex_api_url": "https://translate.yandex.net/api/v1.5/tr.json/translate",
     "ocr_api_list": [
         {
             "id": "1",
-            "ocr_api_key": "copyfishonly23cr",
-            "ocr_api_url": "https://apipro1.ocr.space/parse/image"
+            "ocr_api_key": "helloworld",
+            "ocr_api_url": "https://api.ocr.space/parse/image"
         },
         {
             "id": "2",
-            "ocr_api_key": "copyfishonly23cr",
-            "ocr_api_url": "https://apipro2.ocr.space/parse/image"
+            "ocr_api_key": "helloworld",
+            "ocr_api_url": "https://api.ocr.space/parse/image"
         },
         {
             "id": "3",
-            "ocr_api_key": "copyfishonly23cr",
-            "ocr_api_url": "https://apipro3.ocr.space/parse/image"
+            "ocr_api_key": "helloworld",
+            "ocr_api_url": "https://api.ocr.space/parse/image"
         }
     ],
     "ocr_server_reset_time": 86400,
     "ocr_timeout": 15000,
     "yandex_timeout": 30000,
+    "google_translation_api_url":"https://translation.googleapis.com/language/translate/v2",
+    "deepapi_translation_api_url":"https://api.deepl.com/v2/translate",
     "yandex_err_msgs": {
         "401": "ERR_KEY_INVALID",
         "402": "ERR_KEY_BLOCKED",
@@ -49,7 +53,7 @@
     },
     "ocr_google_languages": [
         {
-            "lang": "avto",
+            "lang": "auto",
             "name": "Auto-Detect",
             "short": "AUTO"
         },
@@ -386,7 +390,10 @@
             "cs": "Czech"
         },
         {
-            "zh": "Chinese"
+            "zh-TW": "Chinese"
+        },
+        {
+            "zh-CN": "Chinese Simplified"
         },
         {
             "da": "Danish"
@@ -422,7 +429,7 @@
             "ht": "Haitian (Creole)"
         },
         {
-            "he": "Hebrew"
+            "iw": "Hebrew"
         },
         {
             "hu": "Hungarian"
@@ -565,220 +572,34 @@
             "en": "English"
         },
         {
-            "af": "Afrikaans"
-        },
-        {
-            "sq": "Albanian"
-        },
-        {
-            "am": "Amharic"
-        },
-        {
-            "ar": "Arabian"
-        },
-        {
-            "hy": "Armenian"
-        },
-        {
-            "az": "Azerbaijani"
-        },
-        {
-            "eu": "Basque"
-        },
-        {
-            "be": "Belarusian"
-        },
-        {
-            "bn": "Bosnian"
-        },
-        {
-            "bs": "Bengali"
-        },
-        {
-            "bg": "Bulgarian"
-        },
-        {
-            "ca": "Catalan"
-        },
-        {
-            "hr": "Croatian"
-        },
-        {
-            "cs": "Czech"
-        },
-        {
-            "zh": "Chinese"
-        },
-        {
-            "da": "Danish"
-        },
-        {
-            "ceb": "Cebuano"
-        },
-        {
-            "nl": "Dutch"
-        },
-        {
-            "et": "Estonian"
-        },
-        {
-            "fi": "Finnish"
+            "de": "German"
         },
         {
             "fr": "French"
         },
         {
-            "gl": "Galician"
-        },
-        {
-            "ka": "Georgian"
-        },
-        {
-            "de": "German"
-        },
-        {
-            "el": "Greek"
-        },
-        {
-            "ht": "Haitian (Creole)"
-        },
-        {
-            "he": "Hebrew"
-        },
-        {
-            "hu": "Hungarian"
-        },
-        {
-            "is": "Icelandic"
-        },
-        {
-            "id": "Indonesian"
-        },
-        {
-            "ga": "Irish"
-        },
-        {
-            "it": "Italian"
-        },
-        {
-            "ja": "Japanese"
-        },
-        {
-            "kk": "Kazakh"
-        },
-        {
-            "ko": "Korean"
-        },
-        {
-            "ky": "Kyrgyz"
-        },
-        {
-            "la": "Latin"
-        },
-        {
-            "lv": "Latvian"
-        },
-        {
-            "lt": "Lithuanian"
-        },
-        {
-            "mk": "Macedonian"
-        },
-        {
-            "mg": "Malagasy"
-        },
-        {
-            "ms": "Malay"
-        },
-        {
-            "mt": "Maltese"
-        },
-        {
-            "mn": "Mongolian"
-        },
-        {
-            "no": "Norwegian"
-        },
-        {
-            "fa": "Persian"
-        },
-        {
-            "pl": "Polish"
+            "es": "Spanish"
         },
         {
             "pt": "Portuguese"
         },
         {
-            "ro": "Romanian"
+            "it": "Italian"
+        },
+        {
+            "nl": "Dutch"
+        },
+        {
+            "pl": "Polish"
         },
         {
             "ru": "Russian"
         },
         {
-            "es": "Spanish"
+            "ja": "Japanese"
         },
         {
-            "sr": "Serbian"
-        },
-        {
-            "sk": "Slovak"
-        },
-        {
-            "sl": "Slovenian"
-        },
-        {
-            "sw": "Swahili"
-        },
-        {
-            "sv": "Swedish"
-        },
-        {
-            "tl": "Tagalog"
-        },
-        {
-            "tg": "Tajik"
-        },
-        {
-            "tt": "Tatar"
-        },
-        {
-            "ta": "Tamil"
-        },
-        {
-            "te": "Telugu"
-        },
-        {
-            "ur": "Urdu"
-        },
-        {
-            "th": "Thai"
-        },
-        {
-            "tr": "Turkish"
-        },
-        {
-            "uz": "Uzbek"
-        },
-        {
-            "uk": "Ukrainian"
-        },
-        {
-            "vi": "Vietnamese"
-        },
-        {
-            "cy": "Welsh"
-        },
-        {
-            "xh": "Xhosa"
-        },
-        {
-            "yi": "Yiddish"
-        },
-        {
-            "yo": "Yoruba"
-        },
-        {
-            "zu": "Zulu"
+            "zh": "Chinese"
         }
     ],
     "ocr_languages": [
@@ -934,7 +755,10 @@
             "cs": "Czech"
         },
         {
-            "zh": "Chinese"
+            "zh-TW": "Chinese"
+        },
+        {
+            "zh-CN": "Chinese Simplified"
         },
         {
             "da": "Danish"

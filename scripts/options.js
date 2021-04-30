@@ -5,19 +5,56 @@ window.browser = (function () {
 })();
 
 $(function () {
+  var configSetting = {};
   $.ajaxSetup({ cache: false });
   'use strict';
   let engine, OPTIONS;
+  function getScreenshotVersion() {
+    createNMPromise("getVersion").
+      then(result => {
+        $('.status-box.xmodule-span span:first-of-type').text(`Installed (${result.version})`).css({ color: "#008000" });
+        $('.status-box.xmodule-span a:first-of-type').text('Check for update');
+      });
+  }
+  function testScreenshot() {
+    createNMPromise("testScreenshot").
+      then(result => {
+        var resultText = $('.status-box.xmodule-span span:nth-of-type(2)');
+        var enableLink = $('.status-box.xmodule-span a:nth-of-type(2)');
+        var shutterText = $('#xmodule-shutter');
+        if (result.result) {
+          resultText.text('Enabled').css({ color: "#008000", opacity: 0 }).animate({ opacity: 1 }, 1000);
+          enableLink.css({ display: "none" });
+          shutterText.css({ display: "" });
+        }
+        else {
+          resultText.text('Disabled').css({ color: "red", opacity: 0 }).animate({ opacity: 1 }, 1000);
+          if (result.error === 'shutter') {
+            enableLink.css({ display: "none" });
+            shutterText.css({ display: "initial" });
+          }
+          else {
+            enableLink.css({ display: "" });
+            shutterText.css({ display: "" });
+          }
+        }
+      }).
+      catch(() => {
+        $('.status-box.xmodule-span span:nth-of-type(2)').text('Disabled').css({ color: "red", opacity: 0 }).animate({ opacity: 1 }, 1000);
+        $('.status-box.xmodule-span a:nth-of-type(2)').css({ display: "none" });
+      });
+  }
   $.getJSON(browser.extension.getURL('config/config.json'))
     .done(function (appConfig) {
       var suppressSaves;
       var defaults = appConfig.defaults;
       var ocrnameArray = appConfig.ocr_languages;
       var statusTimeout;
-
       var checkBoxes = {
         visualCopyAutoTranslate: [ '.auto-translate', defaults.visualCopyAutoTranslate ],
         visualCopySupportDicts: [ '.popup-dicts', defaults.visualCopySupportDicts ],
+        useTableOcr: [ '.table-ocr', defaults.useTableOcr ],
+        useDefaultDesktopOcr: [ '.usedesktop-ocr', defaults.useDefaultDesktopOcr ],
         copyAfterProcess: [ '.copy-auto', defaults.copyAfterProcess ],
         visualCopyTextOverlay: [ '.text-overlay', defaults.visualCopyTextOverlay ]
       };
@@ -64,21 +101,22 @@ $(function () {
         visualCopyAutoTranslate: defaults.visualCopyAutoTranslate,
         visualCopyOCRFontSize: defaults.visualCopyOCRFontSize,
         visualCopySupportDicts: defaults.visualCopySupportDicts,
+        useTableOcr: defaults.useTableOcr || '',
+        useDefaultDesktopOcr: defaults.useDefaultDesktopOcr,
         copyAfterProcess: defaults.copyAfterProcess,
         copyType: defaults.copyType,
         visualCopyQuickSelectLangs: defaults.visualCopyQuickSelectLangs,
-        visualCopyTextOverlay: defaults.visualCopyTextOverlay,
+        visualCopyTextOverlay: 1, // make it default always on defaults.visualCopyTextOverlay,
         openGrabbingScreenHotkey: defaults.openGrabbingScreenHotkey,
         closePanelHotkey: defaults.closePanelHotkey,
         copyTextHotkey: defaults.copyTextHotkey,
         ocrEngine: defaults.ocrEngine,
         transitionEngine: defaults.transitionEngine,
-        status: defaults.status
-
+        status: defaults.status,
       }, function (items) {
+        items.visualCopyTextOverlay = 1;
         OPTIONS = items;
-        console.log('settings', items);
-        //pro status
+        console.log(items)
         engine = items.ocrEngine;
         if (items.ocrEngine === "OcrSpaceSecond") $('#OcrSpaceSecond').click();
         if (items.status === 'PRO') {
@@ -86,17 +124,19 @@ $(function () {
             $(this).text(items.status);
           });
           $('#OcrGoogle').removeAttr('disabled').parents().removeClass('is-disabled');
+          $(".upgrade_status").show();
         } else if (items.status === 'PRO+') {
 
           $('.show_status').each(function (index, el) {
             $(this).text(items.status);
           });
-
+          $(".upgrade_status").hide();
           $('#copy_translation').removeAttr('disabled').parents().removeClass('is-disabled');
           $('#copy_both').removeAttr('disabled').parents().removeClass('is-disabled');
           $('#OcrGoogle').removeAttr('disabled').parents().removeClass('is-disabled');
           $('#YandexTranslator').removeAttr('disabled').parents().removeClass('is-disabled');
           $('#GoogleTranslator').removeAttr('disabled').parents().removeClass('is-disabled');
+          $('#DeepTranslator').removeAttr('disabled').parents().removeClass('is-disabled');
           $('#switch-auto-translate').removeAttr('disabled').parents().removeClass('is-disabled');
         } else if (items.status === 'Free Plan') {
           const $OcrSpace = $('#OcrSpace');
@@ -105,9 +145,21 @@ $(function () {
             setTimeout(() => {
               $('.status-text').removeClass('visible');
             }, 100)
-
           }
+          $(".upgrade_status").show();
 
+        } else if (items.status === 'Subscription expired') {
+          $(".upgrade_status").show();
+          const $OcrSpace = $('#OcrSpace');
+          if (!$OcrSpace.attr('checked')) {
+            items.ocrEngine === "OcrSpaceSecond" ? $('#OcrSpaceSecond').click() : $('#OcrSpace').click();
+            setTimeout(() => {
+              $('.status-text').removeClass('visible');
+            }, 100)
+          }
+          $('.show_status').each(function (index, el) {
+            $(this).text(items.status);
+          });
         }
         //radio buttons values
         $(`#${items.ocrEngine}`).attr('checked', 'checked').parent().addClass('is-checked');
@@ -123,6 +175,17 @@ $(function () {
         if (items.transitionEngine == "GoogleTranslator") {
           //render translate api language
           var translateArray = appConfig.google_languages;
+          var translateLangArray = $(translateArray).map(function (i, val) {
+            let langCode = Object.keys(val)[ 0 ];
+
+            return '<option value="' + langCode + '">' + val[ langCode ] + '</option>';
+          });
+
+          $('#output-lang').html(translateLangArray.toArray().join(' '));
+
+        } else if (items.transitionEngine == "DeepTranslator") {
+          //render translate api language
+          var translateArray = appConfig.deepapi_languages;
           var translateLangArray = $(translateArray).map(function (i, val) {
             let langCode = Object.keys(val)[ 0 ];
 
@@ -204,11 +267,11 @@ $(function () {
         $('#ocr-fontsize').val(items.visualCopyOCRFontSize);
         /*set checkbox state(s)*/
         $.each(checkBoxes, function (key, value) {
-          console.log(items[ key ], value[ 0 ], 123123)
           if ((!items[ key ] && $(value[ 0 ]).hasClass('is-checked')) ||
             (items[ key ] && !$(value[ 0 ]).hasClass('is-checked'))) {
             $('#switch-' + value[ 0 ].substr(1)).click();
           }
+          disabledTrnslationBlock();
         });
         if (!items.visualCopyQuickSelectLangs.length) {
           $('.lang-quickselect').each(function (i, node) {
@@ -225,6 +288,7 @@ $(function () {
         $('#copyHotkey').val(items.copyTextHotkey);
         suppressSaves = false;
       });
+
 
       $('body')
         .on('change', function (e) {
@@ -250,6 +314,7 @@ $(function () {
               visualCopyOCRLang: $target.val()
             });
           } else if ($target.is('#switch-auto-translate')) {
+            disabledTrnslationBlock();
             setChromeSyncStorage({
               visualCopyAutoTranslate: $target.parent().hasClass('is-checked')
             });
@@ -257,7 +322,15 @@ $(function () {
             setChromeSyncStorage({
               visualCopySupportDicts: $target.parent().hasClass('is-checked')
             });
-          } else if ($target.is('#switch-copy-auto')) {
+          } else if ($target.is('#switch-table-ocr')) {
+            setChromeSyncStorage({
+              useTableOcr: $target.parent().hasClass('is-checked')
+            });
+          }  else if ($target.is('#switch-usedesktop-ocr')) {
+            setChromeSyncStorage({
+              useDefaultDesktopOcr: $target.parent().hasClass('is-checked')
+            });
+          }else if ($target.is('#switch-copy-auto')) {
             let optionStatus = $target.parent().hasClass('is-checked')
             if (!optionStatus) $('.copy-options').each((i, el) => $(el).prop('disabled', true).closest('label').addClass('is-disabled'))
             else if (OPTIONS.status !== "PRO+") $('#copy_text').prop('disabled', false).closest('label').removeClass('is-disabled')
@@ -318,7 +391,6 @@ $(function () {
 
             htmlStrArr.splice(0, htmlStrArr.length);
             // reset Input Language Quickselect if OcrIsChanged
-            console.log(engine, 12312)
             if (engine !== "OcrSpaceSecond") {
               setChromeSyncStorage({
                 ocrEngine: $target.val(),
@@ -401,7 +473,7 @@ $(function () {
 
             // reset Input Language Quickselect if OcrIsChanged
             setChromeSyncStorage({
-              visualCopyOCRLang: "avto",
+              visualCopyOCRLang: "auto",
               visualCopyQuickSelectLangs: [ "none", "none", "none" ]
             });
             // reset Input Language Quickselect if OcrIsChanged
@@ -432,16 +504,17 @@ $(function () {
             });
 
             //render translate api language
+            let alreadySetLang = $("#output-lang").val();
+            let setLanguageCode = 'en';
             var translateArray = appConfig.google_languages;
             var translateLangArray = $(translateArray).map(function (i, val) {
               let langCode = Object.keys(val)[ 0 ];
-
-              return '<option value="' + langCode + '">' + val[ langCode ] + '</option>';
+              return '<option ' + (alreadySetLang && alreadySetLang == langCode && (setLanguageCode = langCode) && 'selected' || '') + ' value="' + langCode + '">' + val[ langCode ] + '</option>';
             });
 
             $('#output-lang').html(translateLangArray.toArray().join(' '));
             setChromeSyncStorage({
-              visualCopyTranslateLang: 'en'
+              visualCopyTranslateLang: setLanguageCode
             });
 
           } else if ($target.is("#DeepTranslator")) {
@@ -450,18 +523,18 @@ $(function () {
             });
 
             //render translate api language
+            let alreadySetLang = $("#output-lang").val();
+            let setLanguageCode = 'en';
             var translateArray = appConfig.deepapi_languages;
             var translateLangArray = $(translateArray).map(function (i, val) {
               let langCode = Object.keys(val)[ 0 ];
-
-              return '<option value="' + langCode + '">' + val[ langCode ] + '</option>';
+              return '<option ' + (alreadySetLang && alreadySetLang == langCode && (setLanguageCode = langCode) && 'selected' || '') + ' value="' + langCode + '">' + val[ langCode ] + '</option>';
             });
 
             $('#output-lang').html(translateLangArray.toArray().join(' '));
             setChromeSyncStorage({
-              visualCopyTranslateLang: 'en'
+              visualCopyTranslateLang: setLanguageCode
             });
-
           }
         })
         /*.on('click', '.btn-save', function() {
@@ -509,6 +582,20 @@ $(function () {
         });
     });
 
+  function disabledTrnslationBlock() {
+    let enable = $('#switch-auto-translate').parent().hasClass('is-checked');
+    if (enable) {
+      $("#translation-block").removeClass('disabled-trans-block');
+      //$("#output-lang").removeAttr('disabled').closest('label').removeClass('is-disabled');
+      $("#GoogleTranslator").removeAttr('disabled').closest('label').removeClass('is-disabled');
+      $("#DeepTranslator").removeAttr('disabled').closest('label').removeClass('is-disabled');
+    } else {
+      $("#translation-block").addClass('disabled-trans-block');
+      //$("#output-lang").prop('disabled', true).closest('label').addClass('is-disabled');
+      $("#GoogleTranslator").prop('disabled', true).closest('label').addClass('is-disabled');
+      $("#DeepTranslator").prop('disabled', true).closest('label').addClass('is-disabled');
+    }
+  }
   // check file access status
   browser.storage.sync.get([ 'fileAccessStatus' ], function (result) {
     const fileAccessStatus = result.fileAccessStatus;
@@ -524,38 +611,30 @@ $(function () {
     checkKey($('.keyChecker_input').val().toLowerCase());
   });
 
-  let xmodule_version;
   //get xmodule version
-  browser.runtime.sendMessage({ evt: "getVersion" });
+  getScreenshotVersion();
+  testScreenshot();
   browser.runtime.sendMessage({ evt: "fileaccessGetVersion" });
+  browser.runtime.sendMessage({ evt: "fileaccessTest" });
 
   browser.runtime.onMessage.addListener(
     function (request, sender, sendResponse) {
 
-      if (request.evt === "x_module_version") {
+      if (request.evt === "fileaccess_module_version") {
         console.log(request.version)
         if (request.version) {
-          $('.status-box.xmodule-span span').text(`Installed (${request.version})`).css({ color: "#008000" });
-          $('.status-box.xmodule-span a').text('Check for update');
-
-          if (xmodule_version) {
-            xmodule_version = false;
-            alert(`status updated: Installed (${request.version})`)
-          }
-        }
-
-      } else if (request.evt === "fileaccess_module_version") {
-        console.log(request.version)
-        if (request.version) {
-          $('.status-box.fileaccess_module-span span').text(`Installed (${request.version})`).css({ color: "#008000" });
+          $('.status-box.fileaccess_module-span span:first-of-type').text(`Installed (${request.version})`).css({ color: "#008000" });
           $('.status-box.fileaccess_module-span a').text('Check for update');
-
-          if (xmodule_version) {
-            xmodule_version = false;
-            alert(`status updated: Installed (${request.version})`)
-          }
         }
-
+      } else if (request.evt === "fileaccess_module_test") {
+        if (request.result) {
+          $('.status-box.fileaccess_module-span span:nth-of-type(2)').text('Enabled').css({ color: "#008000", opacity: 0 }).
+            animate({ opacity: 1 }, 1000);
+        }
+        else {
+          $('.status-box.fileaccess_module-span span:nth-of-type(2)').text('Disabled').css({ color: "red", opacity: 0 }).
+            animate({ opacity: 1 }, 1000);
+        }
       } else if (request.evt === "not_installed") {
 
         alert(`status updated: not Installed`)
@@ -582,133 +661,302 @@ $(function () {
 
     });
 
-  $('#check-update-xmodule').click(() => {
-    browser.runtime.sendMessage({ evt: "getVersion", check: true });
-    xmodule_version = true;
+  $('#check-update-xmodule').click(() =>
+    $('.status-box.xmodule-span span:nth-of-type(2)').text('Testing...').delay(500).queue(next => {
+      testScreenshot();
+      next();
+    })
+  );
+
+  $('.status-box.xmodule-span a:nth-of-type(2)').click(e => {
+    e.preventDefault();
+    createNMPromise("enableScreenshot");
   });
 
   $('#check-update-fileaccess').click(() => {
-    browser.runtime.sendMessage({ evt: "fileaccessGetVersion", check: true });
-    xmodule_version = true;
+    $('.status-box.fileaccess_module-span span:nth-of-type(2)').text('Testing...').delay(500).
+      queue(next => {
+        browser.runtime.sendMessage({ evt: "fileaccessTest" });
+        next();
+      });
   });
+  const multipleKeySchema =
+  {
+    validKeyFound: false,
+    urlSchema: [
+      {
+        url: 'https://license1.ocr.space/api/status?licensekey=',
+        legacy: false
+      },
+      {
+        url: 'https://ui.vision/xcopyfish/',
+        legacy: true
+      }
+    ]
+  };
+  function checkKey(keyData, singleEntity = multipleKeySchema.urlSchema[ 0 ], iteration = 0) {
+    try {
+      checkLicenseKey(keyData, singleEntity.url, singleEntity.legacy).done(function (result) {
+        iteration++;
+        //  console.log('first here');
+      }).fail(function (err) {
+        //    console.log(err, iteration);
+        iteration++;
+        // if error found and we have any entity left to verify then check..
+        if (iteration < multipleKeySchema.urlSchema.length) {
+          // clear old message and make space for other messages ...
+          $('#status_msg').text("");
+          checkKey(keyData, multipleKeySchema.urlSchema[ iteration ], iteration);
+        }
+      });
+    } catch (err) {
 
-  function checkKey(keyData) {
+    }
+  }
+
+  function checkLicenseKey(keyData, urlApi = 'https://ui.vision/xcopyfish/', legacy = true) {
+    // const urlApi = 'https://ui.vision/xcopyfish/';
+    let $dfd = $.Deferred();
     let key = keyData;
     let keyChar = key.substr(1, 9);
     if (key.length === 20) {
-
       if (key.charAt(1) === 'p') {
-
-        $.get("https://a9t9.com/xcopyfish/" + keyChar + ".json", function (data, status, xhr) {
+        $.get(legacy ? urlApi + keyChar + ".json" : urlApi + key.toUpperCase(), function (data, status, xhr) {
           if (xhr.status == 200) {
-            browser.storage.sync.set({ "key": key });
+            const ifSuccessRes = function (key) {
+              browser.storage.sync.set({ "key": key });
+              browser.runtime.sendMessage({ evt: "checkKey" });
+              if ($('.show_status').text() === 'PROPRO') {
+                $('#status_msg').text("PRO plan already activated");
+                setTimeout(function () {
+                  $('#status_msg').text("");
+                }, 3000);
+              } else {
+                $('.show_status').each(function (index, el) {
+                  $(this).text('PRO');
+                });
 
-            browser.runtime.sendMessage({ evt: "checkKey" });
+                $('.copy-options:not(#copy_text)').each((i, el) => $(el).prop('disabled', true).closest('label').addClass('is-disabled'))
 
-            if ($('.show_status').text() === 'PROPRO') {
-              $('#status_msg').text("PRO plan already activated");
+                $('#OcrGoogle').removeAttr('disabled').click().parents().removeClass('is-disabled');
 
-              setTimeout(function () {
-                $('#status_msg').text("");
-              }, 3000);
-            } else {
-              $('.show_status').each(function (index, el) {
-                $(this).text('PRO');
+                $('#status_msg_success').text("PRO plan activated");
+
+                setTimeout(function () {
+                  $('#status_msg_success').text("");
+                }, 3000);
+                let enable = $('#switch-auto-translate').parent().hasClass('is-checked');
+                if (enable) {
+                  $('#switch-auto-translate').click();
+                }
+                $('#switch-auto-translate').prop('disabled', true).closest('label').addClass('is-disabled');
+                $(".upgrade_status").show();
+                disabledTrnslationBlock();
+                /* Intnly commented*/
+                // $.get(urlApi + keyChar + ".json", function (data, status, xhr) {
+                //   browser.storage.sync.set({
+                //     status: 'PRO',
+                //     google_ocr_api_url: data.google_ocr_api_url,
+                //     google_ocr_api_key: data.google_ocr_api_key
+                //   });
+                // });
+              }
+            }
+            if (legacy) {
+              ifSuccessRes(key);
+              browser.storage.sync.set({
+                status: 'PRO',
+                google_ocr_api_url: data.google_ocr_api_url || '',
+                google_ocr_api_key: data.google_ocr_api_key || ''
               });
+              $('#copy_text').attr('checked', 'checked').closest('label').addClass('is-checked');
+              $dfd.resolve(data);
+            } else {
+              if (data && data.status && data.status == 'on') {
+                // valid key found.
+                ifSuccessRes(key);
+                browser.storage.sync.set({
+                  status: 'PRO',
+                  google_ocr_api_url: data.data1a || '',
+                  google_ocr_api_key: data.data1b || ''
+                });
+                $('#copy_text').attr('checked', 'checked').closest('label').addClass('is-checked');
+                $dfd.resolve(data);
+              } else if (data && data.status && data.status == 'off') {
+                browser.storage.sync.set({ "key": key });
+                browser.runtime.sendMessage({ evt: "checkKey" });
+                // invalid key or key not found...
+                $('#status_msg').text("Subscription Expired");
+                setTimeout(function () {
+                  $('#status_msg').text("");
+                }, 3000);
+                $dfd.resolve(data);
+              } else {
+                // invalid key or key not found...
+                $('#status_msg').text("Invalid key");
+                setTimeout(function () {
+                  $('#status_msg').text("");
+                }, 3000);
+                $dfd.reject(data);
+              }
+            }
+          } else {
+            $dfd.reject(data);
+          }
+        }).fail(function (data, status, xhr) {
+          if ((data && data.status == 200) || !data) {
+            $('#status_msg').text("Invalid key");
+            setTimeout(function () {
+              $('#status_msg').text("");
+            }, 3000);
+          } else if (data && data.status == 404) {
+            $('#status_msg').text("Invalid key");
+            //$('#status_msg').text("License server can not be reached. Please try again later");
+            setTimeout(function () {
+              $('#status_msg').text("");
+            }, 3000);
+          }
+          $dfd.reject(data);
+          // $.get(urlApi + "onlinetest.json", function (data) {
 
-              $('.copy-options:not(#copy_text)').each((i, el) => $(el).prop('disabled', true).closest('label').addClass('is-disabled'))
+          // }).fail(function (data, status, xhr) {
+          //   if (data.status == 200) {
+          //     $('#status_msg').text("Invalid key");
+          //     setTimeout(function () {
+          //       $('#status_msg').text("");
+          //     }, 3000);
 
+          //   } else if (data.status == 404) {
+          //     $('#status_msg').text("License server can not be reached. Please try again.");
+          //     setTimeout(function () {
+          //       $('#status_msg').text("");
+          //     }, 3000);
+          //   }
+
+          // })
+
+        });
+        $('.keyChecker_input').val('');
+      } else if (key.charAt(1) === 't') {
+        $.get(legacy ? urlApi + keyChar + ".json" : urlApi + key.toUpperCase(), function (data, status, xhr) {
+          if (xhr.status == 200) {
+            const successFn = function (key) {
+              browser.storage.sync.set({ "key": key });
+              browser.runtime.sendMessage({ evt: "checkKey" });
+              $('.show_status').each(function (index, el) {
+                $(this).text('PRO+');
+              });
+              $('.copy-options').each((i, el) => $(el).prop('disabled', false).closest('label').removeClass('is-disabled'))
+              $('#copy_text').attr('checked', 'checked').closest('label').addClass('is-checked');
               $('#OcrGoogle').removeAttr('disabled').click().parents().removeClass('is-disabled');
+              $('#YandexTranslator').removeAttr('disabled').parents().removeClass('is-disabled');
+              $('#DeepTranslator').removeAttr('disabled').click().parents().removeClass('is-disabled');
+              $('#GoogleTranslator').removeAttr('disabled').click().parents().removeClass('is-disabled');
 
-              $('#status_msg_success').text("PRO plan activated");
-
+              $('#switch-auto-translate').removeAttr('disabled').click().parents().removeClass('is-disabled');
+              $('#output-lang').removeAttr('disabled');
+              $('#status_msg_success').text("PRO+ plan activated");
               setTimeout(function () {
                 $('#status_msg_success').text("");
               }, 3000);
-
-              $.get("https://a9t9.com/xcopyfish/" + keyChar + ".json", function (data, status, xhr) {
-                browser.storage.sync.set({ status: 'PRO', google_ocr_api_url: data.google_ocr_api_url, google_ocr_api_key: data.google_ocr_api_key });
+              $(".upgrade_status").hide();
+            }
+            if (legacy) {
+              $dfd.resolve(data);
+              successFn(key);
+              browser.storage.sync.set({
+                status: 'PRO+',
+                google_ocr_api_url: data.google_ocr_api_url || '',
+                google_ocr_api_key: data.google_ocr_api_key || '',
+                google_trs_api_url: data.google_trs_api_url || data.google_translation_api_url || configSetting.google_translation_api_url || '',
+                google_trs_api_key: data.google_trs_api_key || '',
+                deepl_api_url: data.deepl_api_url || data.deepapi_translation_api_url || configSetting.deepapi_translation_api_url || '',
+                deepl_api_key: data.deepl_api_key || '',
               });
 
+              /* temp disabled may be not required
+              $.get(urlApi + keyChar + ".json", function (data, status, xhr) {
+                browser.storage.sync.set({
+                  status: 'PRO+',
+                  google_ocr_api_url: data.google_ocr_api_url,
+                  google_ocr_api_key: data.google_ocr_api_key,
+                  google_trs_api_url: data.google_trs_api_url,
+                  google_trs_api_key: data.google_trs_api_key,
+                  deepl_api_url: data.deepl_api_url || '',
+                  deepl_api_key: data.deepl_api_key || '',
+                });
+              });
+              */
+            } else {
+              // new api call
+              if (data && data.status && data.status == 'on') {
+                // valid key found.
+                successFn(key);
+                browser.storage.sync.set({
+                  status: 'PRO+',
+                  google_ocr_api_url: data.data1a || '',
+                  google_ocr_api_key: data.data1b || '',
+                  google_trs_api_url: configSetting.google_translation_api_url || '',
+                  google_trs_api_key: data.data2a || '',
+                  deepl_api_url: configSetting.deepapi_translation_api_url || '',
+                  deepl_api_key: data.data2b || '',
+                });
+              } else if (data && data.status && data.status == 'off') {
+                browser.storage.sync.set({ "key": key });
+                browser.runtime.sendMessage({ evt: "checkKey" });
+                // invalid key or key not found...
+                $('#status_msg').text("Subscription Expired");
+                setTimeout(function () {
+                  $('#status_msg').text("");
+                }, 3000);
+                $dfd.resolve(data);
+              } else {
+                // invalid key or key not found...
+                $('#status_msg').text("Invalid key");
+                setTimeout(function () {
+                  $('#status_msg').text("");
+                }, 3000);
+                $dfd.reject(data);
+              }
             }
-
-            $('#copy_text').attr('checked', 'checked').closest('label').addClass('is-checked');
+          }
+          else {
+            $dfd.reject(data);
           }
         }).fail(function (data, status, xhr) {
-
-          $.get("https://a9t9.com/xcopyfish/onlinetest.json", function (data) {
-
-          }).fail(function (data, status, xhr) {
-            if (data.status == 200) {
-              $('#status_msg').text("Invalid key");
-              setTimeout(function () {
-                $('#status_msg').text("");
-              }, 3000);
-
-            } else if (data.status == 404) {
-              $('#status_msg').text("License server can not be reached. Please try again.");
-              setTimeout(function () {
-                $('#status_msg').text("");
-              }, 3000);
-            }
-
-          })
-
-        })
-
-        $('.keyChecker_input').val('');
-
-
-      } else if (key.charAt(1) === 't') {
-
-        $.get("https://a9t9.com/xcopyfish/" + keyChar + ".json", function (data, status, xhr) {
-          if (xhr.status == 200) {
-            browser.storage.sync.set({ "key": key });
-            browser.runtime.sendMessage({ evt: "checkKey" });
-            $('.show_status').each(function (index, el) {
-              $(this).text('PRO+');
-            });
-            $('.copy-options').each((i, el) => $(el).prop('disabled', false).closest('label').removeClass('is-disabled'))
-            $('#copy_text').attr('checked', 'checked').closest('label').addClass('is-checked');
-            $('#OcrGoogle').removeAttr('disabled').click().parents().removeClass('is-disabled');
-            $('#YandexTranslator').removeAttr('disabled').parents().removeClass('is-disabled');
-            $('#GoogleTranslator').removeAttr('disabled').click().parents().removeClass('is-disabled');
-            $('#switch-auto-translate').removeAttr('disabled').click().parents().removeClass('is-disabled');
-            $('#output-lang').removeAttr('disabled');
-
-            $('#status_msg_success').text("PRO+ plan activated");
+          if ((data && data.status == 200) || !data) {
+            $('#status_msg').text("Invalid key");
             setTimeout(function () {
-              $('#status_msg_success').text("");
+              $('#status_msg').text("");
             }, 3000);
-            $.get("https://a9t9.com/xcopyfish/" + keyChar + ".json", function (data, status, xhr) {
-              browser.storage.sync.set({ status: 'PRO+', google_ocr_api_url: data.google_ocr_api_url, google_ocr_api_key: data.google_ocr_api_key, google_trs_api_url: data.google_trs_api_url, google_trs_api_key: data.google_trs_api_key });
-
-            });
-
+          } else if (data && data.status == 404) {
+            $('#status_msg').text("Invalid key");
+            //$('#status_msg').text("License server can not be reached. Please try again later");
+            setTimeout(function () {
+              $('#status_msg').text("");
+            }, 3000);
           }
-        }).fail(function (data, status, xhr) {
+          // $.get(urlApi + "onlinetest.json", function (data) {
 
-          $.get("https://a9t9.com/xcopyfish/onlinetest.json", function (data) {
+          // }).fail(function (data, status, xhr) {
+          //   if (data.status == 200) {
+          //     $('#status_msg').text("Invalid key");
+          //     setTimeout(function () {
+          //       $('#status_msg').text("");
+          //     }, 3000);
+          //   } else if (data.status == 404) {
+          //     $('#status_msg').text("License server can not be reached. Please try again later");
+          //     setTimeout(function () {
+          //       $('#status_msg').text("");
+          //     }, 3000);
+          //   }
 
-          }).fail(function (data, status, xhr) {
-            if (data.status == 200) {
-              $('#status_msg').text("Invalid key");
-              setTimeout(function () {
-                $('#status_msg').text("");
-              }, 3000);
-            } else if (data.status == 404) {
-              $('#status_msg').text("License server can not be reached. Please try again later");
-              setTimeout(function () {
-                $('#status_msg').text("");
-              }, 3000);
-            }
-
-          })
-
-        })
+          // })
+          $dfd.reject(data);
+        });
         $('.keyChecker_input').val('');
       } else {
-
+        $dfd.reject('invalid_key');
         $('#status_msg').text('Invalid key');
         setTimeout(function () {
           $('#status_msg').text("");
@@ -719,12 +967,13 @@ $(function () {
 
     } else {
       //if key.length !== 15
+      $dfd.reject('invalid_key');
       $('#status_msg').text('Invalid key');
       setTimeout(function () {
         $('#status_msg').text("");
       }, 3000);
     }
-    //		$('.keyChecker_input').val('');
+    return $dfd;
   }
 
 
