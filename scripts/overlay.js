@@ -34,6 +34,10 @@ window.browser = (function () {
 			},
 			closeDialog: function(){
 				$('#cfish-popup-message-dialog').fadeOut(300);
+				let isfounfLocalocr = $("#OcrLocal").attr('LocalOcrFound');
+				if ($("#OcrLocal").prop('checked') && isfounfLocalocr == 'NO') {
+					$('#OcrSpace').click()
+				}
 			},
 			hardClose:function(){
 				$('#cfish-popup-message-dialog').hide();

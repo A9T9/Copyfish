@@ -23,18 +23,18 @@
     "ocr_api_list": [
         {
             "id": "1",
-            "ocr_api_key": "helloworld",
-            "ocr_api_url": "https://api.ocr.space/parse/image"
+            "ocr_api_key": "test",
+            "ocr_api_url": "https://apipro1.ocr.space/parse/image"
         },
         {
             "id": "2",
-            "ocr_api_key": "helloworld",
-            "ocr_api_url": "https://api.ocr.space/parse/image"
+            "ocr_api_key": "test",
+            "ocr_api_url": "https://apipro2.ocr.space/parse/image"
         },
-        {
+	    {
             "id": "3",
-            "ocr_api_key": "helloworld",
-            "ocr_api_url": "https://api.ocr.space/parse/image"
+            "ocr_api_key": "test",
+            "ocr_api_url": "https://apipro3.ocr.space/parse/image"
         }
     ],
     "ocr_server_reset_time": 86400,

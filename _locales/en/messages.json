@@ -17,6 +17,14 @@
       "description": "Could not capture media stream",
       "message": "Media capture failed"
    },
+   "captureNotAvailable": {
+      "description": "If this message does not disappear, try reloading the page.",
+      "message": "If this message does not disappear, try reloading the page."
+   },
+   "nativeAppNotSupported": {
+      "description": "The desktop screen capture helper is not yet installed. This free helper app is required as the browser extension alone can not take desktop screenshots.",
+      "message": "The desktop screen capture helper is not yet installed. This free helper app is required as the browser extension alone can not take desktop screenshots."
+   },
    "ocrDimensionError": {
       "description": "Invalid dimensions for OCR",
       "message": "The parameter is incorrect.Image size is not supported. Each image dimension must be between 40 and 2600 pixels."
@@ -64,13 +72,5 @@
    "userMediaUnsupported": {
       "description": "getUserMedia is unsupported",
       "message": "Your browser does not support desktop capture"
-   },
-   "captureNotAvailable":{
-      "description":"If this message does not disappear, try reloading the page.",
-      "message":"If this message does not disappear, try reloading the page."
-   },
-   "nativeAppNotSupported":{
-      "description":"The desktop screen capture helper is not yet installed. This free helper app is required as the browser extension alone can not take desktop screenshots.",
-      "message":"The desktop screen capture helper is not yet installed. This free helper app is required as the browser extension alone can not take desktop screenshots."
    }
 }

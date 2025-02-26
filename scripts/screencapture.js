@@ -47,7 +47,7 @@ let ScreenCap = {
 		// doesn't handle URLEncoded DataURIs - see SO answer #6850276 for code that does this
 		var byteString = atob(
 			/^data:/.test(dataURI) ? dataURI.split(',')[ 1 ] : dataURI
-		);
+			);
 
 		// write the bytes of the string to an ArrayBuffer
 		var ab = new ArrayBuffer(byteString.length);
@@ -96,7 +96,7 @@ let ScreenCap = {
 	readFileAsDataURL: (range, withBase64Prefix = true) => {
 
 		return ScreenCap.readFileAsBlob(range)
-			.then(blob => ScreenCap.blobToDataURL(blob, withBase64Prefix));
+		.then(blob => ScreenCap.blobToDataURL(blob, withBase64Prefix));
 	},
 
 	init: function () {
@@ -154,45 +154,66 @@ let ScreenCap = {
 			document.body.removeChild(copyDivElm);
 			request.onComplete && request.onComplete();
 		}
-	
+
 		browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 			//console.log(request.evt, 8789)
 			if (request.evt === 'desktopcaptureData') {
+				console.log(request)
+
+				if (request.ocrEngine == "OcrLocal") {
+
+						// enable only if resources are loaded and available
+						if (request.result.buffer) {
+							resizedataURL(`data:application/octet-stream;base64,${request.result.buffer}`).done(function (resultDataUri) {
+								request.result.buffer = resultDataUri;
+								$('#copyfish-tab-image').attr('src', `${request.result.buffer}`)
+								browser.runtime.sendMessage({ evt: "translateDesktopCapturedImage", data: `${request.result.buffer}`,imagepath: `${request.imagepath}`})
+								const setImage = ScreenCap.readFileAsDataURL(request.result);
+								$('.placeholder')
+								.text(browser.i18n.getMessage('screenCaptureNotify'))
+								.addClass('notify');
+							});
+						} else {
+							$('#copyfish-tab-image').attr('src', request.result);
+							browser.runtime.sendMessage({ 	evt: "translateDesktopCapturedImage",
+								imagepath: request.imagepath,
+								data: request.result,
+								ocrText: request.ocrText || '',
+								overlayInfo : request.overlayInfo || '',
+								forExternalTab:request.forExternalTab || 0,
+								translatedTextIfAny	: request.translatedTextIfAny || '',
+								currentZoomLevel	: request.currentZoomLevel || 0,
+							})
+						}	
+
+					}else{
 				// enable only if resources are loaded and available
 				if (request.result.buffer) {
-					/* Old code witohut adjusting the devicePixcelRatio
-					$('#copyfish-tab-image').attr('src', `data:application/octet-stream;base64,${request.result.buffer}`)
-					browser.runtime.sendMessage({evt: "translateDesktopCapturedImage", data: `data:application/octet-stream;base64,${request.result.buffer}`})
-					const setImage = ScreenCap.readFileAsDataURL(request.result);
-					$('.placeholder')
-						.text(browser.i18n.getMessage('screenCaptureNotify'))
-						.addClass('notify');
-					*/
-					// do adjust of devicePixelRatio because nmost app already done the adjustment...
 					resizedataURL(`data:application/octet-stream;base64,${request.result.buffer}`).done(function (resultDataUri) {
-
 						request.result.buffer = resultDataUri;
 						$('#copyfish-tab-image').attr('src', `${request.result.buffer}`)
 						browser.runtime.sendMessage({ evt: "translateDesktopCapturedImage", data: `${request.result.buffer}` })
 						const setImage = ScreenCap.readFileAsDataURL(request.result);
 						$('.placeholder')
-							.text(browser.i18n.getMessage('screenCaptureNotify'))
-							.addClass('notify');
+						.text(browser.i18n.getMessage('screenCaptureNotify'))
+						.addClass('notify');
 					});
 				} else {
 					$('#copyfish-tab-image').attr('src', request.result);
 					browser.runtime.sendMessage({ 	evt: "translateDesktopCapturedImage",
-													data: request.result,
-													ocrText: request.ocrText || '',
-													overlayInfo : request.overlayInfo || '',
-													forExternalTab:request.forExternalTab || 0,
-													translatedTextIfAny	: request.translatedTextIfAny || '',
-													currentZoomLevel	: request.currentZoomLevel || 0,
-												})
-				}
-			} else if (request.evt === 'copyToClipboard') {
-				copyToClipboard(request, sendResponse);
+						imagepath: request.imagepath,
+						data: request.result,
+						ocrText: request.ocrText || '',
+						overlayInfo : request.overlayInfo || '',
+						forExternalTab:request.forExternalTab || 0,
+						translatedTextIfAny	: request.translatedTextIfAny || '',
+						currentZoomLevel	: request.currentZoomLevel || 0,
+					})
+				}	
 			}
+		} else if (request.evt === 'copyToClipboard') {
+			copyToClipboard(request, sendResponse);
+		}
 			// ACK back
 			return true;
 		});
