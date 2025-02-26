@@ -23,7 +23,15 @@ Common reasons to convert images to text are if you want to google it, store it,
 
 # For language learners and Manga readers 
 
-There are many translator addons available, but they only work with plain website text. Text inside images, in the form of tricky Javascript/AJAX or, especially, in the form of movie subtitles on Youtube or Youku is unreachable for them. But not for Copyfish. And if you want, Copyfish also translates the text for you right away. Especially for the subtitle translation use case, Copyfish has a repeat feature. Mark the area of the subtitle once and then use the repeat button to grab the text from this area repeatable as you watch the movie. Clearly, that function was inspired by the Chinese Pinyin subtitle translator app, from the same author. Copyfish replaces this app with a cross-platform solution.
+There are many translator addons available, but they only work with plain website text.
+ Text inside images, in the form of tricky Javascript/AJAX or, especially,
+ in the form of movie subtitles on Youtube or Youku is unreachable for them.
+ But not for Copyfish. And if you want, Copyfish also translates the text for you right away.
+
+ For the subtitle translation use case, Copyfish has a repeat feature.
+ Mark the area of the subtitle once and then use the repeat button to grab the text from
+ this area repeatable as you watch the movie. 
+
 
 # For developers
 
