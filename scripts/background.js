@@ -48,6 +48,8 @@ function deferred() {
 
 if (typeof browser != 'object') {
 	browser = chrome;
+}
+if (typeof importScripts === 'function') {
 	importScripts("crossbrowser.js", "genlib.js", "chromereload.js");
 }
 
@@ -85,7 +87,9 @@ if (typeof browser != 'object') {
 
 const getFileAccessVersion = () => {
 	invokeAsync('get_version').
-	then(result => browser.runtime.sendMessage({ evt: 'fileaccess_module_version', version: result }));
+	then(result => {
+		browser.runtime.sendMessage({ evt: 'fileaccess_module_version', version: result });
+	}).catch(err => {});
 }
 const checkOsisMac= () => {
 	if (navigator.platform.indexOf('Mac') > -1) {
@@ -119,7 +123,7 @@ const fetchLocalFiles = (fileUrl) => {
 	});
 }
 const getLocalOcrPath = () => {
-	return new Promise(resolve => {
+	return new Promise((resolve, reject) => {
 		invokeAsync('get_special_folder_path', 'UserProfile').
 		then(folder => {
 			if (navigator.platform.indexOf('Mac') > -1) {
@@ -129,9 +133,9 @@ const getLocalOcrPath = () => {
 				resolve(folder+'\\AppData\\Roaming\\UI.Vision\\XModules\\ocr');
 				///Windows
 			}
-		})
+		}).catch(reject);
 	});
-	
+
 }
 const testFileAccess = () => {
 	var file;
@@ -158,34 +162,15 @@ const testFileAccessOcrLocal = () => {
 	var file;
 
 	getLocalOcrPath().then(path => {
-		const isMac =checkOsisMac();
-		if (isMac) {
-			var filepath =  path+'/ocr3';
-			var targetpath = path+'/localfileaccesstest.txt';
-
-		}else{
-			var filepath = path+'\\ocrexe\\ocrcl1.exe';	
-			var targetpath = path+'\\localfileaccesstest.txt';
-		}
-		params={
-			fileName: filepath,
-			path: targetpath,
-			content:'',
-			waitForExit: true
-		}	
+		const isMac = checkOsisMac();
+		const filepath   = isMac ? path+'/ocr3'                    : path+'\\ocrexe\\ocrcl1.exe';
+		const targetpath = isMac ? path+'/localfileaccesstest.txt' : path+'\\localfileaccesstest.txt';
+		params = { fileName: filepath, path: targetpath, content: '', waitForExit: true };
 		invokeAsync('write_all_text', params).
 		then(writeOk => {
-			if (writeOk){
-				const isMac =checkOsisMac();
-				if (isMac) {
-					return invokeAsync('delete_file', { path: targetpath });		
-				}else{
-					return invokeAsync('delete_file', { fileName: filepath,path: targetpath });		
-				}
-				
-				return Promise.reject('can not create file');
-			}
-
+			if (writeOk)
+				return invokeAsync('delete_file', isMac ? { path: targetpath } : { fileName: filepath, path: targetpath });
+			return Promise.reject('can not create file');
 		}).
 		then(deleteOk => {
 			if (deleteOk)
@@ -193,11 +178,9 @@ const testFileAccessOcrLocal = () => {
 			else
 				return Promise.reject('can not delete file');
 		}).
-		catch(() => browser.runtime.sendMessage({ evt: 'fileaccess_module_test_local', result: false }));		
-
-		
-	})
-
+		catch(() => browser.runtime.sendMessage({ evt: 'fileaccess_module_test_local', result: false }));
+	}).
+	catch(() => browser.runtime.sendMessage({ evt: 'fileaccess_module_test_local', result: false }));
 }
 
 const onMessageReceiveFromDesktopCapture = (message) => {
@@ -208,16 +191,6 @@ const onMessageReceiveFromDesktopCapture = (message) => {
 const connectAsync = () => {
 	errorConnect = false;
 	port = browser.runtime.connectNative("com.a9t9.kantu.file_access");
-	try {
-		let imageCapturePort = browser.runtime.connectNative(NMHOST);
-		imageCapturePort.onMessage.addListener(onMessageReceiveFromDesktopCapture);
-		imageCapturePort.onDisconnect.addListener(function () {
-			fileaccessConnectError = true;
-		});
-	}
-	catch (e) {
-		fileaccessConnectError = true;
-	}
 	port.onMessage.addListener(function (msg) {
 
 		var id = msg.id;
@@ -239,21 +212,13 @@ const connectAsync = () => {
 						imageURI = btoa(atob(imageURI) + atob(msg.result.buffer))
 						if (msg.result.rangeEnd >= totalSize || msg.result.rangeEnd <= msg.result.rangeStart) {
 							msg.result.buffer = imageURI;
-							if (items.ocrEngine == "OcrLocal") {
-								browser.tabs.sendMessage(optionsTabId, {
-									evt: 'desktopcaptureLocal',
-									imagepath:imagepath,
-									ocrEngine:items.ocrEngine,
-									result: msg.result
-								});
-
-							}else{
-								browser.tabs.sendMessage(optionsTabId, {
-									evt: 'desktopcaptureData',
-									imagepath:imagepath,
-									ocrEngine:items.ocrEngine,
-									result: msg.result
-								});
+							browser.tabs.sendMessage(optionsTabId, {
+								evt: 'desktopcaptureData',
+								imagepath:imagepath,
+								ocrEngine:items.ocrEngine,
+								result: msg.result
+							});
+							if (items.ocrEngine !== "OcrLocal") {
 								invokeAsync("delete_file", { path: imagepath });
 							}
 
@@ -461,7 +426,7 @@ function checkLicenseKey(keyData, urlApi = 'https://ui.vision/xcopyfish/', legac
 					if (legacy) {
 						if (data.google_ocr_api_key === 'freeplan') {
               //key is invalid
-              browser.storage.sync.set({ status: "Free Plan", ocrEngine: "OcrSpace", transitionEngine: false, visualCopyAutoTranslate: false, visualCopyOCRLang: "eng" });
+              browser.storage.sync.set({ status: "Free Plan", ocrEngine: "OcrSpace", visualCopyOCRLang: "eng" });
               browser.storage.sync.remove("key");
               reloadOptionsPage()
               browser.runtime.openOptionsPage()
@@ -473,13 +438,10 @@ function checkLicenseKey(keyData, urlApi = 'https://ui.vision/xcopyfish/', legac
               	silent: true
               });
           } else {
-          	browser.storage.sync.set({ visualCopyAutoTranslate: false });
-          	browser.storage.sync.set({
+          	          	browser.storage.sync.set({
           		status: 'PRO',
           		google_ocr_api_url: data.google_ocr_api_url,
           		google_ocr_api_key: data.google_ocr_api_key,
-          		deepl_api_url: data.deepl_api_url || '',
-          		deepl_api_key: data.deepl_api_key || '',
           	});
           }
           resolve(data);
@@ -489,12 +451,10 @@ function checkLicenseKey(keyData, urlApi = 'https://ui.vision/xcopyfish/', legac
       			status: 'PRO',
       			google_ocr_api_url: data.data1a,
       			google_ocr_api_key: data.data1b,
-      			deepl_api_url: '',
-      			deepl_api_key: '',
       		});
       		resolve(data);
       	} else if (data && data.status && data.status == 'off') {
-      		browser.storage.sync.set({ status: "Subscription expired", ocrEngine: "OcrSpace", transitionEngine: false, visualCopyAutoTranslate: false, visualCopyOCRLang: "eng" });
+      		browser.storage.sync.set({ status: "Subscription expired", ocrEngine: "OcrSpace", visualCopyOCRLang: "eng" });
       		browser.storage.sync.remove("key");
       		reloadOptionsPage()
       		browser.runtime.openOptionsPage()
@@ -512,7 +472,7 @@ function checkLicenseKey(keyData, urlApi = 'https://ui.vision/xcopyfish/', legac
 
   }).catch((res) => {
         if (res && res.status && res.status == 404 && legacy) { // if legacy api and key not found then reset to free
-        	browser.storage.sync.set({ status: "Free Plan", ocrEngine: "OcrSpace", transitionEngine: false, visualCopyAutoTranslate: false, visualCopyOCRLang: "eng" });
+        	browser.storage.sync.set({ status: "Free Plan", ocrEngine: "OcrSpace", visualCopyOCRLang: "eng" });
         	browser.storage.sync.remove("key");
         	reloadOptionsPage()
         	browser.runtime.openOptionsPage()
@@ -544,7 +504,7 @@ function checkLicenseKey(keyData, urlApi = 'https://ui.vision/xcopyfish/', legac
 		if (legacy) {
 			if (data.google_ocr_api_key === 'freeplan') {
               //key is invalid
-              browser.storage.sync.set({ status: "Free Plan", ocrEngine: "OcrSpace", transitionEngine: false, visualCopyAutoTranslate: false, visualCopyOCRLang: "eng" });
+              browser.storage.sync.set({ status: "Free Plan", ocrEngine: "OcrSpace", visualCopyOCRLang: "eng" });
               browser.storage.sync.remove("key");
               reloadOptionsPage()
               browser.runtime.openOptionsPage()
@@ -561,10 +521,6 @@ function checkLicenseKey(keyData, urlApi = 'https://ui.vision/xcopyfish/', legac
               	status: 'PRO+',
               	google_ocr_api_url: data.google_ocr_api_url,
               	google_ocr_api_key: data.google_ocr_api_key,
-              	google_trs_api_url: data.google_trs_api_url || data.google_translation_api_url || appConfigSettings.google_translation_api_url || '',
-              	google_trs_api_key: data.google_trs_api_key,
-              	deepl_api_url: data.deepl_api_url || data.deepapi_translation_api_url || appConfigSettings.deepapi_translation_api_url || '',
-              	deepl_api_key: data.deepl_api_key || '',
               });
           }
 
@@ -576,14 +532,10 @@ function checkLicenseKey(keyData, urlApi = 'https://ui.vision/xcopyfish/', legac
               	status: 'PRO+',
               	google_ocr_api_url: data.data1a,
               	google_ocr_api_key: data.data1b,
-              	google_trs_api_url: appConfigSettings.google_translation_api_url || '',
-              	google_trs_api_key: data.data2a,
-              	deepl_api_url: appConfigSettings.deepapi_translation_api_url || '',
-              	deepl_api_key: data.data2b || '',
               });
               resolve(data);
           } else if (data && data.status && data.status == 'off') {
-          	browser.storage.sync.set({ status: "Subscription expired", ocrEngine: "OcrSpace", transitionEngine: false, visualCopyAutoTranslate: false, visualCopyOCRLang: "eng" });
+          	browser.storage.sync.set({ status: "Subscription expired", ocrEngine: "OcrSpace", visualCopyOCRLang: "eng" });
           	browser.storage.sync.remove("key");
           	reloadOptionsPage()
           	browser.runtime.openOptionsPage()
@@ -603,7 +555,7 @@ function checkLicenseKey(keyData, urlApi = 'https://ui.vision/xcopyfish/', legac
   })
 	.catch((res) => {
         if (res && res.status && res.status == 404 && legacy) { // if this is legacy method and key not found (404) in that case reset to free plan
-        	browser.storage.sync.set({ status: "Free Plan", ocrEngine: "OcrSpace", transitionEngine: false, visualCopyAutoTranslate: false, visualCopyOCRLang: "eng" });
+        	browser.storage.sync.set({ status: "Free Plan", ocrEngine: "OcrSpace", visualCopyOCRLang: "eng" });
         	browser.storage.sync.remove("key");
         	reloadOptionsPage()
         	browser.runtime.openOptionsPage()
@@ -622,7 +574,7 @@ function checkLicenseKey(keyData, urlApi = 'https://ui.vision/xcopyfish/', legac
 
 } else {
 		//if key is invalid
-		browser.storage.sync.set({ status: "Free Plan", ocrEngine: "OcrSpace", transitionEngine: false, visualCopyAutoTranslate: false, visualCopyOCRLang: "eng" });
+		browser.storage.sync.set({ status: "Free Plan", ocrEngine: "OcrSpace", visualCopyOCRLang: "eng" });
 		browser.storage.sync.remove("key");
 		reloadOptionsPage()
 		browser.runtime.openOptionsPage()
@@ -636,7 +588,7 @@ function checkLicenseKey(keyData, urlApi = 'https://ui.vision/xcopyfish/', legac
 	}
 } else {
 		//if key is invalid
-		browser.storage.sync.set({ status: "Free Plan", ocrEngine: "OcrSpace", transitionEngine: false, visualCopyAutoTranslate: false, visualCopyOCRLang: "eng" });
+		browser.storage.sync.set({ status: "Free Plan", ocrEngine: "OcrSpace", visualCopyOCRLang: "eng" });
 		browser.storage.sync.remove("key");
 		reloadOptionsPage()
 		browser.runtime.openOptionsPage()
@@ -660,7 +612,8 @@ function captureScreen(beforeCb, afterCb, tabId) {
 	if (errorConnect === false && fileaccessConnectError === false) {
 		browser.tabs.sendMessage(tabId, {
 			evt: 'getDevicePixelRatio'
-		}, {},(devicePixelRatio) => {
+		}, {}, (devicePixelRatio) => {
+			void chrome.runtime.lastError; // suppress unchecked lastError warning if cs.js not loaded
 			browser.storage.sync.get(null, function (items) {
 				let ocrEngine = items.ocrEngine;
 
@@ -669,11 +622,22 @@ function captureScreen(beforeCb, afterCb, tabId) {
 					command: "saveScreenshot",
 					scale: devicePixelRatio
 				};
-				browser.runtime.sendNativeMessage(NMHOST, takeScreenshot, ({ file, result }) => {
+				browser.runtime.sendNativeMessage(NMHOST, takeScreenshot, (response) => {
+					if (chrome.runtime.lastError || !response) {
+						browser.notifications.create({
+							type: 'basic',
+							iconUrl: 'images/copyfish-48.png',
+							title: "Desktop capture",
+							message: `Please install the Copyfish Desktop Screenshot module first`
+						});
+						afterCb && typeof afterCb == 'function' && afterCb();
+						return;
+					}
+					let { file, result } = response;
 					if (result) {
 						if (file) {
 							browser.tabs.create({
-								url: ocrEngine == "OcrLocal" ?browser.runtime.getURL('/ocrlocal.html'):browser.runtime.getURL('/screencapture.html')
+								url: browser.runtime.getURL('/screencapture.html')
 							}, function (destTab) {
 								setTimeout(() => {
 									optionsTabId = destTab.id;
@@ -697,8 +661,8 @@ function captureScreen(beforeCb, afterCb, tabId) {
 						message: `Please install external Shutter program first`
 					});
 					openXmoduleInstallOption();
-				})
-			})
+				});
+			});
 		});
 
 
@@ -855,28 +819,26 @@ fetch(url)
 		 appConfigSettings = appConfig;
 		 var OcrDS = (function () {
 		 	var _maxResponseTime = 99;
-		 	var _randNotEqual = function (serverList, server) {
-		 		var idx = Math.floor(Math.random() * serverList.length);
-		 		if (serverList.length === 1) {
-		 			return serverList[ 0 ];
-		 		}
-		 		if (serverList[ idx ].id !== server.id) {
-		 			return serverList[ idx ];
-		 		} else {
-		 			return _randNotEqual(serverList, server);
-		 		}
+		 	// Pick a random server from serverList whose id differs from currentId.
+		 	var _randNotEqual = function (serverList, currentId) {
+		 		var candidates = serverList.filter(function (s) { return s.id !== currentId; });
+		 		if (candidates.length === 0) return serverList[0];
+		 		return candidates[Math.floor(Math.random() * candidates.length)];
 		 	};
 		 	var _ocrDSAPI = {
-		 		resetTime: appConfig.ocr_server_reset_time,
+		 		resetTime: appConfig.ocr_server_reset_time * 1000, // convert s → ms
 		 		currentBest: {},
 		 		reset: function () {
+		 			var self = this;
 		 			this.getAll().then(function (items) {
-		 				if (Date.now() - items.ocrServerLastReset || 0 > this.resetTime) {
-		 					items.ocrServerList.forEach((server, i) => {
+		 				if (Date.now() - items.ocrServerLastReset > self.resetTime) {
+		 					items.ocrServerList.forEach(function (server) {
 		 						server.responseTime = 0;
 		 					});
-
-		 					
+		 					browser.storage.sync.set({
+		 						ocrServerList: items.ocrServerList,
+		 						ocrServerLastReset: Date.now()
+		 					});
 		 				}
 		 			});
 		 		},
@@ -895,44 +857,25 @@ fetch(url)
 		 			var self = this;
 		 			this.getAll().then(function (items) {
 		 				var serverList = items.ocrServerList;
-		 				var best = serverList[ 0 ];
-		 				var allValuesSame = true;
-						// 1. check if all values are same
-						var cmp;
-						/*const map1 = array1.map(x => x * 2);
-						array1.forEach(element => console.log(element));*/
-						serverList.forEach((s, i) => {
-							
-							if (i === 0) {
-								cmp = s.responseTime;;
-								return true;
-							}
-							if (cmp !== s.responseTime) {
-								allValuesSame = false;
-								return false;
-							}
-
-						});
-						if (allValuesSame) {
-							// if all values are same and one of them is zero, use the first occurrence
-							if (serverList[ 0 ].responseTime === 0) {
-								self.currentBest = serverList[ 0 ];
-							} else {
-								self.currentBest = _randNotEqual(serverList, self.currentBest);
-							}
-							return $dfd.resolve(self.currentBest);
-						}
-						// 2. Linear search to find best server
-
-						serverList.forEach((server,i) => {
-							if (server.responseTime < best.responseTime) {
-								best = server;
-							}
-
-						});
-						self.currentBest = best;
-						$dfd.resolve(self.currentBest);
-					});
+		 				var best = serverList[0];
+		 				var allValuesSame = serverList.every(function (s) {
+		 					return s.responseTime === serverList[0].responseTime;
+		 				});
+		 				if (allValuesSame) {
+		 					// All equal: rotate randomly (when all 0, this distributes
+		 					// initial load; when all equal non-zero, avoids hot-spotting)
+		 					self.currentBest = _randNotEqual(serverList, self.currentBest.id);
+		 					return $dfd.resolve(self.currentBest);
+		 				}
+		 				// Pick server with lowest response time
+		 				serverList.forEach(function (server) {
+		 					if (server.responseTime < best.responseTime) {
+		 						best = server;
+		 					}
+		 				});
+		 				self.currentBest = best;
+		 				$dfd.resolve(self.currentBest);
+		 			});
 		 			return $dfd;
 		 		},
 		 		set: function (id, responseTime) {
@@ -942,14 +885,11 @@ fetch(url)
 		 				if (responseTime === -1) {
 		 					responseTime = _maxResponseTime;
 		 				}
-		 				serverList.forEach((server, i) => {
+		 				serverList.forEach(function (server) {
 		 					if (id === server.id) {
 		 						server.responseTime = responseTime;
-		 						return false;
 		 					}
-
 		 				});
-		 				
 		 				browser.storage.sync.set({
 		 					ocrServerList: serverList
 		 				}, function () {
@@ -959,30 +899,22 @@ fetch(url)
 		 			return $dfd;
 		 		}
 		 	};
-			// init
+			// Init: always reconcile stored server list with current config so that
+			// adding or removing endpoints in config.json takes effect immediately.
 			browser.storage.sync.get({
 				ocrServerLastReset: -1,
 				ocrServerList: []
 			}, function (items) {
-				var serverList;
-				if (items.ocrServerLastReset === -1) {
-					serverList = [];
-					// if -1, then the store is empty. Populate it
-					appConfig.ocr_api_list.forEach((api,i) => {
-						serverList.push({
-							id: api.id,
-							responseTime: 0
-						});
-					});
-					
-					browser.storage.sync.set({
-						ocrServerList: serverList,
-						ocrServerLastReset: Date.now()
-					});
-				} else {
-					// store is not empty, reset if required
-					_ocrDSAPI.reset();
-				}
+				var stored = items.ocrServerList;
+				var serverList = appConfig.ocr_api_list.map(function (api) {
+					var existing = stored.find(function (s) { return s.id === api.id; });
+					return existing || { id: api.id, responseTime: 0 };
+				});
+				browser.storage.sync.set({
+					ocrServerList: serverList,
+					ocrServerLastReset: items.ocrServerLastReset === -1 ? Date.now() : items.ocrServerLastReset
+				});
+				_ocrDSAPI.reset();
 			});
 			return _ocrDSAPI;
 		}());
@@ -1068,32 +1000,20 @@ fetch(url)
 		 function captureClipboardImage(info, tab) {
 		 	try {
 		 		if (isFirefoxBrowser) {
-		 			browser.tabs.sendMessage(
-						// Send a message to the content script
-						tab.id || 0,
-						{
-							evt: 'captureClipboard'
-						}
-						).catch((err) => {
-							let url = "/message-dialog-action-popup.html";
-							browser.windows.create({
-								url: url,
-								type: "popup",
-								height: 300,
-								width: 525,
-								top: 200,
-								allowScriptsToClose: true,
-							}).then(function (info) {
-								setTimeout(function () {
-								// will be closed in 5 seconds...
-								browser.windows.remove(info.id);
-							}, 5000);
-							}, (err) => {
-							//console.log(err);
-						});
-						});
-						return;
-					}
+		 			var sendClipboardMsg = function (tabId) {
+		 				browser.tabs.sendMessage(tabId, { evt: 'captureClipboard' });
+		 			};
+		 			isTabAvailable(tab.id)
+		 			.then(function () {
+		 				sendClipboardMsg(tab.id);
+		 			})
+		 			.catch(function () {
+		 				loadFiles(tab.id).then(function () {
+		 					sendClipboardMsg(tab.id);
+		 				});
+		 			});
+		 			return;
+		 		}
 
 					isTabAvailable(tab.id)
 					.then(function () {
@@ -1211,7 +1131,6 @@ fetch(url)
 		// });
 		browser.storage.sync.get({
 			visualCopyOCRLang: '',
-			visualCopyTranslateLang: '',
 			visualCopyAutoTranslate: '',
 			visualCopyOCRFontSize: '',
 			visualCopySupportDicts: '',
@@ -1460,6 +1379,19 @@ fetch(url)
 			var copyDiv;
 			var overlayInfo;
 			var imgDataURI;
+			if (request.evt === 'fileaccessGetVersion') {
+				getFileAccessVersion();
+				return;
+			} else if (request.evt === 'fileaccessTest') {
+				testFileAccess();
+				return;
+			} else if (request.evt === 'fileaccessGetVersionLocal') {
+				fileaccessGetVersionLocal();
+				return;
+			} else if (request.evt === 'fileaccessTestOcrLocal') {
+				testFileAccessOcrLocal();
+				return;
+			}
 			if (!tab) {
 				return false;
 			}
@@ -1566,16 +1498,7 @@ fetch(url)
 				})
 				return true
 
-			} else if (request.evt === 'fileaccessGetVersion') {
-				getFileAccessVersion();
-			} else if (request.evt === 'fileaccessTest') {
-				testFileAccess();
-			}else if (request.evt === 'fileaccessGetVersionLocal') {
-				fileaccessGetVersionLocal();
-			}else if (request.evt === 'fileaccessTestOcrLocal') {
-				testFileAccessOcrLocal();
-			}
-			else if (request.evt === '_bootStrapResources') {
+			} else if (request.evt === '_bootStrapResources') {
 				(async()=>{
 					let config = await fetchLocalFiles(browser.runtime.getURL('config/config.json'));
 					let html = await fetchLocalFiles(browser.runtime.getURL('/dialog.html'));
@@ -1637,9 +1560,9 @@ fetch(url)
 					}).
 					catch(() => sendResponse({result: false}));
 
-				})
+				}).catch(() => sendResponse({result: false}));
 				return true
-				
+
 			} else if (request.evt === 'ready') {
 				enableIcon(tab.id);
 				sendResponse({
@@ -1772,136 +1695,6 @@ fetch(url)
 					}, 300);
 				});
 				return true;
-			} else if (request.evt === 'google-translate') {
-				let OPTIONS = request.options;
-				let text = request.text;
-				const url = OPTIONS.google_trs_api_url;
-
-				let _data = {
-					key: OPTIONS.google_trs_api_key,
-					target: OPTIONS.visualCopyTranslateLang,
-					q: text
-				}
-				var queryString = Object.keys(_data).map(key => key + '=' + _data[key]).join('&');
-
-				fetch(url+'?'+queryString, {
-					method: "GET"
-				})
-				.then((response) => {
-
-					if (response.ok) {
-						return response.json();
-					}
-					return Promise.reject(response);
-				})
-				.then((data) => {
-					if (data && data.data && data.data.translations && data.data.translations[ 0 ].translatedText != null) {
-						sendResponse({
-							success: true,
-							data: data.data.translations[ 0 ].translatedText
-						});
-					}
-				})
-				.catch((response) => {
-					console.log(response.status, response.statusText);
-					var errData;
-					try {
-						errData = JSON.parse(response.statusText);
-					} catch (e) {
-						errData = {};
-					}
-					sendResponse({
-						success: false,
-						data: errData,
-						time: response.status
-					});
-
-
-				});
-				return true;
-			} else if (request.evt === 'deepapi-translate') {
-				const url = OPTIONS.deepl_api_url;
-
-				let _data = {
-					auth_key: OPTIONS.deepl_api_key,
-					target_lang: OPTIONS.visualCopyTranslateLang,
-					text: text
-				}
-				var queryString = Object.keys(_data).map(key => key + '=' + _data[key]).join('&');
-
-				fetch(url+'?'+queryString, {
-					method: "GET"
-					
-				})
-				.then((response) => {
-
-					if (response.ok) {
-						return response.json();
-					}
-					return Promise.reject(response);
-				})
-				.then((data) => {
-
-					if (data && data.translations && data.translations[ 0 ] && data.translations[ 0 ].text != null) {
-						sendResponse({
-							success: true,
-							data: data.translations[ 0 ].text
-						});
-					}
-
-				})
-				.catch((response) => {
-					console.log(response.status, response.statusText);
-					var errData;
-					try {
-						errData = JSON.parse(response.statusText);
-					} catch (e) {
-						errData = {};
-					}
-					sendResponse({
-						success: false,
-						data: errData,
-						time: response.status
-					});
-
-
-				});
-			} else if (request.evt === 'google-ocr') {
-				let OPTIONS = request.options;
-				const url = OPTIONS.google_ocr_api_url + '?key=' + OPTIONS.google_ocr_api_key;
-				const headers = {
-					Accept: "application/json",
-					"Content-Type": "application/json",
-				};
-				fetch(url, {
-					method: "POST",
-					headers,
-					body: JSON.stringify(request.request),
-				})
-				.then((response) => {
-
-					if (response.ok) {
-						return response.json();
-					}
-					return Promise.reject(response);
-				})
-				.then((json) => {
-					sendResponse({
-						success: true,
-						data: json
-					});
-				})
-				.catch((response) => {
-					console.log(response.status, response.statusText);
-					response.json().then((json) => {
-						sendResponse({
-							success: false,
-							data: []
-						});
-					})
-				});
-
-				return true
 			} else if (request.evt == 'show-warning') {
 				if (request.message) {
 					if (isFirefoxBrowser) {

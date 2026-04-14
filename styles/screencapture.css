@@ -16,17 +16,18 @@ html, body {
 	min-height: none !important;
 	max-height: none !important;
 	overflow: auto;
-	margin-bottom: 20px;
-	height:50%
+	height: 55%;
 }
 .ocrext-element.ocrext-status{
 	height:auto;
 }
-.ocrext-grid-translated, .copyfish-tab-text{
-	height:33%;
+.copyfish-tab-text{
+	height: 45%;
+	padding-top: 8px;
 }
 .ocrext-canvas-container {
 	width: 100%;
+	height: 100%;
 	overflow: auto;
 	position: relative;
 }
@@ -46,17 +47,6 @@ html, body {
 	align-items: flex-start;
 	justify-content: space-between;
 	flex-direction: row;
-}
-
-.copyfish-tab-text .ocrext-ocr-translated, .copyfish-tab-text .ocrext-element.ocrext-cell.ocrext-cell-large {
-	width: 100% !important;
-}
-
-.translate-text-tab.ocrext-grid-translated.disabled {
-	display: block !important;
-	color: #757575;
-	background-color: #9b9b9b;
-	pointer-events: none !important;
 }
 
 .settings-icon {
@@ -162,6 +152,11 @@ html, body {
 	border-top-right-radius: 3px;
 	border-bottom-right-radius: 3px;
 	border-bottom-left-radius: 3px;
+}
+
+[data-panes]>* {
+	height: 100%;
+	box-sizing: border-box;
 }
 
 [data-tabs]>[aria-selected=true] {
@@ -287,13 +282,89 @@ body {
 	border-bottom-left-radius: 3px;
 	border-bottom-right-radius: 3px;
 }
-.translated-textarea{
+.ocr-textarea{
 	height:98%;
+	display:flex;
+	flex-direction:column;
 }
-.translated-textarea textarea,p {
-	height:100%;
+.ocr-textarea textarea {
+	flex:1;
+	width:100%;
+	box-sizing:border-box;
+	resize:none;
+	padding:10px 15px;
+	color:rgb(117,117,117);
+	font-size:16px;
+	font-weight:normal;
+	border:none;
+	line-height:20px;
 }
-.translated-textarea-tab{
+.ocr-textarea-tab{
 	height:89%;
 	padding-bottom: 0px !important;
+}
+
+/* ── Markdown tab ────────────────────────────────────────────── */
+.markdown-render-tab {
+	height: 89%;
+	padding: 0 !important;
+	overflow-y: auto;
+}
+
+.md-render-output {
+	padding: 14px 18px;
+	color: rgb(80, 80, 80);
+	font-size: 14px;
+	line-height: 1.5;
+}
+
+.md-render-output p {
+	margin: 0 0 6px 0;
+}
+
+.md-render-output .md-empty {
+	color: #aaa;
+	font-style: italic;
+}
+
+.md-render-output .md-engine-notice {
+	color: #888;
+	font-style: italic;
+	margin-top: 18px;
+	text-align: left;
+}
+
+/* Table */
+.md-table {
+	border-collapse: collapse;
+	width: 100%;
+	margin: 8px 0 14px 0;
+	font-size: 13px;
+}
+
+.md-table th,
+.md-table td {
+	border: 1px solid #c8d8ea;
+	padding: 5px 10px;
+	text-align: left;
+	vertical-align: top;
+}
+
+.md-table thead th {
+	background: rgb(33, 150, 243);
+	color: #fff;
+	font-weight: 600;
+	white-space: nowrap;
+}
+
+.md-table tbody tr:nth-child(even) {
+	background: #f0f6fd;
+}
+
+.md-table tbody tr:hover {
+	background: #daeeff;
+}
+
+.md-table td:empty::after {
+	content: '\00a0';   /* prevent zero-height cells */
 }

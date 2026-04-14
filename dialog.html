@@ -1,7 +1,7 @@
 <div class="ocrext-element ocrext-wrapper">
   <header class="ocrext-element ocrext-header">
 	<span class="ocrext-element ocrext-title mdl-layout-title">
-    <span>Copyfish</span>
+    <span class="ocrext-title-name">Copyfish</span><span class="ocrext-nano-title"></span><span class="ocrext-header-status"></span><a class="ocrext-cancel-ocr" title="Cancel OCR"> cancel</a>
     <a class="ocrext-closeToolbar-link icon-action-white icon-action-white-ic_close_white_24dp" title="Close"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <line x1="18" y1="6" x2="6" y2="18"/>
   <line x1="6" y1="6" x2="18" y2="18"/>
@@ -28,21 +28,12 @@
       <div class="ocrext-element ocrext-spinner-wrapper">
         <div class="ocrext-element mdl-spinner mdl-js-spinner ocrext-spinner"></div>
       </div>
-      <p class="ocrext-element ocrext-status"></p>
       <div class="ocrext-element ocrext-grid ocrext-grid-message ocrext-clearfix">
         <div class="ocrext-element ocrext-cell ocrext-cell-small">
           <h5 class="ocrext-element ocrext-label ocrext-message">OCR Result<span></span></h5>
         </div>
         <div class="ocrext-element ocrext-cell ocrext-cell-large">
           <textarea class="ocrext-element ocrext-ocr-message ocrext-result">N/A</textarea>
-        </div>
-      </div>
-      <div class="ocrext-element ocrext-grid ocrext-grid-translated ocrext-clearfix">
-        <div class="ocrext-element ocrext-cell ocrext-cell-small">
-          <h5 class="ocrext-element ocrext-label ocrext-translated">Translated<span></span></h5>
-        </div>
-        <div class="ocrext-element ocrext-cell ocrext-cell-large">
-          <p class="ocrext-element ocrext-ocr-translated ocrext-result">N/A</p>
         </div>
       </div>
 
@@ -55,7 +46,6 @@
       <div class="ocrext-element mdl-cell mdl-cell--9-col ocrext-btn-container">
         <button class="ocrext-element ocrext-ocr-sendocr ocrext-btn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" title="Redo OCR">Redo OCR</button>
         <button class="ocrext-element ocrext-ocr-recapture ocrext-btn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" title="Recapture">Recapture</button>
-        <button class="ocrext-element ocrext-ocr-retranslate ocrext-btn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" title="Re-Translate">Re-Translate</button>
         <button class="ocrext-element ocrext-ocr-copy ocrext-btn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" title="Copy to clipboard">Copy to clipboard</button>
         <div class="translate-button" id="deepl_translate_button"><img src="" alt="open translate"></div>
         <div  id="popup_translate_button"><img src="" alt="open translate"></div>

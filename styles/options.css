@@ -81,12 +81,7 @@ body {
 	font-size: 16px;
 }
 
-.container .inner-wrapper select.lang-quickselect {
-	width: 120px;
-}
-
 .container .inner-wrapper label.auto-process,
-.container .inner-wrapper label.auto-translate,
 .container .inner-wrapper label.popup-dicts {
 	margin-top: 8px;
 }
@@ -155,11 +150,6 @@ body {
 .container .inner-wrapper .buttons .button-cell {
 	text-align: center;
 }
-@media screen and (max-width: 700px) {
-	.OcrEngine label, .TranslationEngine label, .copy_options label{
-		margin-left: 50px !important;
-	}
-}
 @media screen and (max-width: 959px) {
 
 	.container {
@@ -178,36 +168,16 @@ body {
 		margin: 0 0 15px 10px !important;
 	}
 }
-.OcrEngine,.TranslationEngine, .copy_options{
-	width: 100%;
-	display: grid;
-  grid-template-columns: 1fr;
-  grid-template-rows: 1fr;
-  grid-template-areas: "." ".";
-	align-items: center;
-  justify-items: center;
-	margin-bottom: 10px;
-	/* width: 100%;
+.OcrEngine, .copy_options {
 	display: flex;
-	justify-content: center;
- flex-direction: column;
-	align-items: center;
-	margin-bottom: 15px; */
-}
-.OcrEngine label,.TranslationEngine label, .copy_options label{
-	display: run-in !important;
-	width: 400px;
-	margin-left: 274px;
-	margin-bottom: 5px;
-
+	flex-direction: column;
+	gap: 10px;
+	padding: 4px 0;
 }
 
-.EnginesType{
-	margin: 0 auto -20px 0px;
-	width: 38%;
-	text-align: right;
-	display:block;
-
+/* Ensure MDL radio upgraded elements have room for the circle */
+.OcrEngine .mdl-radio.is-upgraded {
+	padding-left: 24px;
 }
 
 .upgrade_status{

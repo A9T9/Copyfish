@@ -6,15 +6,54 @@ tabbis({
 	tabActiveFallback: 0
 });
 
+var _activeTabId = 'tab-0-0';
+var MARKDOWN_TAB_ID = 'tab-0-3';
+
+function _renderMarkdownPane(sourceVal) {
+	browser.storage.sync.get({ ocrEngine: '' }, function (opts) {
+		if (opts.ocrEngine !== 'OcrSpaceThird') {
+			$('#md-render-output').html(
+				'<p class="md-engine-notice">Image to Markdown is a feature of OCR Engine 3</p>'
+			);
+			return;
+		}
+		var text = (sourceVal !== undefined) ? sourceVal
+			: ($('.ocrext-ocr-message.ocrext-result').first().val() || '');
+		$('#md-render-output').html(window.renderMarkdown(text));
+	});
+}
+
 document.addEventListener("tabbis", e => {
 	let data = e.detail.tab;
+	_activeTabId = $(data).attr('id');
 
-	if ($(data).attr('id') === 'tab-0-0') {
-		$('#tabpanel-0-0').removeClass('canvas-hidden')
+	if (_activeTabId === 'tab-0-0') {
+		$('#tabpanel-0-0').removeClass('canvas-hidden');
 	} else {
-		$('#tabpanel-0-0').addClass('canvas-hidden')
+		$('#tabpanel-0-0').addClass('canvas-hidden');
+	}
+
+	// Re-render Markdown pane whenever it becomes active.
+	if (_activeTabId === MARKDOWN_TAB_ID) {
+		_renderMarkdownPane();
 	}
 }, false);
+
+// User types in any OCR textarea → sync siblings and live-update Markdown pane.
+$(document).on('input', '.ocrext-ocr-message.ocrext-result', function () {
+	var val = $(this).val();
+	$('.ocrext-ocr-message.ocrext-result').not(this).val(val);
+	if (_activeTabId === MARKDOWN_TAB_ID) {
+		_renderMarkdownPane(val);
+	}
+});
+
+// cs.js sets the textarea programmatically → update Markdown pane if open.
+$(document).on('ocrResultChanged', '.ocrext-ocr-message', function () {
+	if (_activeTabId === MARKDOWN_TAB_ID) {
+		_renderMarkdownPane($(this).val());
+	}
+});
 
 
 let ScreenCap = {

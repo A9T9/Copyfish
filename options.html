@@ -15,38 +15,37 @@
 
     <div class="inner-wrapper">
       <div class="status-text">Settings saved successfully. Changes will be visible after the next conversion.</div>
-      <span class="EnginesType">OCR Engine</span>
-      <div class="OcrEngine">
-        <tr>
-          <td>
-            <label class="mdl-radio mdl-js-radio  mdl-js-ripple-effect" for="OcrSpace">
-              <input type="radio" id="OcrSpace" name="OCR" class="mdl-radio__button" value="OcrSpace">
-              <span class="mdl-radio__label">OCR Engine 1
-                (<a class="options-link" target="_blank" href="https://ocr.space/rd/copyfish?help=ocr1">more
-                languages</a>)
-              </span>
-            </label>
-          </td>
-
-          <td>
-            <label class="mdl-radio mdl-js-radio  mdl-js-ripple-effect" for="OcrSpaceSecond">
-              <input type="radio" id="OcrSpaceSecond" name="OCR" class="mdl-radio__button" value="OcrSpaceSecond">
-              <span class="mdl-radio__label">OCR Engine 2
-                (better <a class="options-link" target="_blank"
-                href="https://ocr.space/rd/copyfish?help=ocr2">alphanumeric OCR</a>)</span>
-              </label>
-            </td>
-
-            <td>
-              <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="OcrLocal">
-                <input type="radio" id="OcrLocal" name="OCR" class="mdl-radio__button" value="OcrLocal">
-                <span class="mdl-radio__label">XModule Local OCR (<a class="options-link" target="_blank"
-                  href="https://ocr.space/rd/copyfish?help=xmodule-ocr">Install Link</a>)</span>
-                </label>
-              </td>
-
-            </tr>
-          </div>
+    <div class="mdl-grid options-container">
+      <div class="mdl-cell mdl-cell--5-col label">
+        <label>OCR Engine</label>
+      </div>
+      <div class="mdl-cell mdl-cell--7-col OcrEngine">
+        <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="OcrSpace">
+          <input type="radio" id="OcrSpace" name="OCR" class="mdl-radio__button" value="OcrSpace">
+          <span class="mdl-radio__label">OCR Engine 1
+            (<a class="options-link" target="_blank" href="https://ocr.space/rd/copyfish?help=ocr1">fastest OCR</a>)
+          </span>
+        </label>
+        <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="OcrSpaceSecond">
+          <input type="radio" id="OcrSpaceSecond" name="OCR" class="mdl-radio__button" value="OcrSpaceSecond">
+          <span class="mdl-radio__label">OCR Engine 2
+            (Default: Fast & <a class="options-link" target="_blank" href="https://ocr.space/rd/copyfish?help=ocr2">very good OCR</a>)
+          </span>
+        </label>
+        <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="OcrSpaceThird">
+          <input type="radio" id="OcrSpaceThird" name="OCR" class="mdl-radio__button" value="OcrSpaceThird">
+          <span class="mdl-radio__label">OCR Engine 3
+		  (<a class="options-link" target="_blank" href="https://ocr.space/rd/copyfish?help=ocr3">Best OCR, most languages</a>, but slower and no overlay)
+		  </span>
+        </label>
+        <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="OcrLocal">
+          <input type="radio" id="OcrLocal" name="OCR" class="mdl-radio__button" value="OcrLocal">
+          <span class="mdl-radio__label">XModule Local OCR
+            (<a class="options-link" target="_blank" href="https://ocr.space/rd/copyfish?help=xmodule-ocr">Install Link</a>)
+          </span>
+        </label>
+      </div>
+    </div>
 
             <div class="mdl-grid options-container input-language">
               <div class="mdl-cell mdl-cell--5-col label">
@@ -57,26 +56,7 @@
                 </select>
               </div>
             </div>
-            <div class="mdl-grid options-container input-language-quickselect">
-              <div class="mdl-cell mdl-cell--5-col label">
-                <label>Input Language Quickselect</label>
-              </div>
-              <div class="mdl-cell mdl-cell--2-col">
-                <select id="input-lang-1" name="inputlang" class="lang-quickselect">
-                  <option value="none" selected="selected">None</option>
-                </select>
-              </div>
-              <div class="mdl-cell mdl-cell--2-col">
-                <select id="input-lang-2" name="inputlang" class="lang-quickselect">
-                  <option value="none" selected="selected">None</option>
-                </select>
-              </div>
-              <div class="mdl-cell mdl-cell--2-col">
-                <select id="input-lang-3" name="inputlang" class="lang-quickselect">
-                  <option value="none" selected="selected">None</option>
-                </select>
-              </div>
-            </div>
+
 
   
 
@@ -119,7 +99,7 @@
 
     <div class="mdl-grid options-container translate-options">
       <div class="mdl-cell mdl-cell--5-col label">
-        <label title="Use Table OCR">Use Table OCR</label>
+        <label title="Use Table OCR">Use <a target="_blank" href="https://ocr.space/rd/copyfish?help=table">Table OCR</a></label>
       </div>
       <div class="mdl-cell mdl-cell--7-col">
         <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect table-ocr" for="switch-table-ocr">

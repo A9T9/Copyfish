@@ -115,15 +115,6 @@
 	color: #227fd2;
 }
 
-.text-capture-tab textarea, .translate-text-tab .ocrext-ocr-translated {
-	margin-top: 14px !important;
-	min-height: 120px !important;
-	width: -moz-available !important;
-	width: -webkit-fill-available !important;
-	width: fill-available !important;
-	padding: 10px !important;
-	border: 2px solid #393939 !important;
-}
 
 [data-panes]>* {
 	padding: 16px !important;
@@ -140,7 +131,7 @@
 
 .ocrext-textoverlay-container.visible {
 	display: block;
-	margin: 15px 30px;
+	margin: 5px 9px;
 }
 
 .tabs-container .ocrext-textoverlay-container.visible {
@@ -201,10 +192,10 @@
 	font-weight: normal;
 	font-variant: normal;
 	right: 2%;
-	width: 65%;
+	width: 57%;
 	max-width: 1020px;
 	min-height: 200px;
-	min-width: 680px;
+	min-width: 590px;
 	position: fixed;
 	/*.transition-bottom();*/
 	transition: all 0.25 ease;
@@ -272,6 +263,8 @@
 	font-size: 20px;
 	padding: 15px 0 8px 15px;
 	margin: 0;
+	white-space: nowrap;
+	overflow: hidden;
 }
 
 .ocrext-wrapper header.ocrext-header .ocrext-title .ocrext-settings-link {
@@ -289,23 +282,112 @@
 	margin-right: 16px;
 }
 
-.tabs-container .ocrext-footer {
+/* screencapture page footer */
+.button-screencapture {
+	display: flex;
+	align-items: center;
+	gap: 0;
+}
+
+.button-screencapture .ocrext-quickselect-btn-container {
 	display: flex;
 	align-items: center;
 	justify-content: flex-end;
+	padding: 8px 8px 0 8px;
 }
 
-.tabs-container .ocrext-btn-container {
+.button-screencapture .ocrext-btn-container {
 	display: flex;
-	width: auto;
-	margin-right: 60px;
+	align-items: center;
+	flex: 1;
+	justify-content: flex-start;
+	padding: 8px 0 0 8px;
 }
 
-.tabs-container .ocrext-quickselect-btn-container {
-	height: 45px;
-	width: auto;
-	margin-right: 60px;
+/* engine dropdown in screencapture footer */
+.button-screencapture .ocrext-engine-dropdown {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	margin-bottom: 0;
+	margin-right: 12px;
 }
+
+.button-screencapture .ocrext-engine-btn {
+	white-space: nowrap;
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 0 16px;
+	margin-bottom: 0;
+}
+
+.button-screencapture .ocrext-engine-btn-arrow {
+	font-size: 9px;
+	opacity: 0.85;
+}
+
+.button-screencapture .ocrext-engine-panel {
+	display: none;
+	position: absolute;
+	bottom: calc(100% + 4px);
+	left: 0;
+	min-width: 100%;
+	background: #fff;
+	border-radius: 2px;
+	box-shadow: 0 4px 8px rgba(0,0,0,0.25), 0 2px 4px rgba(0,0,0,0.15);
+	z-index: 9999;
+	overflow: hidden;
+}
+
+.button-screencapture .ocrext-engine-panel.open {
+	display: block;
+}
+
+.button-screencapture .ocrext-engine-item {
+	font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+	font-size: 13px;
+	font-weight: 500;
+	text-transform: uppercase;
+	letter-spacing: 0.03em;
+	color: #2196f3;
+	padding: 10px 16px;
+	cursor: pointer;
+	white-space: nowrap;
+	border-left: 3px solid transparent;
+	transition: background 0.15s, border-color 0.15s;
+}
+
+.button-screencapture .ocrext-engine-item:hover {
+	background: #e3f2fd;
+	border-left-color: #2196f3;
+}
+
+.button-screencapture .ocrext-engine-item.selected {
+	color: #2196f3;
+	border-left-color: #2196f3;
+	background: #e3f2fd;
+}
+
+.button-screencapture .ocrext-engine-item.disabled {
+	color: #bdbdbd;
+	cursor: default;
+}
+
+.button-screencapture .ocrext-engine-item.disabled:hover {
+	background: none;
+	border-left-color: transparent;
+}
+
+.button-screencapture .ocrext-engine-item-sub {
+	display: block;
+	font-size: 10px;
+	font-weight: 400;
+	text-transform: none;
+	color: #bdbdbd;
+	letter-spacing: 0;
+}
+
 
 .ocrext-wrapper header.ocrext-header .ocrext-title .ocrext-open-tab-link {
 	display: inline-block;
@@ -343,7 +425,7 @@
 }
 
 .ocrext-wrapper .ocrext-content {
-	padding: 5px 30px 10px 30px;
+	padding: 5px 10px 10px 10px;
 	/*Canvas container*/
 	/*Ouput Container*/
 	/*Bottom buttons container*/
@@ -353,8 +435,8 @@
 
 .ocrext-wrapper .ocrext-content .ocrext-canvas-container {
 	position: relative;
-	margin: 5px auto 10px auto;
-	min-width: 430px;
+	margin: 2px auto 4px auto;
+	min-width: 370px;
 	max-height: 200px;
 	width: 100%;
 	overflow: auto;
@@ -365,7 +447,7 @@
 }
 
 .ocrext-wrapper .ocrext-content .ocrext-canvas-container #ocrext-can {
-	margin: 15px 30px;
+	margin: 5px 9px;
 	display: block;
 	cursor: pointer;
 }
@@ -373,11 +455,9 @@
 .ocrext-wrapper .ocrext-content .ocrext-ocr-output {
 	/*margin:30px 0;*/
 	padding: 0 7px;
-	/* max-height: @output-max-height;
-	min-height: @output-min-height;  */
-	height: 200px;
-	margin-bottom: 10px;
-	overflow-y: hidden;
+	height: auto;
+	margin-bottom: 4px;
+	overflow-y: visible;
 	position: relative;
 	transition: height 0.25 ease;
 	-webkit-transition: height 0.25s ease;
@@ -388,32 +468,111 @@
         /*padding:5px;*/
     }
 
-    .ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-status {
-    	text-align: center;
-    	padding: 0 10px;
-    	margin: 0 7px 5px 0;
-    	height: 0px;
+    /* Nano mode title text (truncated OCR result) */
+    .ocrext-wrapper .ocrext-nano-title {
+      display: none;
+    }
+    .ocrext-wrapper.ocrext-wrapper-nano .ocrext-title-name {
+      display: none;
+    }
+    /* Flexbox on the title row in nano mode — fixes icon alignment and text width */
+    .ocrext-wrapper.ocrext-wrapper-nano header.ocrext-header .ocrext-title {
+      display: flex;
+      align-items: center;
+      padding-top: 4px;
+      padding-bottom: 4px;
+    }
+    /* Icons become flex items — reset float and ALL margins from the non-nano
+       rule (margin: -4px 25px 0 0), then center SVG content inside each link */
+    .ocrext-wrapper.ocrext-wrapper-nano header.ocrext-header .ocrext-title > a {
+      float: none;
+      margin: 0;
+      padding: 0 4px;
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+    }
+    /* margin-left:auto on the open-tab icon pushes the icon group to the right.
+       order values match full mode visual order: open-tab(1), gear(2), X(3). */
+    .ocrext-wrapper.ocrext-wrapper-nano header.ocrext-header .ocrext-title > a.ocrext-open-tab-link {
+      margin-left: auto;
+      order: 1;
+    }
+    .ocrext-wrapper.ocrext-wrapper-nano header.ocrext-header .ocrext-title > a.ocrext-settings-link {
+      order: 2;
+    }
+    .ocrext-wrapper.ocrext-wrapper-nano header.ocrext-header .ocrext-title > a.ocrext-closeToolbar-link {
+      order: 3;
+    }
+    /* OCR text: takes all remaining space, clamps to 2 lines.
+       display is managed by JS (_updateNanoTitle sets display:-webkit-box,
+       setStatus hides it while progress/error status is active) */
+    .ocrext-wrapper.ocrext-wrapper-nano .ocrext-nano-title {
+      flex: 1;
+      min-width: 0;
+      display: none;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      overflow: hidden;
+      white-space: normal;
+      font-size: 13px;
+      font-weight: normal;
+      color: #fff;
+      line-height: 1.35;
+    }
+    .ocrext-wrapper.ocrext-wrapper-nano .ocrext-nl {
+      color: #00e5ff;
+      font-weight: bold;
+    }
+    .ocrext-wrapper.ocrext-wrapper-nano .ocrext-nano-placeholder {
+      opacity: 0.55;
+      font-style: italic;
+    }
+    /* Status in nano: auto-width, flows naturally left next to cancel link.
+       Do NOT use flex:1 here — that would eat 50% of space even when empty. */
+    .ocrext-wrapper.ocrext-wrapper-nano .ocrext-header-status {
+      flex: 0 0 auto;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      font-size: 13px;
+      margin-left: 0;
+    }
+    /* Status shown inline in the title bar.
+       display:inline-block + max-width + ellipsis ensures the status text
+       truncates before the cancel link is pushed off-screen. The 340px
+       subtraction covers: "Copyfish" title (~90px) + 3 floated icons (~220px)
+       + cancel link (~60px) + breathing room. */
+    .ocrext-wrapper header.ocrext-header .ocrext-header-status {
+    	font-size: 12px;
+    	font-weight: normal;
+    	margin-left: 10px;
+    	vertical-align: middle;
+    	opacity: 0.9;
+    	display: inline-block;
+    	max-width: calc(100% - 340px);
     	overflow: hidden;
-    	font-weight: bold;
-    	font-size: 14px;
-    	transition: height 0.25 ease;
-    	-webkit-transition: height 0.25s ease;
+    	text-overflow: ellipsis;
+    	white-space: nowrap;
     }
+    .ocrext-wrapper header.ocrext-header .ocrext-header-status.ocrext-error   { color: #ffcdd2; }
+    .ocrext-wrapper header.ocrext-header .ocrext-header-status.ocrext-success { color: #ccff90; }
+    .ocrext-wrapper header.ocrext-header .ocrext-header-status.ocrext-progress { color: #e3f2fd; }
 
-    .ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-status.ocrext-error {
-    	color: #d9534f;
-    	height: 16px;
+    /* Cancel OCR link — shown only while OCR is in progress */
+    .ocrext-wrapper .ocrext-cancel-ocr {
+      display: none;
+      color: #fff;
+      font-size: 12px;
+      font-weight: normal;
+      opacity: 0.85;
+      text-decoration: underline;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+      margin-left: 4px;
     }
-
-    .ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-status.ocrext-success {
-    	color: #8bc34a;
-    	height: 16px;
-    }
-
-    .ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-status.ocrext-progress {
-    	color: #03a9f4;
-    	height: 16px;
-    }
+    .ocrext-wrapper .ocrext-cancel-ocr:hover { opacity: 1; }
 
     .ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-spinner-wrapper {
     	position: absolute;
@@ -447,11 +606,11 @@
       }
 
       .ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-cell.ocrext-cell-small {
-      	width: 20%;
+      	width: 13%;
       }
 
       .ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-cell.ocrext-cell-large {
-      	width: 80%;
+      	width: 87%;
       }
 
       .ocrext-wrapper .ocrext-content .ocrext-ocr-output h5.ocrext-label {
@@ -493,62 +652,62 @@
 
       .ocrext-wrapper .ocrext-content .ocrext-ocr-output textarea.ocrext-result {
       	width: 100%;
-      	height: 85px;
+      	height: 110px;
       	margin: 5px 0 0 15px;
       	resize: none;
       }
 
-      .ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-message.ocrext-font-48px, .ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-translated.ocrext-font-48px {
+      .ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-message.ocrext-font-48px {
       	font-size: 48px;
       	line-height: 48px;
       }
 
-      .ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-message.ocrext-font-42px, .ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-translated.ocrext-font-42px {
+      .ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-message.ocrext-font-42px {
       	font-size: 42px;
       	line-height: 42px;
       }
 
-      .ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-message.ocrext-font-36px, .ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-translated.ocrext-font-36px {
+      .ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-message.ocrext-font-36px {
       	font-size: 36px;
       	line-height: 36px;
       }
 
-      .ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-message.ocrext-font-32px, .ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-translated.ocrext-font-32px {
+      .ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-message.ocrext-font-32px {
       	font-size: 32px;
       	line-height: 32px;
       }
 
-      .ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-message.ocrext-font-28px, .ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-translated.ocrext-font-28px {
+      .ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-message.ocrext-font-28px {
       	font-size: 28px;
       	line-height: 28px;
       }
 
-      .ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-message.ocrext-font-24px, .ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-translated.ocrext-font-24px {
+      .ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-message.ocrext-font-24px {
       	font-size: 24px;
       	line-height: 24px;
       }
 
-      .ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-message.ocrext-font-20px, .ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-translated.ocrext-font-20px {
+      .ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-message.ocrext-font-20px {
       	font-size: 20px;
       	line-height: 24px;
       }
 
-      .ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-message.ocrext-font-18px, .ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-translated.ocrext-font-18px {
+      .ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-message.ocrext-font-18px {
       	font-size: 18px;
       	line-height: 22px;
       }
 
-      .ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-message.ocrext-font-16px, .ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-translated.ocrext-font-16px {
+      .ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-message.ocrext-font-16px {
       	font-size: 16px;
       	line-height: 20px;
       }
 
-      .ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-message.ocrext-font-14px, .ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-translated.ocrext-font-14px {
+      .ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-message.ocrext-font-14px {
       	font-size: 14px;
       	line-height: 18px;
       }
 
-      .ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-message.ocrext-font-12px, .ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-translated.ocrext-font-12px {
+      .ocrext-wrapper .ocrext-content .ocrext-ocr-output .ocrext-ocr-message.ocrext-font-12px {
       	font-size: 12px;
       	line-height: 16px;
       }
@@ -558,26 +717,102 @@
       }
 
       .ocrext-wrapper .ocrext-content .ocrext-footer .ocrext-quickselect-btn-container {
-      	/*float: left;*/
       	display: flex;
       	flex-direction: row;
-      	justify-content: center;
+      	align-items: center;
+      	justify-content: flex-end;
       }
 
-      .ocrext-wrapper .ocrext-content .ocrext-footer .ocrext-quickselect-btn-container button.ocrext-btn {
-      	margin-bottom: 5px;
-      	margin-right: 5px;
-      	padding: 0 8px;
-      	min-width: 46px;
+      /* Custom engine dropdown */
+      .ocrext-wrapper .ocrext-content .ocrext-footer .ocrext-engine-dropdown {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        margin-bottom: 5px;
+        margin-right: 12px;
       }
 
-      .ocrext-wrapper .ocrext-content .ocrext-footer .ocrext-quickselect-btn-container button.ocrext-btn.selected {
-      	cursor: default;
-      	opacity: 0.6;
+      .ocrext-wrapper .ocrext-content .ocrext-footer .ocrext-engine-btn {
+        white-space: nowrap;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 0 16px;
+        margin-bottom: 0;
       }
 
-      .ocrext-wrapper .ocrext-content .ocrext-footer .ocrext-quickselect-btn-container button.ocrext-btn:last-child {
-      	margin-right: 0;
+      .ocrext-wrapper .ocrext-content .ocrext-footer .ocrext-engine-btn-arrow {
+        font-size: 9px;
+        opacity: 0.85;
+        line-height: 1;
+        margin-top: 1px;
+      }
+
+      .ocrext-wrapper .ocrext-content .ocrext-footer .ocrext-engine-panel {
+        display: none;
+        position: absolute;
+        bottom: calc(100% + 4px);
+        left: 0;
+        min-width: 100%;
+        background: #fff;
+        border-radius: 2px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.25), 0 2px 4px rgba(0,0,0,0.15);
+        z-index: 9999;
+        overflow: hidden;
+      }
+
+      .ocrext-wrapper .ocrext-content .ocrext-footer .ocrext-engine-panel.open {
+        display: block;
+      }
+
+      .ocrext-wrapper .ocrext-content .ocrext-footer .ocrext-engine-item {
+        font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+        font-size: 13px;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        color: #2196f3;
+        padding: 10px 16px;
+        cursor: pointer;
+        white-space: nowrap;
+        border-left: 3px solid transparent;
+        transition: background 0.15s, border-color 0.15s;
+      }
+
+      .ocrext-wrapper .ocrext-content .ocrext-footer .ocrext-engine-item:hover {
+        background: #e3f2fd;
+        border-left-color: #2196f3;
+      }
+
+      .ocrext-wrapper .ocrext-content .ocrext-footer .ocrext-engine-item.selected {
+        color: #2196f3;
+        border-left-color: #2196f3;
+        background: #e3f2fd;
+      }
+
+      .ocrext-wrapper .ocrext-content .ocrext-footer .ocrext-engine-item.disabled {
+        color: #bdbdbd;
+        cursor: default;
+        border-left-color: transparent;
+      }
+
+      .ocrext-wrapper .ocrext-content .ocrext-footer .ocrext-engine-item.disabled:hover {
+        background: none;
+        border-left-color: transparent;
+      }
+
+      .ocrext-wrapper .ocrext-content .ocrext-footer .ocrext-engine-item-sub {
+        display: block;
+        font-size: 10px;
+        font-weight: 400;
+        text-transform: none;
+        color: #bdbdbd;
+        letter-spacing: 0;
+        margin-top: 1px;
+      }
+
+      .ocrext-wrapper .ocrext-content .ocrext-footer {
+      	align-items: center;
       }
 
       .ocrext-wrapper .ocrext-content .ocrext-footer .ocrext-btn-container {
@@ -585,9 +820,7 @@
       	display: flex;
       	flex-direction: row;
       	justify-content: space-around;
-	/* .ocrext-ocr-close {
-          margin-right: 0;
-          } */
+      	align-items: center;
       }
 
       .ocrext-wrapper .ocrext-content .ocrext-footer .ocrext-btn-container button.ocrext-btn {
@@ -610,12 +843,24 @@
       }
 
       .ocrext-wrapper.ocrext-wrapper-minimized .ocrext-content .ocrext-ocr-output {
-      	height: 100px;
-      	overflow-y: auto;
+      	height: auto;
+      	overflow: hidden;
       }
 
       .ocrext-wrapper.ocrext-wrapper-minimized .ocrext-content .ocrext-ocr-output p.ocrext-ocr-message.expanded {
       	height: auto;
+      }
+
+      /* Stage 3: nano — header + button row only, nothing else */
+      .ocrext-wrapper.ocrext-wrapper-nano {
+      	min-height: 0;
+      }
+      .ocrext-wrapper.ocrext-wrapper-nano .ocrext-content .ocrext-canvas-container,
+      .ocrext-wrapper.ocrext-wrapper-nano .ocrext-content .ocrext-ocr-output {
+      	display: none !important;
+      }
+      .ocrext-wrapper.ocrext-wrapper-nano .ocrext-content {
+      	padding: 0;
       }
 
       @media screen and (max-width: 960px) {
@@ -631,15 +876,8 @@
       	.ocrext-wrapper .ocrext-content .ocrext-ocr-output h5.ocrext-label span {
       		max-width: 70px;
       	}
-      	.ocrext-wrapper .ocrext-content .ocrext-footer .ocrext-quickselect-btn-container {
-      		justify-content: flex-start;
-      	}
       	.ocrext-wrapper .ocrext-content .ocrext-footer .ocrext-btn-container {
       		/*float: none;*/
-		/* button.ocrext-btn {
-            margin-right:10px;
-            padding: 0 8px;
-            } */
         }
     }
 

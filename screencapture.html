@@ -28,6 +28,7 @@
       <div data-active>Copyfish</div>
       <div>Overlay</div>
       <div class="ocr-text-capture-tab">Text</div>
+      <div class="ocr-markdown-tab">Markdown</div>
     </div>
     <div class="settings-icon-container">
       <img src="./images/gear-active.png" alt="settings" class="settings-icon ocrext-settings-link">
@@ -50,15 +51,7 @@
           <h5 class="ocrext-element ocrext-label ocrext-message">OCR Result<br><span></span></h5>
         </div>
         <textarea name="capture-text" class="ocrext-element ocrext-ocr-message ocrext-result" cols="30"
-          rows="10">N/A</textarea>
-      </div>
-      <div class="copyfish-tab-text copyfish-text-translate ocrext-grid-translated">
-        <div class="copyfish-tab-text-lng">
-          <h5 class="ocrext-element ocrext-label ocrext-translated">Translated<span></span></h5>
-        </div>
-        <div class="ocrext-element ocrext-cell ocrext-cell-large">
-          <p class="ocrext-element ocrext-ocr-translated ocrext-result">N/A</p>
-        </div>
+          rows="10">Loading…</textarea>
       </div>
     </div>
     <div id="ocrext-element" class="tab-screenshot">
@@ -69,36 +62,25 @@
         </div>
       </div>
     </div>
-    <div class="text-capture-tab translate-text-tab tab-screenshot translated-textarea-tab ">
-      <div><h5 class="ocrext-element ocrext-label ocrext-message">OCR Result<span></span>:</h5></div>
-      <div class="translated-textarea">
-      <textarea name="capture-text" class="ocrext-element ocrext-ocr-message ocrext-result" >N/A</textarea>
+    <div class="text-capture-tab tab-screenshot ocr-textarea-tab">
+      <div class="ocr-textarea">
+        <textarea name="capture-text" class="ocrext-element ocrext-ocr-message ocrext-result">Loading…</textarea>
       </div>
     </div>
-    <div class="translate-text-tab tab-screenshot translated-textarea-tab">
-      <div class="ocrext-element ocrext-cell ocrext-cell-small">
-        <h5 class="ocrext-element ocrext-label ocrext-translated">Translated<span></span>:</h5>
-      </div>
-      <div class="ocrext-element ocrext-cell ocrext-cell-large translated-textarea">
-        <p class="ocrext-element ocrext-ocr-translated ocrext-result">N/A</p>
-      </div>
+    <div class="markdown-render-tab tab-screenshot">
+      <div id="md-render-output" class="md-render-output"></div>
     </div>
   </div>
-  <div class="ocrext-element ocrext-footer mdl-grid button-screencapture">
-    <!-- <div class="ocrext-element mdl-cell mdl-cell--2-col ocrext-quickselect-btn-container">
-      </div> -->
-    <!-- <div class="ocrext-element mdl-cell mdl-cell--1-col">
-      </div> -->
-    <div class="ocrext-element mdl-cell mdl-cell--12-col ocrext-btn-container align-flex-center">
+  <div class="ocrext-element ocrext-footer button-screencapture">
+    <div class="ocrext-element ocrext-quickselect-btn-container">
+    </div>
+    <div class="ocrext-element ocrext-btn-container align-flex-center">
       <button
         class="ocrext-element ocrext-ocr-sendocr ocrext-btn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
         title="Redo OCR">Redo OCR</button>
       <button
         class="ocrext-element ocrext-ocr-desktop-recapture ocrext-btn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
         title="Recapture">Recapture</button>
-      <button
-        class="ocrext-element ocrext-ocr-retranslate ocrext-btn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
-        title="Re-Translate">Re-Translate</button>
       <button
         class="ocrext-element ocrext-ocr-copy ocrext-btn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent"
         title="Copy to clipboard">Copy to clipboard</button>
@@ -108,9 +90,9 @@
 
     </div>
   </div>
-  </div>
 
   <script src="scripts/tabbis.es6.min.js"></script>
+  <script src="scripts/md-render.js"></script>
   <script src="scripts/screencapture.js"></script>
 </body>
 

@@ -98,7 +98,6 @@ $(function () {
       ocrnameArrayForLOcal=ocrnameArray;
       var statusTimeout;
       var checkBoxes = {
-        visualCopyAutoTranslate: [ '.auto-translate', defaults.visualCopyAutoTranslate ],
         visualCopySupportDicts: [ '.popup-dicts', defaults.visualCopySupportDicts ],
         useTableOcr: [ '.table-ocr', defaults.useTableOcr ],
         useDefaultDesktopOcr: [ '.usedesktop-ocr', defaults.useDefaultDesktopOcr ],
@@ -136,29 +135,22 @@ $(function () {
       // htmlStrArr = $(ocrnameArray).map(function (i, val) {
       // 	return '<option value="' + val.lang + '" data-shhort="' + val.short + '">' + val.name + '-' + val.short + '</option>';
       // });
-      // $('.lang-quickselect').each(function (i, node) {
-      // 	$(node).append(htmlStrArr.toArray().join(' '));
-      // });
       // htmlStrArr.splice(0, htmlStrArr.length);
 
       // fetch options while defaulting them when unavailable
       browser.storage.sync.get({
         visualCopyOCRLang: defaults.visualCopyOCRLang,
-        visualCopyTranslateLang: defaults.visualCopyTranslateLang,
-        visualCopyAutoTranslate: defaults.visualCopyAutoTranslate,
         visualCopyOCRFontSize: defaults.visualCopyOCRFontSize,
         visualCopySupportDicts: defaults.visualCopySupportDicts,
         useTableOcr: defaults.useTableOcr || '',
         useDefaultDesktopOcr: defaults.useDefaultDesktopOcr,
         copyAfterProcess: defaults.copyAfterProcess,
         copyType: defaults.copyType,
-        visualCopyQuickSelectLangs: defaults.visualCopyQuickSelectLangs,
         visualCopyTextOverlay: 1, // make it default always on defaults.visualCopyTextOverlay,
         openGrabbingScreenHotkey: defaults.openGrabbingScreenHotkey,
         closePanelHotkey: defaults.closePanelHotkey,
         copyTextHotkey: defaults.copyTextHotkey,
         ocrEngine: defaults.ocrEngine,
-        transitionEngine: defaults.transitionEngine,
         status: defaults.status,
       }, function (items) {
 
@@ -169,11 +161,13 @@ $(function () {
         if (items.ocrEngine === "OcrSpaceSecond"){
          $('#OcrSpaceSecond').click();
        }
+        if (items.ocrEngine === "OcrSpaceThird"){
+         $('#OcrSpaceThird').click();
+       }
        if (items.status === 'PRO') {
         $('.show_status').each(function (index, el) {
           $(this).text(items.status);
         });
-        $('#OcrGoogle').removeAttr('disabled').parents().removeClass('is-disabled');
         $('#OcrLocal').removeAttr('disabled').parents().removeClass('is-disabled');
         $(".upgrade_status").show();
       } else if (items.status === 'PRO+') {
@@ -182,14 +176,7 @@ $(function () {
           $(this).text(items.status);
         });
         $(".upgrade_status").hide();
-        $('#copy_translation').removeAttr('disabled').parents().removeClass('is-disabled');
-        $('#copy_both').removeAttr('disabled').parents().removeClass('is-disabled');
-        $('#OcrGoogle').removeAttr('disabled').parents().removeClass('is-disabled');
         $('#OcrLocal').removeAttr('disabled').parents().removeClass('is-disabled');
-        $('#YandexTranslator').removeAttr('disabled').parents().removeClass('is-disabled');
-        $('#GoogleTranslator').removeAttr('disabled').parents().removeClass('is-disabled');
-        $('#DeepTranslator').removeAttr('disabled').parents().removeClass('is-disabled');
-        $('#switch-auto-translate').removeAttr('disabled').parents().removeClass('is-disabled');
       } else if (items.status === 'Free Plan') {
         const $OcrSpace = $('#OcrSpace');
         if (!$OcrSpace.attr('checked')) {
@@ -223,115 +210,6 @@ $(function () {
 
         if (!items.copyAfterProcess) $('.copy-options').each((i, el) => $(el).prop('disabled', true).closest('label').addClass('is-disabled'));
 
-        //get  translationEngine value   in chrome storage and check it
-        $(`#${items.transitionEngine}`).attr('checked', 'checked').parent().addClass('is-checked');
-
-        if (items.transitionEngine == "GoogleTranslator") {
-          //render translate api language
-          var translateArray = appConfig.google_languages;
-          var translateLangArray = $(translateArray).map(function (i, val) {
-            let langCode = Object.keys(val)[ 0 ];
-
-            return '<option value="' + langCode + '">' + val[ langCode ] + '</option>';
-          });
-
-          $('#output-lang').html(translateLangArray.toArray().join(' '));
-
-        } else if (items.transitionEngine == "DeepTranslator") {
-          //render translate api language
-          var translateArray = appConfig.deepapi_languages;
-          var translateLangArray = $(translateArray).map(function (i, val) {
-            let langCode = Object.keys(val)[ 0 ];
-
-            return '<option value="' + langCode + '">' + val[ langCode ] + '</option>';
-          });
-
-          $('#output-lang').html(translateLangArray.toArray().join(' '));
-
-        } else if (items.transitionEngine == "YandexTranslator") {
-
-          //render translate api language
-          var translateArray = appConfig.yandex_languages;
-          var translateLangArray = $(translateArray).map(function (i, val) {
-            let langCode = Object.keys(val)[ 0 ];
-
-            return '<option value="' + langCode + '">' + val[ langCode ] + '</option>';
-          });
-
-          $('#output-lang').html(translateLangArray.toArray().join(' '));
-        }
-        if (items.ocrEngine == "OcrGoogle") {
-
-          var ocrnameArray = appConfig.ocr_google_languages;
-          // render the Input Language select box
-          var htmlStrArr = $(ocrnameArray).map(function (i, val) {
-            return '<option value="' + val.lang + '">' + val.name + '</option>';
-          });
-
-          $('#input-lang').html(htmlStrArr.toArray().join(' '));
-          htmlStrArr.splice(0, htmlStrArr.length);
-
-          // render the quick select checkboxes
-          htmlStrArr = $(ocrnameArray).map(function (i, val) {
-            return '<option value="' + val.lang + '" data-short="' + val.short + '">' + val.name + '-' + val.short + '</option>';
-          });
-          $('.lang-quickselect').each(function (i, node) {
-            $(node).append(htmlStrArr.toArray().join(' '));
-          });
-          htmlStrArr.splice(0, htmlStrArr.length);
-        }
-        else if (items.ocrEngine == "OcrLocal") {
-
-          //get languages from exe
-          var ocrnameArray = appConfig.ocr_google_languages;
-          // render the Input Language select box
-          var htmlStrArr = $(ocrnameArray).map(function (i, val) {
-            return '<option value="' + val.lang + '">' + val.name + '</option>';
-          });
-
-          $('#input-lang').html(htmlStrArr.toArray().join(' '));
-          htmlStrArr.splice(0, htmlStrArr.length);
-
-          // render the quick select checkboxes
-          htmlStrArr = $(ocrnameArray).map(function (i, val) {
-            return '<option value="' + val.lang + '" data-short="' + val.short + '">' + val.name + '-' + val.short + '</option>';
-          });
-          $('.lang-quickselect').each(function (i, node) {
-            $(node).append(htmlStrArr.toArray().join(' '));
-          });
-          htmlStrArr.splice(0, htmlStrArr.length);
-        }
-        else if (items.ocrEngine == "OcrSpace") {
-
-          //render translate api language
-          var translateArray = appConfig.yandex_languages;
-          var translateLangArray = $(translateArray).map(function (i, val) {
-            let langCode = Object.keys(val)[ 0 ];
-
-            return '<option value="' + langCode + '">' + val[ langCode ] + '</option>';
-          });
-
-          $('#output-lang').html(translateLangArray.toArray().join(' '));
-
-
-          var ocrnameArray = appConfig.ocr_languages;
-          // render the Input Language select box
-          var htmlStrArr = $(ocrnameArray).map(function (i, val) {
-            return '<option value="' + val.lang + '">' + val.name + '</option>';
-          });
-
-          $('#input-lang').html(htmlStrArr.toArray().join(' '));
-          htmlStrArr.splice(0, htmlStrArr.length);
-          // render the quick select checkboxes
-          htmlStrArr = $(ocrnameArray).map(function (i, val) {
-            return '<option value="' + val.lang + '" data-short="' + val.short + '">' + val.name + '-' + val.short + '</option>';
-          });
-          $('.lang-quickselect').each(function (i, node) {
-            $(node).append(htmlStrArr.toArray().join(' '));
-          });
-          htmlStrArr.splice(0, htmlStrArr.length);
-        }
-
         // don't persist any triggered changes
         suppressSaves = true;
 
@@ -339,7 +217,6 @@ $(function () {
           $('#input-lang').val(items.visualCopyOCRLang);
         }
 
-        $('#output-lang').val(items.visualCopyTranslateLang);
         $('#ocr-fontsize').val(items.visualCopyOCRFontSize);
         /*set checkbox state(s)*/
         $.each(checkBoxes, function (key, value) {
@@ -347,17 +224,7 @@ $(function () {
             (items[ key ] && !$(value[ 0 ]).hasClass('is-checked'))) {
             $('#switch-' + value[ 0 ].substr(1)).click();
         }
-        disabledTrnslationBlock();
       });
-        if (!items.visualCopyQuickSelectLangs.length) {
-          $('.lang-quickselect').each(function (i, node) {
-            $(node).val('none');
-          });
-        } else {
-          $.each(items.visualCopyQuickSelectLangs, function (i, language) {
-            $('#input-lang-' + (i + 1)).val(language);
-          });
-        }
         // hotkey
         $('#openHotkey').val(items.openGrabbingScreenHotkey);
         $('#closeHotkey').val(items.closePanelHotkey);
@@ -369,7 +236,6 @@ $(function () {
 $('body')
 .on('change', function (e) {
   var $target = $(e.target);
-  var quickSelectLangs = [];
   var localOcrLangs = [];
 
   if (suppressSaves) {
@@ -379,22 +245,9 @@ $('body')
     setChromeSyncStorage({
       visualCopyOCRLang: $('#input-lang').val()
     });
-  } else if ($target.is('#output-lang')) {
-    setChromeSyncStorage({
-      visualCopyTranslateLang: $target.val()
-    });
   } else if ($target.is('#ocr-fontsize')) {
     setChromeSyncStorage({
       visualCopyOCRFontSize: $target.val()
-    });
-  } else if ($target.is('#output-lang')) {
-    setChromeSyncStorage({
-      visualCopyOCRLang: $target.val()
-    });
-  } else if ($target.is('#switch-auto-translate')) {
-    disabledTrnslationBlock();
-    setChromeSyncStorage({
-      visualCopyAutoTranslate: $target.parent().hasClass('is-checked')
     });
   } else if ($target.is('#switch-popup-dicts')) {
     setChromeSyncStorage({
@@ -424,13 +277,6 @@ $('body')
       } else if ($target.is('#switch-text-overlay')) {
         setChromeSyncStorage({
           visualCopyTextOverlay: $target.parent().hasClass('is-checked')
-        });
-      } else if ($target.is('.lang-quickselect')) {
-        $('.lang-quickselect').each(function (i, node) {
-          quickSelectLangs.push($(node).val());
-        });
-        setChromeSyncStorage({
-          visualCopyQuickSelectLangs: quickSelectLangs
         });
       } else if ($target.is("#openHotkey")) {
         setChromeSyncStorage({
@@ -473,7 +319,7 @@ $('body')
               var ocrnameArray = ocrnameArrayForLOcal;
               if (!resultLangs) {
                 $("#OcrLocal").attr('LocalOcrFound','NO');
-                var msg = 'Error 101: XModule OCR not found. -> Did you install the XModules yet? If you did - and still see this error - please report the issue to tech support. (Local OCR is still in BETA).';
+                var msg = 'Error 101: XModule OCR not found. -> Did you install the XModules yet? If you did - and still see this error - please report the issue to tech support.';
 
                 let buttons = [
                 {
@@ -489,7 +335,7 @@ $('body')
                 return;
               }
               $('.second-engine-text').remove();
-              $('.input-language,.input-language-quickselect').removeClass('disabled-background')
+              $('.input-language').removeClass('disabled-background')
 
               var htmlStrArr = $(ocrnameArray).map(function (i, val) {
                 if(jQuery.inArray(val.lang, resultLangs) !== -1){
@@ -508,45 +354,24 @@ $('body')
               return '<option value="' + val.lang + '" data-short="' + val.short + '">' + val.name + '-' + val.short + '</option>';
             });
 
-            $('.lang-quickselect').each(function (i, node) {
-              $(node).children('option').not(':first').remove();
-              $(node).append(htmlStrArr.toArray().join(' '));
-            });
 
             htmlStrArr.splice(0, htmlStrArr.length);
-            // reset Input Language Quickselect if OcrIsChanged
-         
 
-            browser.storage.sync.get([ 'visualCopyOCRLang', 'visualCopyQuickSelectLangs' ], function ({ visualCopyOCRLang, visualCopyQuickSelectLangs }) {
+            browser.storage.sync.get([ 'visualCopyOCRLang' ], function ({ visualCopyOCRLang }) {
               $('#input-lang').val(visualCopyOCRLang);
-
-              visualCopyQuickSelectLangs.map((lng, index) => {
-                $('.lang-quickselect').eq(index).val(lng)
+              setChromeSyncStorage({
+                ocrEngine: 'OcrLocal',
+                visualCopyOCRLang: $('#input-lang').val(),
               });
-
-                 setChromeSyncStorage({
-              ocrEngine: 'OcrLocal',
-              visualCopyOCRLang: $('#input-lang').val(),
-              visualCopyQuickSelectLangs: [ "none", "none", "none" ]
             });
 
-            });
-
-
-
-            // reset Input Language Quickselect if OcrIsChanged
-            $('.lang-quickselect').each(function (i, node) {
-              $(node).val('none');
-            }).prop('disabled', false);
-
-            
           })
           }
           else if ($target.is("#OcrSpace")) {
 
             var ocrnameArray = appConfig.ocr_languages;
             $('.second-engine-text').remove();
-            $('.input-language,.input-language-quickselect').removeClass('disabled-background')
+            $('.input-language').removeClass('disabled-background')
             // render the Input Language select box
             var htmlStrArr = $(ocrnameArray).map(function (i, val) {
               return '<option value="' + val.lang + '">' + val.name + '</option>';
@@ -555,127 +380,51 @@ $('body')
             $('#input-lang').prop('disabled', false).html(htmlStrArr.toArray().join(' '));
             htmlStrArr.splice(0, htmlStrArr.length);
 
-            // render the quick select checkboxes
-            htmlStrArr = $(ocrnameArray).map(function (i, val) {
-              return '<option value="' + val.lang + '" data-short="' + val.short + '">' + val.name + '-' + val.short + '</option>';
-            });
-
-            $('.lang-quickselect').each(function (i, node) {
-              $(node).children('option').not(':first').remove();
-              $(node).append(htmlStrArr.toArray().join(' '));
-            });
-
-            htmlStrArr.splice(0, htmlStrArr.length);
-            // reset Input Language Quickselect if OcrIsChanged
             if (engine !== "OcrSpaceSecond") {
               setChromeSyncStorage({
                 ocrEngine: $target.val(),
                 visualCopyOCRLang: $('#input-lang').val(),
-                visualCopyQuickSelectLangs: [ "none", "none", "none" ]
               });
             } else {
               setChromeSyncStorage({
                 ocrEngine: $target.val()
-              })
-
-              browser.storage.sync.get([ 'visualCopyOCRLang', 'visualCopyQuickSelectLangs' ], function ({ visualCopyOCRLang, visualCopyQuickSelectLangs }) {
+              });
+              browser.storage.sync.get([ 'visualCopyOCRLang' ], function ({ visualCopyOCRLang }) {
                 $('#input-lang').val(visualCopyOCRLang);
-
-                visualCopyQuickSelectLangs.map((lng, index) => {
-                  $('.lang-quickselect').eq(index).val(lng)
-                });
-
               });
             }
-
-            // reset Input Language Quickselect if OcrIsChanged
-            $('.lang-quickselect').each(function (i, node) {
-              $(node).val('none');
-            }).prop('disabled', false);
 
           } else if ($target.is("#OcrSpaceSecond")) {
 
             $('#input-lang').text('');
             $('#input-lang').after("<span class='second-engine-text' style='color: #b1b1b1;position: absolute;margin-left: -390px;margin-top: 2px'>Autodetect Language</span>").prop('disabled', false);
-            $('.lang-quickselect').each(function (i, node) {
-              $(node).val('none');
-            }).prop('disabled', true);
 
-            $('.input-language,.input-language-quickselect').addClass('disabled-background')
+            $('.input-language').addClass('disabled-background')
 
             engine = 'OcrSpaceSecond';
 
             setChromeSyncStorage({
               ocrEngine: $target.val()
             });
-          } else if ($target.is("#OcrGoogle")) {
+          } else if ($target.is("#OcrSpaceThird")) {
+
+            $('#input-lang').text('');
+            $('#input-lang').after("<span class='second-engine-text' style='color: #b1b1b1;position: absolute;margin-left: -390px;margin-top: 2px'>Autodetect Language</span>").prop('disabled', false);
+
+            $('.input-language').addClass('disabled-background')
+
+            engine = 'OcrSpaceThird';
+
             setChromeSyncStorage({
               ocrEngine: $target.val()
-            });
-            $('.second-engine-text').remove();
-            $('.input-language,.input-language-quickselect').removeClass('disabled-background')
-            //render translate api language
-            engine = 'OcrGoogle';
-            var translateArray = appConfig.google_languages;
-            var translateLangArray = $(translateArray).map(function (i, val) {
-              let langCode = Object.keys(val)[ 0 ];
-
-              return '<option value="' + langCode + '">' + val[ langCode ] + '</option>';
-            });
-            setChromeSyncStorage({
-              visualCopyTranslateLang: 'en'
-            });
-
-            $('#output-lang').html(translateLangArray.toArray().join(' '));
-            var ocrnameArray = appConfig.ocr_google_languages;
-
-            // render the Input Language select box
-            var htmlStrArr = $(ocrnameArray).map(function (i, val) {
-              return '<option value="' + val.lang + '">' + val.name + '</option>';
-            });
-
-            $('#input-lang').prop('disabled', false).html(htmlStrArr.toArray().join(' '));
-            htmlStrArr.splice(0, htmlStrArr.length);
-
-            // render the quick select checkboxes
-            htmlStrArr = $(ocrnameArray).map(function (i, val) {
-              return '<option value="' + val.lang + '" data-short="' + val.short + '">' + val.name + '-' + val.short + '</option>';
-            });
-            $('.lang-quickselect').each(function (i, node) {
-              $(node).children('option').not(':first').remove();
-              $(node).append(htmlStrArr.toArray().join(' '));
-            }).prop('disabled', false);
-            htmlStrArr.splice(0, htmlStrArr.length);
-
-            // reset Input Language Quickselect if OcrIsChanged
-            setChromeSyncStorage({
-              visualCopyOCRLang: "auto",
-              visualCopyQuickSelectLangs: [ "none", "none", "none" ]
-            });
-            // reset Input Language Quickselect if OcrIsChanged
-            $('.lang-quickselect').each(function (i, node) {
-              $(node).val('none');
             });
           } else if ($target.is("#OcrLocal")) {
             setChromeSyncStorage({
               ocrEngine: $target.val()
             });
             $('.second-engine-text').remove();
-            $('.input-language,.input-language-quickselect').removeClass('disabled-background')
-            //render translate api language
+            $('.input-language').removeClass('disabled-background')
             engine = 'OcrLocal';
-            //get local ocr languages from exe
-            var translateArray = appConfig.google_languages;
-            var translateLangArray = $(translateArray).map(function (i, val) {
-              let langCode = Object.keys(val)[ 0 ];
-
-              return '<option value="' + langCode + '">' + val[ langCode ] + '</option>';
-            });
-            setChromeSyncStorage({
-              visualCopyTranslateLang: 'en'
-            });
-
-            $('#output-lang').html(translateLangArray.toArray().join(' '));
             var ocrnameArray = appConfig.ocr_google_languages;
 
             // render the Input Language select box
@@ -690,89 +439,20 @@ $('body')
             htmlStrArr = $(ocrnameArray).map(function (i, val) {
               return '<option value="' + val.lang + '" data-short="' + val.short + '">' + val.name + '-' + val.short + '</option>';
             });
-            $('.lang-quickselect').each(function (i, node) {
-              $(node).children('option').not(':first').remove();
-              $(node).append(htmlStrArr.toArray().join(' '));
-            }).prop('disabled', false);
             htmlStrArr.splice(0, htmlStrArr.length);
 
             // reset Input Language Quickselect if OcrIsChanged
             setChromeSyncStorage({
               visualCopyOCRLang: "auto",
-              visualCopyQuickSelectLangs: [ "none", "none", "none" ]
             });
             // reset Input Language Quickselect if OcrIsChanged
-            $('.lang-quickselect').each(function (i, node) {
-              $(node).val('none');
-            });
-          } else if ($target.is("#YandexTranslator")) {
-            setChromeSyncStorage({
-              transitionEngine: $target.val()
-            });
-
-            //render translate api language
-            var translateArray = appConfig.yandex_languages;
-            var translateLangArray = $(translateArray).map(function (i, val) {
-              let langCode = Object.keys(val)[ 0 ];
-
-              return '<option value="' + langCode + '">' + val[ langCode ] + '</option>';
-            });
-
-            $('#output-lang').html(translateLangArray.toArray().join(' '));
-            setChromeSyncStorage({
-              visualCopyTranslateLang: 'en'
-            });
-
-          } else if ($target.is("#GoogleTranslator")) {
-            setChromeSyncStorage({
-              transitionEngine: $target.val()
-            });
-
-            //render translate api language
-            let alreadySetLang = $("#output-lang").val();
-            let setLanguageCode = 'en';
-            var translateArray = appConfig.google_languages;
-            var translateLangArray = $(translateArray).map(function (i, val) {
-              let langCode = Object.keys(val)[ 0 ];
-              return '<option ' + (alreadySetLang && alreadySetLang == langCode && (setLanguageCode = langCode) && 'selected' || '') + ' value="' + langCode + '">' + val[ langCode ] + '</option>';
-            });
-
-            $('#output-lang').html(translateLangArray.toArray().join(' '));
-            setChromeSyncStorage({
-              visualCopyTranslateLang: setLanguageCode
-            });
-
-          } else if ($target.is("#DeepTranslator")) {
-            setChromeSyncStorage({
-              transitionEngine: $target.val()
-            });
-
-            //render translate api language
-            let alreadySetLang = $("#output-lang").val();
-            let setLanguageCode = 'en';
-            var translateArray = appConfig.deepapi_languages;
-            var translateLangArray = $(translateArray).map(function (i, val) {
-              let langCode = Object.keys(val)[ 0 ];
-              return '<option ' + (alreadySetLang && alreadySetLang == langCode && (setLanguageCode = langCode) && 'selected' || '') + ' value="' + langCode + '">' + val[ langCode ] + '</option>';
-            });
-
-            $('#output-lang').html(translateLangArray.toArray().join(' '));
-            setChromeSyncStorage({
-              visualCopyTranslateLang: setLanguageCode
-            });
           }
         })
         /*.on('click', '.btn-save', function() {
             var quickSelectLangs = [];
-            $('.lang-quickselect').each(function(i, node) {
-                var $node = $(node);
-                quickSelectLangs.push($node.val());
-            });
             browser.storage.sync.set({
                 visualCopyOCRLang: $('#input-lang').val(),
-                visualCopyTranslateLang: $('#output-lang').val(),
                 visualCopyOCRFontSize: $('#ocr-fontsize').val(),
-                visualCopyAutoTranslate: $('.auto-translate').hasClass('is-checked'),
                 visualCopySupportDicts: $('.popup-dicts').hasClass('is-checked'),
                 visualCopyQuickSelectLangs: quickSelectLangs,
                 visualCopyTextOverlay: $('.text-overlay').hasClass('is-checked')
@@ -786,7 +466,6 @@ $('body')
           })*/
           .on('click', '.btn-reset', function () {
             $('#input-lang').val(defaults.visualCopyOCRLang);
-            $('#output-lang').val(defaults.visualCopyTranslateLang);
             $('#ocr-fontsize').val(defaults.visualCopyOCRFontSize);
             $.each(checkBoxes, function (key, value) {
               if ((!value[ 1 ] && $(value[ 0 ]).hasClass('is-checked')) ||
@@ -795,9 +474,6 @@ $('body')
             }
           });
 
-            $('.lang-quickselect').each(function (i, node) {
-              $(node).val('none');
-            });
           })
           .on('submit', 'form[name=mc-embedded-subscribe-form]', function (e) {
             var $this = $(this);
@@ -807,20 +483,6 @@ $('body')
           });
         });
 
-function disabledTrnslationBlock() {
-  let enable = $('#switch-auto-translate').parent().hasClass('is-checked');
-  if (enable) {
-    $("#translation-block").removeClass('disabled-trans-block');
-      //$("#output-lang").removeAttr('disabled').closest('label').removeClass('is-disabled');
-      $("#GoogleTranslator").removeAttr('disabled').closest('label').removeClass('is-disabled');
-      $("#DeepTranslator").removeAttr('disabled').closest('label').removeClass('is-disabled');
-    } else {
-      $("#translation-block").addClass('disabled-trans-block');
-      //$("#output-lang").prop('disabled', true).closest('label').addClass('is-disabled');
-      $("#GoogleTranslator").prop('disabled', true).closest('label').addClass('is-disabled');
-      $("#DeepTranslator").prop('disabled', true).closest('label').addClass('is-disabled');
-    }
-  }
   // check file access status
   browser.storage.sync.get([ 'fileAccessStatus' ], function (result) {
     const fileAccessStatus = result.fileAccessStatus;
@@ -841,6 +503,7 @@ function disabledTrnslationBlock() {
   testScreenshot();
   browser.runtime.sendMessage({ evt: "fileaccessGetVersion" });
   browser.runtime.sendMessage({ evt: "fileaccessTest" });
+  browser.storage.sync.set({ localOcrInstalled: false });
   browser.runtime.sendMessage({ evt: "fileaccessGetVersionLocal" });
   browser.runtime.sendMessage({ evt: "fileaccessTestOcrLocal" });
 
@@ -858,6 +521,7 @@ function disabledTrnslationBlock() {
       }else if(request.evt === "fileaccess_module_version_local"){
         $('.status-box.local_fileaccess_module-span span:first-of-type').text(`Installed`).css({ color: "#008000" });
         $('.status-box.local_fileaccess_module-span a').text('Check for update');
+        browser.storage.sync.set({ localOcrInstalled: true });
       }
       else if (request.evt === "fileaccess_module_test") {
         if (request.result) {
@@ -990,8 +654,7 @@ function disabledTrnslationBlock() {
 
                 $('.copy-options:not(#copy_text)').each((i, el) => $(el).prop('disabled', true).closest('label').addClass('is-disabled'))
 
-                $('#OcrGoogle').removeAttr('disabled').click().parents().removeClass('is-disabled');
-                $('#OcrLocal').removeAttr('disabled').click().parents().removeClass('is-disabled');
+                        $('#OcrLocal').removeAttr('disabled').click().parents().removeClass('is-disabled');
 
                 $('#status_msg_success').text("PRO plan activated");
 
@@ -1004,8 +667,7 @@ function disabledTrnslationBlock() {
                 }
                 $('#switch-auto-translate').prop('disabled', true).closest('label').addClass('is-disabled');
                 $(".upgrade_status").show();
-                disabledTrnslationBlock();
-                /* Intnly commented*/
+                        /* Intnly commented*/
                 // $.get(urlApi + keyChar + ".json", function (data, status, xhr) {
                 //   browser.storage.sync.set({
                 //     status: 'PRO',
@@ -1101,14 +763,9 @@ function disabledTrnslationBlock() {
               });
               $('.copy-options').each((i, el) => $(el).prop('disabled', false).closest('label').removeClass('is-disabled'))
               $('#copy_text').attr('checked', 'checked').closest('label').addClass('is-checked');
-              $('#OcrGoogle').removeAttr('disabled').click().parents().removeClass('is-disabled');
-              $('#OcrLocal').removeAttr('disabled').click().parents().removeClass('is-disabled');
-              $('#YandexTranslator').removeAttr('disabled').parents().removeClass('is-disabled');
-              $('#DeepTranslator').removeAttr('disabled').click().parents().removeClass('is-disabled');
-              $('#GoogleTranslator').removeAttr('disabled').click().parents().removeClass('is-disabled');
+                    $('#OcrLocal').removeAttr('disabled').click().parents().removeClass('is-disabled');
 
               $('#switch-auto-translate').removeAttr('disabled').click().parents().removeClass('is-disabled');
-              $('#output-lang').removeAttr('disabled');
               $('#status_msg_success').text("PRO+ plan activated");
               setTimeout(function () {
                 $('#status_msg_success').text("");
@@ -1122,10 +779,6 @@ function disabledTrnslationBlock() {
                 status: 'PRO+',
                 google_ocr_api_url: data.google_ocr_api_url || '',
                 google_ocr_api_key: data.google_ocr_api_key || '',
-                google_trs_api_url: data.google_trs_api_url || data.google_translation_api_url || configSetting.google_translation_api_url || '',
-                google_trs_api_key: data.google_trs_api_key || '',
-                deepl_api_url: data.deepl_api_url || data.deepapi_translation_api_url || configSetting.deepapi_translation_api_url || '',
-                deepl_api_key: data.deepl_api_key || '',
               });
 
               /* temp disabled may be not required
@@ -1134,11 +787,7 @@ function disabledTrnslationBlock() {
                   status: 'PRO+',
                   google_ocr_api_url: data.google_ocr_api_url,
                   google_ocr_api_key: data.google_ocr_api_key,
-                  google_trs_api_url: data.google_trs_api_url,
-                  google_trs_api_key: data.google_trs_api_key,
-                  deepl_api_url: data.deepl_api_url || '',
-                  deepl_api_key: data.deepl_api_key || '',
-                });
+                  });
               });
               */
             } else {
@@ -1150,10 +799,6 @@ function disabledTrnslationBlock() {
                   status: 'PRO+',
                   google_ocr_api_url: data.data1a || '',
                   google_ocr_api_key: data.data1b || '',
-                  google_trs_api_url: configSetting.google_translation_api_url || '',
-                  google_trs_api_key: data.data2a || '',
-                  deepl_api_url: configSetting.deepapi_translation_api_url || '',
-                  deepl_api_key: data.data2b || '',
                 });
               } else if (data && data.status && data.status == 'off') {
                 browser.storage.sync.set({ "key": key });

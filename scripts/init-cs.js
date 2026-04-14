@@ -40,61 +40,37 @@
             });
         },
         captureClipboard: function (sendResponse) {
-            navigator.clipboard.readText().then(function (text) {
-            });
-            let imgSrcRegex = /<img[^>]+src="([^">]+)"/g;
-            let copyDiv = document.createElement('div');
-            copyDiv.style.width = '1px';
-            copyDiv.style.height = '1px';
-            copyDiv.style.opacity = 0;
-            copyDiv.contentEditable = true;
-            document.body.appendChild(copyDiv);
-            copyDiv.focus();
-            document.execCommand("paste");
-            let imageContent = copyDiv.innerHTML;
-            copyDiv.remove();
-            let src = imgSrcRegex.exec(imageContent);
-            if (!src || !src[ 1 ]) {
+            var self = this;
+            var noImage = function () {
                 browser.runtime.sendMessage({
                     evt: 'show-warning-message',
                     data: { message: 'No image in clipboard' },
                 });
-                return;
-            }
-            if(src && src[ 1 ] && !this.checkValidImgBase64(src[ 1 ])){
-                this.toDataURL(src[ 1 ]).then((res)=>{
-                    browser.runtime.sendMessage({
-                        evt: 'imageOcrInTab',
-                        ocrText: '',
-                        overlayInfo: '',
-                        data: res,
-                        translatedTextIfAny: '',
-                        currentZoomLevel: 0,
-                    });
-                },(err)=>{
-                    browser.runtime.sendMessage({
-                        evt: 'show-warning-message',
-                        data: { message: 'No image in clipboard' },
-                    });
-                    return;    
-                });
-                return;
-            }
-            else if (!this.checkValidImgBase64(src[ 1 ])) {
-                browser.runtime.sendMessage({
-                    evt: 'show-warning-message',
-                    data: { message: 'No image in clipboard' },
-                });
-                return;
-            }
-            browser.runtime.sendMessage({
-                evt: 'imageOcrInTab',
-                ocrText: '',
-                overlayInfo: '',
-                data: src[ 1 ],
-                translatedTextIfAny: '',
-                currentZoomLevel: 0,
-            });
+            };
+            navigator.clipboard.read().then(function (items) {
+                for (var i = 0; i < items.length; i++) {
+                    var item = items[i];
+                    var imageType = item.types.find(function (t) { return t.startsWith('image/'); });
+                    if (imageType) {
+                        item.getType(imageType).then(function (blob) {
+                            var reader = new FileReader();
+                            reader.onloadend = function () {
+                                browser.runtime.sendMessage({
+                                    evt: 'imageOcrInTab',
+                                    ocrText: '',
+                                    overlayInfo: '',
+                                    data: reader.result,
+                                    translatedTextIfAny: '',
+                                    currentZoomLevel: 0,
+                                });
+                            };
+                            reader.readAsDataURL(blob);
+                        }).catch(noImage);
+                        return;
+                    }
+                }
+                noImage();
+            }).catch(noImage);
         }, copyToClipboard: function (request, sendResponse) {
             let copyDivElm = document.createElement('div');
             copyDivElm.contentEditable = true;
